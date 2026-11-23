@@ -507,7 +507,7 @@ class MovieSubjectAdapter {
                 genres = genresList,
                 restrictKid = (item["restrictKid"] ?: map["restrictKid"])?.toString()?.toIntOrNull(),
                 explicitFlag = (item["isAdult"] ?: map["isAdult"])?.toString()?.toBoolean() == true,
-                title = title
+                title = name
             )
         )
     }
