@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#101114">
+<title>MovieBox &mdash; Watch Free Movies &amp; TV Shows</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --g:#1DD171;
+  --g-light:#2FF58B;
+  --g-dark:#07B84E;
+  --bg:#101114;
+  --bg-2:#0B0C0E;
+  --surface:#1A1B1F;
+  --surface-2:#28292E;
+  --line:#26272C;
+  --txt:#FFFFFF;
+  --txt-2:#A9ABB3;
+  --txt-3:#6E7078;
+  --blue:#2166E5;
+  --r:8px;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background:#000;color:var(--txt);font-family:Inter,-apple-system,"Segoe UI",Roboto,sans-serif;
+  min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px 8px;
+}
+.stage{width:100%;max-width:400px;}
+.phone{
+  position:relative;width:100%;height:830px;max-height:calc(100vh - 40px);min-height:560px;
+  border-radius:34px;overflow:hidden;background:var(--bg);
+  border:1px solid #2A2B30;box-shadow:0 40px 80px -30px #000;
+}
+.nr{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+
+.screens{position:absolute;left:0;top:0;right:0;bottom:0;}
+.screen{display:none;position:absolute;left:0;top:0;right:0;bottom:0;overflow-y:auto;
+  overflow-x:hidden;padding-bottom:96px;-webkit-overflow-scrolling:touch;}
+.screen::-webkit-scrollbar{width:0;}
+#r-home:checked~.screens>#home,
+#r-search:checked~.screens>#search,
+#r-livetv:checked~.screens>#livetv,
+#r-downloads:checked~.screens>#downloads,
+#r-me:checked~.screens>#me,
+#r-detail:checked~.screens>#detail,
+#r-player:checked~.screens>#player{display:block;}
+
+/* ══ STATUS ══ */
+.sbar{position:absolute;left:0;top:0;right:0;height:34px;z-index:70;
+  display:flex;align-items:center;justify-content:space-between;padding:11px 20px 0;
+  font-size:10.5px;font-weight:600;color:#fff;pointer-events:none;}
+.sbar .r{display:flex;gap:4px;align-items:center;}
+.sbar .r i{display:block;width:2.5px;background:#fff;border-radius:1px;}
+
+/* ══ TOP BAR ══ */
+.top{display:flex;align-items:center;gap:9px;padding:40px 16px 10px;}
+.logo{display:flex;align-items:center;gap:7px;flex:0 0 auto;}
+.logo-mark{width:25px;height:25px;border-radius:7px;flex:0 0 25px;
+  background:linear-gradient(135deg,var(--g-light),var(--g-dark));
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 12px -3px rgba(29,209,113,.6);}
+.logo-mark svg{width:13px;height:13px;color:#06170E;}
+.logo b{font-size:16px;font-weight:800;letter-spacing:-.03em;}
+.logo b em{font-style:normal;color:var(--g);}
+.topact{display:flex;align-items:center;gap:6px;margin-left:auto;}
+.icobtn{width:32px;height:32px;border:none;background:none;color:var(--txt);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0;}
+.icobtn svg{width:18px;height:18px;}
+.prem{font-size:9.5px;font-weight:700;letter-spacing:.02em;padding:6px 10px;border-radius:100px;
+  background:linear-gradient(135deg,var(--g-light),var(--g));color:#06170E;border:none;
+  cursor:pointer;white-space:nowrap;box-shadow:0 3px 12px -4px rgba(29,209,113,.7);}
+
+.searchbar{margin:2px 16px 0;display:flex;align-items:center;gap:8px;
+  background:var(--surface);border-radius:100px;padding:9px 14px;}
+.searchbar svg{width:15px;height:15px;color:var(--txt-3);flex:0 0 15px;}
+.searchbar input{flex:1;background:none;border:none;outline:none;color:var(--txt);
+  font-size:12px;font-family:inherit;}
+.searchbar input::placeholder{color:var(--txt-3);}
+
+/* ══ HERO ══ */
+.hero{position:relative;margin:12px 0 0;height:330px;overflow:hidden;}
+.slide{position:absolute;left:0;top:0;right:0;bottom:0;opacity:0;transition:opacity .5s;}
+.slide.on{opacity:1;}
+.slide-art{position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;}
+.slide-art::before{content:"";position:absolute;left:-10%;top:-10%;right:-10%;bottom:-10%;
+  background:
+    radial-gradient(60% 52% at 22% 18%,var(--tint) 0%,transparent 62%),
+    radial-gradient(72% 66% at 84% 82%,rgba(29,209,113,.16) 0%,transparent 66%),
+    linear-gradient(158deg,#1D1F26 6%,#0B0C0E 92%);}
+.slide-art::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.12) .8px,transparent .8px);
+  background-size:5px 5px;opacity:.4;}
+.slide-art u{position:absolute;left:0;top:0;right:0;bottom:0;display:block;
+  box-shadow:inset 0 0 60px -10px rgba(0,0,0,.8);}
+.slide-veil{position:absolute;left:0;top:0;right:0;bottom:0;
+  background:linear-gradient(to top,var(--bg) 2%,rgba(16,17,20,.94) 24%,rgba(16,17,20,.42) 58%,rgba(16,17,20,.1) 100%);}
+.slide-body{position:absolute;left:0;right:0;bottom:0;padding:0 16px 16px;}
+.slide-tag{display:inline-block;font-size:8.5px;font-weight:800;letter-spacing:.1em;
+  padding:3px 7px;border-radius:3px;background:var(--g);color:#06170E;margin-bottom:7px;}
+.slide-body h2{margin:0 0 7px;font-size:27px;line-height:1.04;font-weight:800;
+  letter-spacing:-.035em;text-shadow:0 2px 16px rgba(0,0,0,.7);}
+.slide-meta{display:flex;align-items:center;gap:6px;font-size:10px;color:var(--txt-2);
+  font-weight:500;margin-bottom:12px;flex-wrap:wrap;}
+.slide-meta i{width:2.5px;height:2.5px;border-radius:50%;background:var(--txt-3);}
+.slide-meta .star{color:var(--g);font-weight:700;}
+.slide-act{display:flex;gap:7px;}
+.btn-play{display:inline-flex;align-items:center;gap:6px;cursor:pointer;
+  background:var(--g);color:#06170E;font-size:11.5px;font-weight:700;
+  padding:9px 18px;border-radius:100px;border:none;
+  box-shadow:0 4px 16px -4px rgba(29,209,113,.75);}
+.btn-play svg{width:13px;height:13px;}
+.btn-add{width:34px;height:34px;border-radius:50%;border:none;cursor:pointer;
+  background:rgba(255,255,255,.14);color:#fff;display:flex;align-items:center;
+  justify-content:center;backdrop-filter:blur(6px);}
+.btn-add svg{width:15px;height:15px;}
+.btn-add.on{background:var(--g);color:#06170E;}
+.dots{position:absolute;left:0;right:0;bottom:7px;display:flex;justify-content:center;
+  gap:4px;z-index:5;}
+.dot{display:block;width:4.5px;height:4.5px;border-radius:50%;background:rgba(255,255,255,.32);}
+.dot.on{width:14px;border-radius:100px;background:var(--g);}
+
+/* ══ SECTION ══ */
+.sec{margin-top:20px;}
+.sec-head{display:flex;align-items:center;justify-content:space-between;
+  padding:0 16px 9px;}
+.sec-head h3{margin:0;font-size:14px;font-weight:800;letter-spacing:-.02em;}
+.more{display:flex;align-items:center;gap:1px;background:none;border:none;
+  color:var(--txt-3);font-size:10.5px;font-weight:600;cursor:pointer;
+  font-family:inherit;padding:0;}
+.more svg{width:11px;height:11px;}
+.railcards{display:flex;gap:9px;overflow-x:auto;padding:0 16px 2px;}
+.railcards::-webkit-scrollbar{height:0;}
+
+/* ══ CARD ══ */
+.card{flex:0 0 104px;cursor:pointer;}
+.card-win{position:relative;height:152px;border-radius:var(--r);overflow:hidden;
+  background:var(--surface);}
+.card-win::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;
+  border-radius:var(--r);box-shadow:inset 0 0 0 1px rgba(255,255,255,.055);}
+.poster{position:absolute;left:0;top:0;right:0;bottom:0;overflow:hidden;}
+.poster::before{content:"";position:absolute;left:-10%;top:-10%;right:-10%;bottom:-10%;
+  background:
+    radial-gradient(58% 50% at 26% 16%,var(--tint) 0%,transparent 62%),
+    radial-gradient(74% 68% at 82% 86%,rgba(29,209,113,.14) 0%,transparent 66%),
+    linear-gradient(160deg,#1E2027 6%,#0B0C0E 94%);}
+.poster::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;
+  background-image:radial-gradient(circle,rgba(255,255,255,.1) .7px,transparent .7px);
+  background-size:4.5px 4.5px;opacity:.4;}
+.poster i{position:absolute;display:block;width:58%;height:0;padding-bottom:58%;
+  border-radius:50%;right:-14%;top:10%;border:1.3px solid rgba(255,255,255,.24);}
+.poster u{position:absolute;left:0;top:0;right:0;bottom:0;display:block;
+  box-shadow:inset 0 -40px 50px -30px rgba(0,0,0,.9);}
+.poster b{position:absolute;left:8px;bottom:7px;font-size:29px;font-weight:800;
+  line-height:1;color:rgba(255,255,255,.9);letter-spacing:-.05em;
+  text-shadow:0 2px 14px rgba(0,0,0,.85);}
+.hd{position:absolute;top:5px;left:5px;font-size:6.5px;font-weight:800;
+  letter-spacing:.06em;padding:2px 4px;border-radius:2.5px;
+  background:rgba(0,0,0,.62);color:var(--g);font-style:normal;
+  box-shadow:inset 0 0 0 1px rgba(29,209,113,.45);}
+.pbadge{position:absolute;top:5px;right:5px;font-size:6.5px;font-weight:700;
+  padding:2px 4.5px;border-radius:2.5px;background:var(--blue);color:#fff;
+  font-style:normal;letter-spacing:.01em;}
+.card-play{position:absolute;left:50%;top:50%;width:30px;height:30px;margin:-15px 0 0 -15px;
+  border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;
+  justify-content:center;opacity:0;transition:opacity .2s;backdrop-filter:blur(3px);}
+.card:hover .card-play{opacity:1;}
+.card-play svg{width:11px;height:11px;color:#fff;}
+.rank{position:absolute;left:5px;bottom:5px;font-size:26px;font-weight:800;line-height:1;
+  color:#fff;letter-spacing:-.05em;text-shadow:0 2px 10px rgba(0,0,0,.9),0 0 18px rgba(0,0,0,.7);z-index:3;}
+.rate{position:absolute;right:5px;bottom:5px;font-size:7.5px;font-weight:800;font-style:normal;
+  padding:2px 4.5px;border-radius:3px;background:rgba(0,0,0,.7);color:var(--g);z-index:3;
+  letter-spacing:.01em;}
+.epn{position:absolute;right:5px;top:19px;font-size:6.5px;font-weight:800;font-style:normal;
+  padding:2px 4px;border-radius:2.5px;background:rgba(0,0,0,.7);color:#fff;
+  letter-spacing:.04em;z-index:3;}
+.pbar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.22);z-index:4;}
+.pbar i{display:block;height:100%;background:var(--g);}
+/* poster pattern variants */
+.p-arc i{width:70%;height:0;padding-bottom:70%;border-radius:50%;left:-14%;top:6%;
+  border:1.2px solid rgba(255,255,255,.3);
+  box-shadow:0 0 0 11px rgba(255,255,255,.055),0 0 0 26px rgba(255,255,255,.028);}
+.p-rings i{width:56%;height:0;padding-bottom:56%;border-radius:50%;right:-10%;top:14%;
+  border:1.2px solid rgba(255,255,255,.32);
+  box-shadow:0 0 0 9px rgba(255,255,255,.06),0 0 0 22px rgba(255,255,255,.03);}
+.p-orb i{width:62%;height:0;padding-bottom:62%;border-radius:50%;right:-12%;bottom:14%;
+  background:radial-gradient(circle at 34% 30%,rgba(255,255,255,.42),rgba(255,255,255,.04) 62%,transparent 72%);
+  border:none;box-shadow:none;}
+.p-bars i{left:0;top:0;right:0;bottom:0;width:auto;height:auto;padding:0;border:none;
+  border-radius:0;box-shadow:none;
+  background:repeating-linear-gradient(102deg,rgba(255,255,255,.15) 0 1.3px,transparent 1.3px 13px);}
+.p-diag i{width:190%;height:34%;left:-45%;top:30%;border:none;border-radius:0;padding:0;
+  box-shadow:none;transform:rotate(-24deg);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.2),transparent);}
+.p-dust i{left:0;top:0;right:0;bottom:0;width:auto;height:auto;padding:0;border:none;
+  border-radius:0;box-shadow:none;opacity:.55;
+  background-image:radial-gradient(circle,rgba(255,255,255,.55) .8px,transparent .8px);
+  background-size:12px 15px;}
+/* continue watching */
+.cw{display:flex;gap:9px;overflow-x:auto;padding:0 16px 2px;}
+.cw::-webkit-scrollbar{height:0;}
+.cwcard{flex:0 0 148px;cursor:pointer;}
+.cw-win{position:relative;height:84px;border-radius:var(--r);overflow:hidden;}
+.cw-win::after{content:"";position:absolute;left:0;top:0;right:0;bottom:0;border-radius:var(--r);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.06);}
+.cw-play{position:absolute;left:50%;top:50%;width:28px;height:28px;margin:-14px 0 0 -14px;
+  border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;
+  justify-content:center;backdrop-filter:blur(3px);z-index:3;}
+.cw-play svg{width:10px;height:10px;color:#fff;}
+.cw-bar{position:absolute;left:0;right:0;bottom:0;height:3px;background:rgba(255,255,255,.25);z-index:3;}
+.cw-bar i{display:block;height:100%;background:var(--g);}
+.cwcard h5{margin:5px 0 1px;font-size:10px;font-weight:600;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.cwcard span{font-size:8.5px;color:var(--txt-3);}
+/* top10 strip */
+.t10{display:flex;gap:4px;overflow-x:auto;padding:0 16px 2px;}
+.t10::-webkit-scrollbar{height:0;}
+.t10card{flex:0 0 118px;display:flex;align-items:flex-end;gap:0;cursor:pointer;}
+.t10num{font-size:46px;font-weight:800;line-height:.8;color:transparent;
+  -webkit-text-stroke:1.6px var(--surface-2);letter-spacing:-.06em;margin-right:-9px;
+  position:relative;z-index:2;}
+.t10col{width:74px;flex:0 0 74px;}
+.t10post{width:74px;height:106px;border-radius:6px;overflow:hidden;position:relative;
+  box-shadow:0 4px 14px -6px #000;}
+.t10col h5{margin:5px 0 0;font-size:8.5px;font-weight:600;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* cast */
+.cast{display:flex;gap:12px;overflow-x:auto;padding:4px 16px 0;}
+.cast::-webkit-scrollbar{height:0;}
+.castc{flex:0 0 52px;text-align:center;}
+.castc .av{width:52px;height:52px;border-radius:50%;overflow:hidden;position:relative;
+  margin-bottom:5px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.09);}
+.castc b{display:block;font-size:8.5px;font-weight:600;line-height:1.25;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.castc span{display:block;font-size:7.5px;color:var(--txt-3);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+/* screenshots */
+.shots{display:flex;gap:8px;overflow-x:auto;padding:4px 16px 0;}
+.shots::-webkit-scrollbar{height:0;}
+.shot{flex:0 0 148px;height:84px;border-radius:6px;overflow:hidden;position:relative;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.07);}
+/* storage */
+.store{margin:14px 16px 0;background:var(--surface);border-radius:var(--r);padding:13px 14px;}
+.store-top{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:9px;}
+.store-top b{font-size:11px;font-weight:700;}
+.store-top span{font-size:9.5px;color:var(--txt-3);font-weight:600;}
+.store-bar{height:6px;border-radius:3px;background:var(--surface-2);display:flex;
+  overflow:hidden;gap:1.5px;}
+.store-bar i{display:block;height:100%;}
+.store-key{display:flex;gap:14px;margin-top:9px;flex-wrap:wrap;}
+.store-key span{display:flex;align-items:center;gap:5px;font-size:8.5px;color:var(--txt-3);
+  font-weight:600;}
+.store-key em{width:6px;height:6px;border-radius:2px;display:block;font-style:normal;}
+/* badge pill on detail */
+.dbadges{display:flex;gap:6px;align-items:center;margin-bottom:9px;flex-wrap:wrap;}
+.db{font-size:8px;font-weight:800;letter-spacing:.04em;padding:3px 6px;border-radius:3px;}
+.db.k{background:rgba(29,209,113,.16);color:var(--g);}
+.db.q{background:rgba(255,255,255,.1);color:#fff;}
+.db.f{background:var(--blue);color:#fff;}
+.card h4{margin:6px 0 1px;font-size:10.5px;font-weight:600;line-height:1.28;
+  overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;}
+.card > span{display:block;font-size:8.5px;color:var(--txt-3);font-weight:500;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.up-date{position:absolute;left:0;right:0;bottom:0;padding:13px 5px 4px;
+  font-size:8px;font-weight:800;letter-spacing:.04em;text-align:center;color:#fff;
+  background:linear-gradient(to top,rgba(0,0,0,.92),transparent);}
+.booked{color:var(--g)!important;font-weight:600!important;}
+
+/* ══ GRID (search / downloads) ══ */
+.chips{display:flex;gap:6px;overflow-x:auto;padding:12px 16px 2px;}
+.chips::-webkit-scrollbar{height:0;}
+.chip{flex:0 0 auto;cursor:pointer;font-family:inherit;font-size:10.5px;font-weight:600;
+  padding:6px 12px;border-radius:100px;background:var(--surface);color:var(--txt-2);
+  border:1px solid transparent;}
+.chip.on{background:var(--g);color:#06170E;font-weight:700;}
+.grid{display:flex;flex-wrap:wrap;gap:12px 9px;padding:14px 16px 0;}
+.grid .card{flex:0 0 calc(33.333% - 6px);}
+.grid .card-win{height:auto;padding-bottom:150%;}
+.cnt{padding:12px 16px 0;font-size:10.5px;color:var(--txt-3);font-weight:600;}
+
+/* ══ DOWNLOADS ══ */
+.dl-row{display:flex;align-items:center;gap:11px;padding:11px 16px;
+  border-bottom:1px solid var(--line);}
+.dl-thumb{width:52px;height:74px;flex:0 0 52px;border-radius:6px;overflow:hidden;
+  position:relative;}
+.dl-txt{flex:1;min-width:0;}
+.dl-txt h5{margin:0 0 3px;font-size:12px;font-weight:600;}
+.dl-txt span{display:block;font-size:9.5px;color:var(--txt-3);margin-bottom:5px;}
+.dl-bar{height:3px;border-radius:2px;background:var(--surface-2);overflow:hidden;}
+.dl-bar i{display:block;height:100%;background:var(--g);border-radius:2px;}
+.dl-pct{font-size:9.5px;font-weight:700;color:var(--g);flex:0 0 auto;}
+.empty{padding:60px 30px;text-align:center;}
+.empty svg{width:44px;height:44px;color:var(--surface-2);margin-bottom:14px;}
+.empty h4{margin:0 0 6px;font-size:14px;font-weight:700;}
+.empty p{margin:0;font-size:11.5px;color:var(--txt-3);line-height:1.6;}
+
+/* ══ ME ══ */
+.me-head{padding:46px 16px 0;display:flex;align-items:center;gap:12px;}
+.avatar{width:56px;height:56px;border-radius:50%;flex:0 0 56px;
+  background:linear-gradient(135deg,var(--g),#0E7A45);display:flex;align-items:center;
+  justify-content:center;font-size:21px;font-weight:800;color:#06170E;}
+.me-head h2{margin:0 0 3px;font-size:17px;font-weight:800;letter-spacing:-.02em;}
+.me-head span{font-size:10.5px;color:var(--txt-3);}
+.stats{display:flex;margin:18px 16px 0;background:var(--surface);border-radius:var(--r);
+  padding:13px 0;}
+.stat{flex:1;text-align:center;border-right:1px solid var(--line);}
+.stat:last-child{border-right:none;}
+.stat b{display:block;font-size:15px;font-weight:800;margin-bottom:2px;}
+.stat span{font-size:8.5px;color:var(--txt-3);font-weight:600;}
+.menu{margin-top:16px;}
+.mrow{display:flex;align-items:center;gap:12px;padding:13px 16px;
+  border-bottom:1px solid var(--line);cursor:pointer;}
+.mrow svg{width:17px;height:17px;color:var(--txt-2);flex:0 0 17px;}
+.mrow span{flex:1;font-size:12.5px;font-weight:500;}
+.mrow em{font-size:10.5px;color:var(--txt-3);font-style:normal;}
+.chev{width:13px!important;height:13px!important;color:var(--txt-3)!important;}
+
+/* ══ DETAIL ══ */
+.dhero{position:relative;height:400px;overflow:hidden;}
+.dhero-veil{position:absolute;left:0;top:0;right:0;bottom:0;
+  background:linear-gradient(to top,var(--bg) 3%,rgba(16,17,20,.95) 30%,rgba(16,17,20,.35) 66%,rgba(16,17,20,.55));}
+.dhero-body{position:absolute;left:0;right:0;bottom:0;padding:0 16px 16px;}
+.dhero-body h1{margin:0 0 8px;font-size:28px;line-height:1.05;font-weight:800;
+  letter-spacing:-.035em;text-shadow:0 2px 16px rgba(0,0,0,.6);}
+.dmeta{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--txt-2);
+  margin-bottom:13px;flex-wrap:wrap;font-weight:500;}
+.dmeta i{width:2.5px;height:2.5px;border-radius:50%;background:var(--txt-3);}
+.dmeta .star{color:var(--g);font-weight:700;}
+.dact{display:flex;gap:8px;}
+.btn-play.wide{flex:1;justify-content:center;padding:12px 0;font-size:12.5px;}
+.btn-ghost{display:inline-flex;align-items:center;justify-content:center;gap:6px;
+  padding:12px 15px;border-radius:100px;border:none;cursor:pointer;
+  background:var(--surface-2);color:#fff;font-size:11.5px;font-weight:600;
+  font-family:inherit;}
+.btn-ghost svg{width:14px;height:14px;}
+.btn-ghost.on{background:var(--g);color:#06170E;}
+.dsec{padding:18px 16px 0;}
+.dsec h3{margin:0 0 8px;font-size:12.5px;font-weight:800;}
+.dsec p{margin:0;font-size:11.5px;line-height:1.72;color:var(--txt-2);}
+.tags{display:flex;gap:6px;flex-wrap:wrap;padding:12px 16px 0;}
+.tag{font-size:9.5px;font-weight:600;padding:4.5px 9px;border-radius:100px;
+  background:var(--surface);color:var(--txt-2);}
+.eps{padding:8px 16px 0;}
+.ep{display:flex;align-items:center;gap:11px;padding:10px 0;border-bottom:1px solid var(--line);}
+.ep-thumb{width:76px;height:44px;flex:0 0 76px;border-radius:5px;overflow:hidden;position:relative;}
+.ep-txt{flex:1;min-width:0;}
+.ep-txt h5{margin:0 0 2px;font-size:11.5px;font-weight:600;}
+.ep-txt span{font-size:9px;color:var(--txt-3);}
+.ep > svg{width:15px;height:15px;color:var(--g);flex:0 0 15px;}
+
+/* ══ PLAYER ══ */
+#player{background:#000;padding-bottom:0;}
+.pwrap{position:relative;height:100%;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;}
+.pwin{position:relative;width:100%;height:224px;overflow:hidden;background:#000;}
+.pui{position:absolute;left:0;top:0;right:0;bottom:0;z-index:6;display:flex;
+  flex-direction:column;justify-content:space-between;padding:40px 14px 16px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.7),transparent 26%,transparent 54%,rgba(0,0,0,.9));}
+.ptop{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.ptop h4{margin:0 0 2px;font-size:12.5px;font-weight:700;}
+.ptop span{font-size:9px;color:var(--txt-3);}
+.pbot{display:flex;flex-direction:column;gap:8px;}
+.scrub{height:3px;border-radius:2px;background:rgba(255,255,255,.24);position:relative;}
+.scrub i{position:absolute;left:0;top:0;bottom:0;width:32%;border-radius:2px;background:var(--g);}
+.scrub i::after{content:"";position:absolute;right:-4px;top:50%;margin-top:-4px;
+  width:8px;height:8px;border-radius:50%;background:var(--g-light);}
+.ptime{display:flex;justify-content:space-between;font-size:9px;color:var(--txt-2);}
+.pctl{display:flex;align-items:center;justify-content:center;gap:26px;padding-top:2px;}
+.pc{background:none;border:none;color:#fff;cursor:pointer;padding:0;
+  display:flex;align-items:center;justify-content:center;}
+.pc svg{width:16px;height:16px;}
+.pc.big{width:46px;height:46px;border-radius:50%;background:var(--g);color:#06170E;}
+.pc.big svg{width:18px;height:18px;}
+.pbig{position:absolute;left:0;top:0;right:0;bottom:0;z-index:5;display:flex;
+  align-items:center;justify-content:center;background:none;border:none;cursor:pointer;}
+.pbig i{width:52px;height:52px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;background:rgba(29,209,113,.2);
+  box-shadow:inset 0 0 0 1.5px rgba(29,209,113,.6);backdrop-filter:blur(4px);}
+.pbig svg{width:19px;height:19px;color:var(--g-light);}
+
+/* ══ MOOD MIXER (original) ══════════════════════════════════ */
+  position:relative;overflow:hidden;}
+  border-radius:50%;background:radial-gradient(circle,rgba(29,209,113,.16),transparent 70%);}
+  text-transform:uppercase;letter-spacing:.04em;}
+  background:linear-gradient(90deg,var(--g-dark),var(--g-light));}
+  border-radius:50%;background:#fff;box-shadow:0 2px 8px rgba(0,0,0,.6);}
+  font-style:normal;flex:0 0 26px;}
+  border-top:1px solid var(--line);position:relative;z-index:2;}
+  font-family:inherit;font-size:9.5px;font-weight:800;padding:7px 12px;cursor:pointer;
+  box-shadow:0 3px 12px -4px rgba(29,209,113,.7);}
+
+/* ══ WATCH PARTY (original) ═════════════════════════════════ */
+.party{display:flex;gap:9px;overflow-x:auto;padding:0 16px 2px;}
+.party::-webkit-scrollbar{height:0;}
+.pcard{flex:0 0 176px;background:var(--surface);border-radius:10px;padding:11px;
+  position:relative;overflow:hidden;border:1px solid rgba(29,209,113,.16);}
+.pcard.live{border-color:rgba(29,209,113,.5);}
+.p-live{display:inline-flex;align-items:center;gap:4px;font-size:7px;font-weight:800;
+  letter-spacing:.1em;color:#FF4D3D;margin-bottom:7px;}
+.p-live::before{content:"";width:4.5px;height:4.5px;border-radius:50%;background:#FF4D3D;
+  animation:blink 1.5s ease-in-out infinite;}
+.pcard h5{margin:0 0 2px;font-size:11px;font-weight:700;line-height:1.3;}
+.pcard > span{font-size:8.5px;color:var(--txt-3);}
+.p-faces{display:flex;margin-top:9px;}
+.p-faces i{width:21px;height:21px;border-radius:50%;border:1.5px solid var(--surface);
+  margin-right:-6px;display:flex;align-items:center;justify-content:center;
+  font-size:7.5px;font-weight:800;color:#06170E;font-style:normal;position:relative;}
+.p-more{background:var(--surface-2)!important;color:var(--txt-2)!important;}
+.p-time{margin-top:8px;font-size:8px;color:var(--txt-3);font-weight:600;}
+
+/* ══ SUBTITLE PREVIEW (original) ════════════════════════════ */
+.subs{margin:12px 16px 0;border-radius:10px;overflow:hidden;position:relative;
+  height:88px;background:#000;display:flex;align-items:center;justify-content:center;}
+.subs .scene{position:absolute;left:0;top:0;right:0;bottom:0;opacity:.5;}
+.sub-line{position:relative;z-index:2;text-align:center;padding:0 18px;}
+.sub-line b{display:inline-block;background:rgba(0,0,0,.72);padding:4px 9px;border-radius:4px;
+  font-size:11px;font-weight:600;line-height:1.45;}
+.sub-meta{position:absolute;top:6px;right:8px;z-index:3;font-size:6.5px;font-weight:800;
+  letter-spacing:.1em;color:var(--g);background:rgba(0,0,0,.6);padding:2px 5px;border-radius:3px;}
+
+/* ══ QUALITY LADDER (original) ══════════════════════════════ */
+.ladder{margin:12px 16px 0;}
+.lrow{display:flex;align-items:center;gap:9px;padding:8px 0;
+  border-bottom:1px solid var(--line);}
+.lrow:last-child{border-bottom:none;}
+.lbadge{font-size:7.5px;font-weight:800;padding:3px 6px;border-radius:3px;
+  background:var(--surface-2);color:var(--txt-2);flex:0 0 auto;letter-spacing:.03em;}
+.lrow.top .lbadge{background:var(--g);color:#06170E;}
+.lrow > span{flex:1;font-size:9.5px;color:var(--txt-3);}
+.lbars{display:flex;gap:2px;align-items:flex-end;flex:0 0 auto;}
+.lbars i{width:3px;background:var(--surface-2);border-radius:1px;display:block;}
+.lrow.top .lbars i.on{background:var(--g);}
+.lbars i.on{background:var(--txt-3);}
+.lsize{font-size:8px;color:var(--txt-3);font-weight:600;flex:0 0 auto;width:40px;
+  text-align:right;}
+
+/* ══ TIMELINE (original) ════════════════════════════════════ */
+.tl{padding:6px 16px 0;position:relative;}
+.tl::before{content:"";position:absolute;left:21px;top:10px;bottom:12px;width:1px;
+  background:linear-gradient(to bottom,var(--g),var(--line));}
+.tlrow{display:flex;gap:11px;padding:7px 0;position:relative;}
+.tldot{width:11px;height:11px;border-radius:50%;flex:0 0 11px;margin-top:3px;
+  background:var(--surface-2);border:1.5px solid var(--line);position:relative;z-index:2;}
+.tlrow.now .tldot{background:var(--g);border-color:var(--g);
+  box-shadow:0 0 0 3px rgba(29,209,113,.18);}
+.tltxt{flex:1;min-width:0;}
+.tltxt b{display:block;font-size:10px;font-weight:700;margin-bottom:1px;}
+.tltxt span{font-size:8.5px;color:var(--txt-3);line-height:1.4;}
+
+/* ══ TRIVIA (original) ══════════════════════════════════════ */
+.trivia{margin:12px 16px 0;display:flex;flex-direction:column;gap:7px;}
+.tq{display:flex;gap:9px;background:var(--surface);border-radius:8px;padding:10px 11px;
+  align-items:flex-start;}
+.tq b{font-size:13px;color:var(--g);line-height:1;flex:0 0 auto;font-weight:800;}
+.tq p{margin:0;font-size:10px;line-height:1.6;color:var(--txt-2);}
+
+/* ══ BOTTOM NAV ══ */
+.bnav{position:absolute;left:0;right:0;bottom:0;z-index:65;display:flex;
+  background:rgba(16,17,20,.97);border-top:1px solid var(--line);
+  padding:8px 0 12px;backdrop-filter:blur(14px);}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  background:none;border:none;cursor:pointer;color:var(--txt-3);padding:0;font-family:inherit;}
+.nb svg{width:19px;height:19px;}
+.nb span{font-size:8.5px;font-weight:600;letter-spacing:.01em;}
+#r-home:checked~.bnav .nb[for="r-home"],
+#r-search:checked~.bnav .nb[for="r-search"],
+#r-livetv:checked~.bnav .nb[for="r-livetv"],
+#r-downloads:checked~.bnav .nb[for="r-downloads"],
+#r-me:checked~.bnav .nb[for="r-me"]{color:var(--g);}
+#r-detail:checked~.bnav,#r-player:checked~.bnav{display:none;}
+.back{position:absolute;top:44px;left:14px;z-index:80;width:32px;height:32px;
+  display:none;align-items:center;justify-content:center;cursor:pointer;border-radius:50%;
+  background:rgba(0,0,0,.55);color:#fff;backdrop-filter:blur(8px);}
+.back svg{width:15px;height:15px;}
+#r-detail:checked~.back,#r-player:checked~.back{display:flex;}
+
+@media (max-width:520px){
+  body{padding:0;display:block;background:var(--bg);}
+  .stage{max-width:none;}
+  .phone{height:100vh;min-height:100vh;max-height:none;border-radius:0;border:none;box-shadow:none;}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="phone">
+
+  <input class="nr" type="radio" name="nav" id="r-home" checked>
+  <input class="nr" type="radio" name="nav" id="r-search">
+  <input class="nr" type="radio" name="nav" id="r-livetv">
+  <input class="nr" type="radio" name="nav" id="r-downloads">
+  <input class="nr" type="radio" name="nav" id="r-me">
+  <input class="nr" type="radio" name="nav" id="r-detail">
+  <input class="nr" type="radio" name="nav" id="r-player">
+
+  <div class="sbar">
+    <span>9:41</span>
+    <div class="r"><i style="height:4px"></i><i style="height:6px"></i>
+      <i style="height:8px"></i><i style="height:10px"></i></div>
+  </div>
+
+  <div class="screens">
+
+    <!-- HOME -->
+    <section class="screen" id="home">
+      <div class="top">
+        <div class="logo">
+          <div class="logo-mark"><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/></svg></div>
+          <b>Movie<em>Box</em></b>
+        </div>
+        <div class="topact">
+          <button class="icobtn" aria-label="Downloads">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <path d="M12 4v10"/><path d="M7.5 10.5L12 15l4.5-4.5"/>
+              <path d="M4.5 19.5h15"/></svg>
+          </button>
+          <button class="icobtn" aria-label="Profile">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+              <circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.8 3.4-5.8 7.5-5.8s7.5 2 7.5 5.8"/></svg>
+          </button>
+        </div>
+      </div>
+      <label class="searchbar" for="r-search">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input placeholder="Search movies/ TV Shows" readonly>
+      </label>
+
+      <div class="hero"><div class="slide on" data-slide="0"><div class="slide-art" style="--tint:#8B5CF6"><i></i><u></u></div><div class="slide-veil"></div><div class="slide-body"><div class="slide-tag">MOVIE</div><h2>The Beast</h2><div class="slide-meta"><span>2026</span><i></i><span>Action,Drama,Thriller</span><i></i><span class="star">&#9733; 8.4</span></div><div class="slide-act"><label class="btn-play" for="r-detail"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play Now</label><button class="btn-add" data-save="t1"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div></div></div><div class="slide" data-slide="1"><div class="slide-art" style="--tint:#0EA5E9"><i></i><u></u></div><div class="slide-veil"></div><div class="slide-body"><div class="slide-tag">MOVIE</div><h2>The Odyssey</h2><div class="slide-meta"><span>2026</span><i></i><span>Action,Adventure,Drama</span><i></i><span class="star">&#9733; 8.6</span></div><div class="slide-act"><label class="btn-play" for="r-detail"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play Now</label><button class="btn-add" data-save="t8"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div></div></div><div class="slide" data-slide="2"><div class="slide-art" style="--tint:#F59E0B"><i></i><u></u></div><div class="slide-veil"></div><div class="slide-body"><div class="slide-tag">SERIES</div><h2>The Rings of Power</h2><div class="slide-meta"><span>2022</span><i></i><span>Action,Adventure,Drama</span><i></i><span class="star">&#9733; 8.1</span></div><div class="slide-act"><label class="btn-play" for="r-detail"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play Now</label><button class="btn-add" data-save="t3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div></div></div><div class="slide" data-slide="3"><div class="slide-art" style="--tint:#B91C1C"><i></i><u></u></div><div class="slide-veil"></div><div class="slide-body"><div class="slide-tag">SERIES</div><h2>Stranger Things</h2><div class="slide-meta"><span>2016</span><i></i><span>Sci-Fi,Horror</span><i></i><span class="star">&#9733; 8.7</span></div><div class="slide-act"><label class="btn-play" for="r-detail"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play Now</label><button class="btn-add" data-save="t51"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></button></div></div></div><div class="dots"><i class="dot on"></i><i class="dot"></i><i class="dot"></i><i class="dot"></i></div></div>
+
+      <div class="sec"><div class="sec-head"><h3>Continue Watching</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="cw"><article class="cwcard" data-open="t8"><div class="cw-win"><div class="poster p-orb" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div><div class="cw-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="cw-bar"><i style="width:62%"></i></div></div><h5>The Odyssey</h5><span>12 min left</span></article><article class="cwcard" data-open="t3"><div class="cw-win"><div class="poster p-bars" style="--tint:#F59E0B"><i></i><u></u><b>T</b></div><div class="cw-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="cw-bar"><i style="width:28%"></i></div></div><h5>The Rings of Power</h5><span>24 min left</span></article><article class="cwcard" data-open="t51"><div class="cw-win"><div class="poster p-diag" style="--tint:#B91C1C"><i></i><u></u><b>S</b></div><div class="cw-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="cw-bar"><i style="width:81%"></i></div></div><h5>Stranger Things</h5><span>6 min left</span></article><article class="cwcard" data-open="t10"><div class="cw-win"><div class="poster p-dust" style="--tint:#78716C"><i></i><u></u><b>T</b></div><div class="cw-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div><div class="cw-bar"><i style="width:15%"></i></div></div><h5>Tulsa King</h5><span>28 min left</span></article></div></div>
+      <div class="sec"><div class="sec-head"><h3>Popular Series</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t3" data-genre="Action,Adventure,Drama" data-search="the rings of power 2022 action,adventure,drama series"><div class="card-win"><div class="poster p-rings" style="--tint:#F59E0B"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Rings of Power</h4><span>2022 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t2" data-genre="Action,Crime,Drama" data-search="12 12 12 2026 action,crime,drama movie"><div class="card-win"><div class="poster p-orb" style="--tint:#EF4444"><i></i><u></u><b>1</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>12 12 12</h4><span>2026 &middot; Action,Crime,Drama</span></article><article class="card" data-open="t12" data-genre="Romance,Drama" data-search="love in disguise 2026 romance,drama series"><div class="card-win"><div class="poster p-bars" style="--tint:#EC4899"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Love in Disguise</h4><span>2026 &middot; Romance,Drama</span></article><article class="card" data-open="t13" data-genre="Drama,Mystery" data-search="100 days of deception 2026 drama,mystery series"><div class="card-win"><div class="poster p-diag" style="--tint:#6366F1"><i></i><u></u><b>1</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>100 Days of Deception</h4><span>2026 &middot; Drama,Mystery</span></article><article class="card" data-open="t6" data-genre="Drama,Horror,Mystery" data-search="the body 2026 drama,horror,mystery movie"><div class="card-win"><div class="poster p-dust" style="--tint:#64748B"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Body</h4><span>2026 &middot; Drama,Horror,Mystery</span></article><article class="card" data-open="t9" data-genre="Drama,Fantasy,History" data-search="the remarried empress 2026 drama,fantasy,history series"><div class="card-win"><div class="poster p-arc" style="--tint:#A855F7"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Remarried Empress</h4><span>2026 &middot; Drama,Fantasy,History</span></article><article class="card" data-open="t10" data-genre="Action,Crime,Drama" data-search="tulsa king 2022 action,crime,drama series"><div class="card-win"><div class="poster p-rings" style="--tint:#78716C"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Tulsa King</h4><span>2022 &middot; Action,Crime,Drama</span></article><article class="card" data-open="t14" data-genre="Crime,Drama" data-search="mobland 2025 crime,drama series"><div class="card-win"><div class="poster p-orb" style="--tint:#B91C1C"><i></i><u></u><b>M</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>MobLand</h4><span>2025 &middot; Crime,Drama</span></article><article class="card" data-open="t15" data-genre="Romance,Teen" data-search="campus drivers 2026 romance,teen series"><div class="card-win"><div class="poster p-bars" style="--tint:#F472B6"><i></i><u></u><b>C</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.3</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Campus Drivers</h4><span>2026 &middot; Romance,Teen</span></article><article class="card" data-open="t16" data-genre="Drama,Family" data-search="homestead 2025 drama,family series"><div class="card-win"><div class="poster p-diag" style="--tint:#84CC16"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Homestead</h4><span>2025 &middot; Drama,Family</span></article><article class="card" data-open="t17" data-genre="Action,Thriller" data-search="black doves 2024 action,thriller series"><div class="card-win"><div class="poster p-dust" style="--tint:#334155"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Doves</h4><span>2024 &middot; Action,Thriller</span></article><article class="card" data-open="t18" data-genre="Drama,Legal" data-search="all's fair 2025 drama,legal series"><div class="card-win"><div class="poster p-arc" style="--tint:#D97706"><i></i><u></u><b>A</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>All's Fair</h4><span>2025 &middot; Drama,Legal</span></article></div></div><div class="sec"><div class="sec-head"><h3>Popular Movie</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t1" data-genre="Action,Drama,Thriller" data-search="the beast 2026 action,drama,thriller movie"><div class="card-win"><div class="poster p-rings" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Beast</h4><span>2026 &middot; Action,Drama,Thriller</span></article><article class="card" data-open="t5" data-genre="Action" data-search="street fighter 2026 action movie"><div class="card-win"><div class="poster p-orb" style="--tint:#F97316"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Street Fighter</h4><span>2026 &middot; Action</span></article><article class="card" data-open="t25" data-genre="Drama,Romance" data-search="guarding stars 2026 drama,romance movie"><div class="card-win"><div class="poster p-bars" style="--tint:#F43F5E"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="pbadge">Limited Free</em><em class="rate">&#9733; 7.9</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Guarding Stars</h4><span>2026 &middot; Drama,Romance</span></article><article class="card" data-open="t8" data-genre="Action,Adventure,Drama" data-search="the odyssey 2026 action,adventure,drama movie"><div class="card-win"><div class="poster p-diag" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Odyssey</h4><span>2026 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t4" data-genre="Drama,Family,Music" data-search="the gospel of christmas 2026 drama,family,music movie"><div class="card-win"><div class="poster p-dust" style="--tint:#10B981"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Gospel of Christmas</h4><span>2026 &middot; Drama,Family,Music</span></article><article class="card" data-open="t26" data-genre="Action,Adventure" data-search="heart of the beast 2026 action,adventure movie"><div class="card-win"><div class="poster p-arc" style="--tint:#A16207"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Heart of the Beast</h4><span>2026 &middot; Action,Adventure</span></article><article class="card" data-open="t7" data-genre="Horror,Thriller" data-search="other mommy 2026 horror,thriller movie"><div class="card-win"><div class="poster p-rings" style="--tint:#BE123C"><i></i><u></u><b>O</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Other Mommy</h4><span>2026 &middot; Horror,Thriller</span></article><article class="card" data-open="t27" data-genre="Horror,Action" data-search="resident evil 2026 horror,action movie"><div class="card-win"><div class="poster p-orb" style="--tint:#991B1B"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Resident Evil</h4><span>2026 &middot; Horror,Action</span></article><article class="card" data-open="t28" data-genre="Adventure,Fantasy" data-search="forgotten island 2026 adventure,fantasy movie"><div class="card-win"><div class="poster p-bars" style="--tint:#0D9488"><i></i><u></u><b>F</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Forgotten Island</h4><span>2026 &middot; Adventure,Fantasy</span></article><article class="card" data-open="t29" data-genre="Drama,Sci-Fi" data-search="hope 2026 drama,sci-fi movie"><div class="card-win"><div class="poster p-diag" style="--tint:#3B82F6"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Hope</h4><span>2026 &middot; Drama,Sci-Fi</span></article><article class="card" data-open="t30" data-genre="Sci-Fi,Drama" data-search="the dog stars 2026 sci-fi,drama movie"><div class="card-win"><div class="poster p-dust" style="--tint:#7E22CE"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Dog Stars</h4><span>2026 &middot; Sci-Fi,Drama</span></article><article class="card" data-open="t31" data-genre="Thriller,Mystery" data-search="verity 2026 thriller,mystery movie"><div class="card-win"><div class="poster p-arc" style="--tint:#1E293B"><i></i><u></u><b>V</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Verity</h4><span>2026 &middot; Thriller,Mystery</span></article></div></div><div class="sec"><div class="sec-head"><h3>Nollywood Movie</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t33" data-genre="Action,Drama" data-search="warlord: olori ogun 2026 action,drama movie"><div class="card-win"><div class="poster p-rings" style="--tint:#92400E"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Warlord: Olori Ogun</h4><span>2026 &middot; Action,Drama</span></article><article class="card" data-open="t34" data-genre="Crime,Thriller" data-search="chasing shadows 2026 crime,thriller movie"><div class="card-win"><div class="poster p-orb" style="--tint:#1F2937"><i></i><u></u><b>C</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Chasing Shadows</h4><span>2026 &middot; Crime,Thriller</span></article><article class="card" data-open="t35" data-genre="Sci-Fi,Action" data-search="time bound 2026 sci-fi,action movie"><div class="card-win"><div class="poster p-bars" style="--tint:#4338CA"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Time Bound</h4><span>2026 &middot; Sci-Fi,Action</span></article><article class="card" data-open="t36" data-genre="Drama,Crime" data-search="beyond blood 2026 drama,crime movie"><div class="card-win"><div class="poster p-diag" style="--tint:#7F1D1D"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Beyond Blood</h4><span>2026 &middot; Drama,Crime</span></article></div></div><div class="sec"><div class="sec-head"><h3>Adult Animation</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t37" data-genre="Animation,Fantasy" data-search="avatar: seven havens 2026 animation,fantasy series"><div class="card-win"><div class="poster p-dust" style="--tint:#0284C7"><i></i><u></u><b>A</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Avatar: Seven Havens</h4><span>2026 &middot; Animation,Fantasy</span></article><article class="card" data-open="t38" data-genre="Animation,Sci-Fi" data-search="cyberpunk: edgerunners 2022 animation,sci-fi series"><div class="card-win"><div class="poster p-arc" style="--tint:#EAB308"><i></i><u></u><b>C</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Cyberpunk: Edgerunners</h4><span>2022 &middot; Animation,Sci-Fi</span></article><article class="card" data-open="t39" data-genre="Animation,Comedy" data-search="rick and morty 2013 animation,comedy series"><div class="card-win"><div class="poster p-rings" style="--tint:#16A34A"><i></i><u></u><b>R</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Rick and Morty</h4><span>2013 &middot; Animation,Comedy</span></article><article class="card" data-open="t40" data-genre="Animation,Action" data-search="invincible 2021 animation,action series"><div class="card-win"><div class="poster p-orb" style="--tint:#DC2626"><i></i><u></u><b>I</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Invincible</h4><span>2021 &middot; Animation,Action</span></article></div></div><div class="sec"><div class="sec-head"><h3>Epic Fantasy</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t41" data-genre="Fantasy,Drama" data-search="game of thrones 2011 fantasy,drama series"><div class="card-win"><div class="poster p-bars" style="--tint:#4B5563"><i></i><u></u><b>G</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.0</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Game of Thrones</h4><span>2011 &middot; Fantasy,Drama</span></article><article class="card" data-open="t42" data-genre="Fantasy,Drama" data-search="house of the dragon 2022 fantasy,drama series"><div class="card-win"><div class="poster p-diag" style="--tint:#B45309"><i></i><u></u><b>H</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>House of the Dragon</h4><span>2022 &middot; Fantasy,Drama</span></article><article class="card" data-open="t3" data-genre="Action,Adventure,Drama" data-search="the rings of power 2022 action,adventure,drama series"><div class="card-win"><div class="poster p-dust" style="--tint:#F59E0B"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Rings of Power</h4><span>2022 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t43" data-genre="Fantasy,Action" data-search="the witcher 2019 fantasy,action series"><div class="card-win"><div class="poster p-arc" style="--tint:#9A3412"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Witcher</h4><span>2019 &middot; Fantasy,Action</span></article><article class="card" data-open="t52" data-genre="Action,Fantasy" data-search="the umbrella academy 2019 action,fantasy series"><div class="card-win"><div class="poster p-rings" style="--tint:#7C3AED"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Umbrella Academy</h4><span>2019 &middot; Action,Fantasy</span></article><article class="card" data-open="t44" data-genre="Comedy,Horror" data-search="wednesday 2022 comedy,horror series"><div class="card-win"><div class="poster p-orb" style="--tint:#3730A3"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Wednesday</h4><span>2022 &middot; Comedy,Horror</span></article></div></div><div class="sec"><div class="sec-head"><h3>Comedy</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t45" data-genre="Comedy,Romance" data-search="friends 1994 comedy,romance series"><div class="card-win"><div class="poster p-bars" style="--tint:#F59E0B"><i></i><u></u><b>F</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.9</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Friends</h4><span>1994 &middot; Comedy,Romance</span></article><article class="card" data-open="t46" data-genre="Comedy,Romance" data-search="the big bang theory 2007 comedy,romance series"><div class="card-win"><div class="poster p-diag" style="--tint:#0891B2"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Big Bang Theory</h4><span>2007 &middot; Comedy,Romance</span></article><article class="card" data-open="t47" data-genre="Comedy,Family" data-search="modern family 2009 comedy,family series"><div class="card-win"><div class="poster p-dust" style="--tint:#0D9488"><i></i><u></u><b>M</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Modern Family</h4><span>2009 &middot; Comedy,Family</span></article><article class="card" data-open="t48" data-genre="Comedy,Family" data-search="young sheldon 2017 comedy,family series"><div class="card-win"><div class="poster p-arc" style="--tint:#CA8A04"><i></i><u></u><b>Y</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Young Sheldon</h4><span>2017 &middot; Comedy,Family</span></article><article class="card" data-open="t49" data-genre="Comedy,Mockumentary" data-search="the office 2005 comedy,mockumentary series"><div class="card-win"><div class="poster p-rings" style="--tint:#475569"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.9</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Office</h4><span>2005 &middot; Comedy,Mockumentary</span></article></div></div>
+      <div class="sec"><div class="sec-head"><h3>Top 10 This Week</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="t10"><article class="t10card" data-open="t69"><div class="t10num">1</div><div class="t10col"><div class="t10post"><div class="poster p-arc" style="--tint:#44403C"><i></i><u></u><b>A</b></div></div><h5>Attack on Titan</h5></div></article><article class="t10card" data-open="t55"><div class="t10num">2</div><div class="t10col"><div class="t10post"><div class="poster p-rings" style="--tint:#3F3F46"><i></i><u></u><b>T</b></div></div><h5>The Sopranos</h5></div></article><article class="t10card" data-open="t41"><div class="t10num">3</div><div class="t10col"><div class="t10post"><div class="poster p-orb" style="--tint:#4B5563"><i></i><u></u><b>G</b></div></div><h5>Game of Thrones</h5></div></article><article class="t10card" data-open="t49"><div class="t10num">4</div><div class="t10col"><div class="t10post"><div class="poster p-bars" style="--tint:#475569"><i></i><u></u><b>T</b></div></div><h5>The Office</h5></div></article><article class="t10card" data-open="t45"><div class="t10num">5</div><div class="t10col"><div class="t10post"><div class="poster p-diag" style="--tint:#F59E0B"><i></i><u></u><b>F</b></div></div><h5>Friends</h5></div></article><article class="t10card" data-open="t66"><div class="t10num">6</div><div class="t10col"><div class="t10post"><div class="poster p-dust" style="--tint:#DC2626"><i></i><u></u><b>O</b></div></div><h5>One Piece</h5></div></article><article class="t10card" data-open="t51"><div class="t10num">7</div><div class="t10col"><div class="t10post"><div class="poster p-arc" style="--tint:#B91C1C"><i></i><u></u><b>S</b></div></div><h5>Stranger Things</h5></div></article><article class="t10card" data-open="t53"><div class="t10num">8</div><div class="t10col"><div class="t10post"><div class="poster p-rings" style="--tint:#292524"><i></i><u></u><b>P</b></div></div><h5>Peaky Blinders</h5></div></article><article class="t10card" data-open="t38"><div class="t10num">9</div><div class="t10col"><div class="t10post"><div class="poster p-orb" style="--tint:#EAB308"><i></i><u></u><b>C</b></div></div><h5>Cyberpunk: Edgerunners</h5></div></article><article class="t10card" data-open="t1"><div class="t10num">10</div><div class="t10col"><div class="t10post"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><h5>The Beast</h5></div></article></div></div>
+      <div class="sec"><div class="sec-head"><h3>Watch Party</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="party"><div class="pcard live"><div class="p-live">LIVE</div><h5>Friday Horror Night</h5><span>The Body</span><div class="p-faces"><i style="background:#1DD171">S</i><i style="background:#2166E5">K</i><i style="background:#F59E0B">V</i><i style="background:#BE123C">S</i><i class="p-more">+1</i></div><div class="p-time">8 min in</div></div><div class="pcard"><div class="p-live" style="color:var(--txt-3)">SCHEDULED</div><h5>Slow Burn Club</h5><span>The Remarried Empress</span><div class="p-faces"><i style="background:#A855F7">S</i><i style="background:#0EA5E9">K</i><i style="background:#EC4899">V</i></div><div class="p-time">Starts 9:30 PM</div></div><div class="pcard live"><div class="p-live">LIVE</div><h5>Action Rewatch</h5><span>The Odyssey</span><div class="p-faces"><i style="background:#EF4444">S</i><i style="background:#F97316">K</i><i style="background:#22C55E">V</i><i style="background:#6366F1">S</i><i class="p-more">+3</i></div><div class="p-time">22 min in</div></div></div></div>
+      <div class="sec"><div class="sec-head"><h3>Coming Soon</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card up"><div class="card-win"><div class="poster" style="--tint:#0EA5E9"><i></i><u></u><b>P</b></div><div class="up-date">Nov 20</div></div><h4>Percy Jackson and the Olympians</h4><span class="booked">53757 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#F59E0B"><i></i><u></u><b>S</b></div><em class="pbadge">Limited Free</em><div class="up-date">Nov 20</div></div><h4>Steps</h4><span class="booked">2483 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#B91C1C"><i></i><u></u><b>Y</b></div><div class="up-date">Nov 20</div></div><h4>Yellowjackets</h4><span class="booked">3959 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#7C3AED"><i></i><u></u><b>G</b></div><div class="up-date">Nov 20</div></div><h4>Good Partner</h4><span class="booked">3898 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#0891B2"><i></i><u></u><b>T</b></div><div class="up-date">Nov 20</div></div><h4>The Blue Road</h4><span class="booked">4600 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#475569"><i></i><u></u><b>A</b></div><em class="pbadge">Limited Free</em><div class="up-date">Nov 24</div></div><h4>A Talent for Murder</h4><span class="booked">431 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#991B1B"><i></i><u></u><b>B</b></div><em class="pbadge">Limited Free</em><div class="up-date">Nov 24</div></div><h4>Breeder</h4><span class="booked">595 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#F97316"><i></i><u></u><b>B</b></div><div class="up-date">Nov 25</div></div><h4>Blade Runner 2099</h4><span class="booked">8439 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#6366F1"><i></i><u></u><b>N</b></div><div class="up-date">Nov 25</div></div><h4>Nine to Six</h4><span class="booked">4415 booked</span></article><article class="card up"><div class="card-win"><div class="poster" style="--tint:#BE185D"><i></i><u></u><b>T</b></div><div class="up-date">Nov 26</div></div><h4>The Hunting Wives</h4><span class="booked">9544 booked</span></article></div></div>
+      <div class="sec"><div class="sec-head"><h3>Teen Romance</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t15" data-genre="Romance,Teen" data-search="campus drivers 2026 romance,teen series"><div class="card-win"><div class="poster p-orb" style="--tint:#F472B6"><i></i><u></u><b>C</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.3</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Campus Drivers</h4><span>2026 &middot; Romance,Teen</span></article><article class="card" data-open="t61" data-genre="Romance,Teen" data-search="xo, kitty 2023 romance,teen series"><div class="card-win"><div class="poster p-bars" style="--tint:#F472B6"><i></i><u></u><b>X</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>XO, Kitty</h4><span>2023 &middot; Romance,Teen</span></article><article class="card" data-open="t62" data-genre="Drama,Comedy" data-search="ginny & georgia 2021 drama,comedy series"><div class="card-win"><div class="poster p-diag" style="--tint:#0E7490"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Ginny & Georgia</h4><span>2021 &middot; Drama,Comedy</span></article><article class="card" data-open="t63" data-genre="Romance,Teen" data-search="the summer i turned pretty 2022 romance,teen series"><div class="card-win"><div class="poster p-dust" style="--tint:#FB7185"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Summer I Turned Pretty</h4><span>2022 &middot; Romance,Teen</span></article><article class="card" data-open="t64" data-genre="Romance,Drama" data-search="maxton hall 2024 romance,drama series"><div class="card-win"><div class="poster p-arc" style="--tint:#BE185D"><i></i><u></u><b>M</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Maxton Hall</h4><span>2024 &middot; Romance,Drama</span></article><article class="card" data-open="t60" data-genre="Drama,Teen" data-search="euphoria 2019 drama,teen series"><div class="card-win"><div class="poster p-rings" style="--tint:#9333EA"><i></i><u></u><b>E</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Euphoria</h4><span>2019 &middot; Drama,Teen</span></article></div></div><div class="sec"><div class="sec-head"><h3>Superhero Series</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t23" data-genre="Action,Sci-Fi" data-search="visionquest 2026 action,sci-fi series"><div class="card-win"><div class="poster p-orb" style="--tint:#7C3AED"><i></i><u></u><b>V</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>VisionQuest</h4><span>2026 &middot; Action,Sci-Fi</span></article><article class="card" data-open="t40" data-genre="Animation,Action" data-search="invincible 2021 animation,action series"><div class="card-win"><div class="poster p-bars" style="--tint:#DC2626"><i></i><u></u><b>I</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Invincible</h4><span>2021 &middot; Animation,Action</span></article><article class="card" data-open="t52" data-genre="Action,Fantasy" data-search="the umbrella academy 2019 action,fantasy series"><div class="card-win"><div class="poster p-diag" style="--tint:#7C3AED"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Umbrella Academy</h4><span>2019 &middot; Action,Fantasy</span></article><article class="card" data-open="t38" data-genre="Animation,Sci-Fi" data-search="cyberpunk: edgerunners 2022 animation,sci-fi series"><div class="card-win"><div class="poster p-dust" style="--tint:#EAB308"><i></i><u></u><b>C</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Cyberpunk: Edgerunners</h4><span>2022 &middot; Animation,Sci-Fi</span></article></div></div><div class="sec"><div class="sec-head"><h3>Bet+</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t71" data-genre="Drama,Romance" data-search="sistas 2019 drama,romance series"><div class="card-win"><div class="poster p-arc" style="--tint:#A21CAF"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Sistas</h4><span>2019 &middot; Drama,Romance</span></article><article class="card" data-open="t72" data-genre="Drama,Thriller" data-search="the oval 2019 drama,thriller series"><div class="card-win"><div class="poster p-rings" style="--tint:#7C2D12"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Oval</h4><span>2019 &middot; Drama,Thriller</span></article><article class="card" data-open="t73" data-genre="Drama,Romance" data-search="zatima 2022 drama,romance series"><div class="card-win"><div class="poster p-orb" style="--tint:#9D174D"><i></i><u></u><b>Z</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Zatima</h4><span>2022 &middot; Drama,Romance</span></article><article class="card" data-open="t74" data-genre="Drama,Crime" data-search="ruthless 2020 drama,crime series"><div class="card-win"><div class="poster p-bars" style="--tint:#78350F"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Ruthless</h4><span>2020 &middot; Drama,Crime</span></article></div></div><div class="sec"><div class="sec-head"><h3>Action&Thriller</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t57" data-genre="Action,Crime" data-search="reacher 2022 action,crime series"><div class="card-win"><div class="poster p-diag" style="--tint:#0F766E"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Reacher</h4><span>2022 &middot; Action,Crime</span></article><article class="card" data-open="t58" data-genre="Action,Drama" data-search="lioness 2023 action,drama series"><div class="card-win"><div class="poster p-dust" style="--tint:#92400E"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Lioness</h4><span>2023 &middot; Action,Drama</span></article><article class="card" data-open="t59" data-genre="Action,Thriller" data-search="the night agent 2023 action,thriller series"><div class="card-win"><div class="poster p-arc" style="--tint:#1E40AF"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Night Agent</h4><span>2023 &middot; Action,Thriller</span></article><article class="card" data-open="t17" data-genre="Action,Thriller" data-search="black doves 2024 action,thriller series"><div class="card-win"><div class="poster p-rings" style="--tint:#334155"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Doves</h4><span>2024 &middot; Action,Thriller</span></article><article class="card" data-open="t20" data-genre="Action,Thriller" data-search="the terminal list 2022 action,thriller series"><div class="card-win"><div class="poster p-orb" style="--tint:#475569"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Terminal List</h4><span>2022 &middot; Action,Thriller</span></article><article class="card" data-open="t31" data-genre="Thriller,Mystery" data-search="verity 2026 thriller,mystery movie"><div class="card-win"><div class="poster p-bars" style="--tint:#1E293B"><i></i><u></u><b>V</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Verity</h4><span>2026 &middot; Thriller,Mystery</span></article></div></div><div class="sec"><div class="sec-head"><h3>Gangster</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t54" data-genre="Crime,Drama" data-search="snowfall 2017 crime,drama series"><div class="card-win"><div class="poster p-diag" style="--tint:#1E3A8A"><i></i><u></u><b>S</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Snowfall</h4><span>2017 &middot; Crime,Drama</span></article><article class="card" data-open="t53" data-genre="Crime,Drama" data-search="peaky blinders 2013 crime,drama series"><div class="card-win"><div class="poster p-dust" style="--tint:#292524"><i></i><u></u><b>P</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Peaky Blinders</h4><span>2013 &middot; Crime,Drama</span></article><article class="card" data-open="t10" data-genre="Action,Crime,Drama" data-search="tulsa king 2022 action,crime,drama series"><div class="card-win"><div class="poster p-arc" style="--tint:#78716C"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Tulsa King</h4><span>2022 &middot; Action,Crime,Drama</span></article><article class="card" data-open="t14" data-genre="Crime,Drama" data-search="mobland 2025 crime,drama series"><div class="card-win"><div class="poster p-rings" style="--tint:#B91C1C"><i></i><u></u><b>M</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>MobLand</h4><span>2025 &middot; Crime,Drama</span></article><article class="card" data-open="t56" data-genre="Crime,Action" data-search="gangs of london 2020 crime,action series"><div class="card-win"><div class="poster p-orb" style="--tint:#7F1D1D"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Gangs of London</h4><span>2020 &middot; Crime,Action</span></article><article class="card" data-open="t55" data-genre="Crime,Drama" data-search="the sopranos 1999 crime,drama series"><div class="card-win"><div class="poster p-bars" style="--tint:#3F3F46"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.2</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Sopranos</h4><span>1999 &middot; Crime,Drama</span></article></div></div><div class="sec"><div class="sec-head"><h3>K-Drama</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t12" data-genre="Romance,Drama" data-search="love in disguise 2026 romance,drama series"><div class="card-win"><div class="poster p-diag" style="--tint:#EC4899"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Love in Disguise</h4><span>2026 &middot; Romance,Drama</span></article><article class="card" data-open="t9" data-genre="Drama,Fantasy,History" data-search="the remarried empress 2026 drama,fantasy,history series"><div class="card-win"><div class="poster p-dust" style="--tint:#A855F7"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Remarried Empress</h4><span>2026 &middot; Drama,Fantasy,History</span></article><article class="card" data-open="t24" data-genre="Drama,Medical" data-search="doctor x 2026 drama,medical series"><div class="card-win"><div class="poster p-arc" style="--tint:#059669"><i></i><u></u><b>D</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Doctor X</h4><span>2026 &middot; Drama,Medical</span></article><article class="card" data-open="t76" data-genre="Romance,Fantasy" data-search="when i meet the moon 2026 romance,fantasy series"><div class="card-win"><div class="poster p-rings" style="--tint:#8B5CF6"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>When I Meet the Moon</h4><span>2026 &middot; Romance,Fantasy</span></article></div></div><div class="sec"><div class="sec-head"><h3>C-Drama</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t75" data-genre="Drama,History" data-search="sunshine through the rain 2026 drama,history series"><div class="card-win"><div class="poster p-orb" style="--tint:#F59E0B"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Sunshine Through the Rain</h4><span>2026 &middot; Drama,History</span></article><article class="card" data-open="t76" data-genre="Romance,Fantasy" data-search="when i meet the moon 2026 romance,fantasy series"><div class="card-win"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>When I Meet the Moon</h4><span>2026 &middot; Romance,Fantasy</span></article><article class="card" data-open="t77" data-genre="Drama,Historical" data-search="tigers sniff the rose 2026 drama,historical series"><div class="card-win"><div class="poster p-diag" style="--tint:#B45309"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Tigers Sniff the Rose</h4><span>2026 &middot; Drama,Historical</span></article><article class="card" data-open="t78" data-genre="Drama,Romance" data-search="the lament of autumn 2026 drama,romance series"><div class="card-win"><div class="poster p-dust" style="--tint:#D97706"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Lament of Autumn</h4><span>2026 &middot; Drama,Romance</span></article><article class="card" data-open="t79" data-genre="Drama,History" data-search="blossoms of power 2026 drama,history series"><div class="card-win"><div class="poster p-arc" style="--tint:#BE123C"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Blossoms of Power</h4><span>2026 &middot; Drama,History</span></article><article class="card" data-open="t80" data-genre="Drama,History" data-search="princess zhaoyang 2026 drama,history series"><div class="card-win"><div class="poster p-rings" style="--tint:#9F1239"><i></i><u></u><b>P</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Princess Zhaoyang</h4><span>2026 &middot; Drama,History</span></article></div></div><div class="sec"><div class="sec-head"><h3>Anime[English Dubbed]</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t11" data-genre="Anime,Action,Adventure" data-search="black clover 2017 anime,action,adventure series"><div class="card-win"><div class="poster p-orb" style="--tint:#22C55E"><i></i><u></u><b>B</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Clover</h4><span>2017 &middot; Anime,Action,Adventure</span></article><article class="card" data-open="t65" data-genre="Anime,Action" data-search="black clover s2 2017 anime,action series"><div class="card-win"><div class="poster p-bars" style="--tint:#15803D"><i></i><u></u><b>B</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Clover S2</h4><span>2017 &middot; Anime,Action</span></article><article class="card" data-open="t66" data-genre="Anime,Adventure" data-search="one piece 2023 anime,adventure series"><div class="card-win"><div class="poster p-diag" style="--tint:#DC2626"><i></i><u></u><b>O</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>One Piece</h4><span>2023 &middot; Anime,Adventure</span></article><article class="card" data-open="t67" data-genre="Anime,Action" data-search="demon slayer 2019 anime,action series"><div class="card-win"><div class="poster p-dust" style="--tint:#065F46"><i></i><u></u><b>D</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Demon Slayer</h4><span>2019 &middot; Anime,Action</span></article><article class="card" data-open="t68" data-genre="Anime,Action" data-search="jujutsu kaisen 2020 anime,action series"><div class="card-win"><div class="poster p-arc" style="--tint:#4C1D95"><i></i><u></u><b>J</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Jujutsu Kaisen</h4><span>2020 &middot; Anime,Action</span></article><article class="card" data-open="t69" data-genre="Anime,Action" data-search="attack on titan 2013 anime,action series"><div class="card-win"><div class="poster p-rings" style="--tint:#44403C"><i></i><u></u><b>A</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Attack on Titan</h4><span>2013 &middot; Anime,Action</span></article><article class="card" data-open="t70" data-genre="Anime,Fantasy" data-search="solo leveling 2024 anime,fantasy series"><div class="card-win"><div class="poster p-orb" style="--tint:#1E1B4B"><i></i><u></u><b>S</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Solo Leveling</h4><span>2024 &middot; Anime,Fantasy</span></article></div></div><div class="sec"><div class="sec-head"><h3>Action Movies</h3><button class="more">More <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div><div class="railcards"><article class="card" data-open="t1" data-genre="Action,Drama,Thriller" data-search="the beast 2026 action,drama,thriller movie"><div class="card-win"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Beast</h4><span>2026 &middot; Action,Drama,Thriller</span></article><article class="card" data-open="t5" data-genre="Action" data-search="street fighter 2026 action movie"><div class="card-win"><div class="poster p-diag" style="--tint:#F97316"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Street Fighter</h4><span>2026 &middot; Action</span></article><article class="card" data-open="t8" data-genre="Action,Adventure,Drama" data-search="the odyssey 2026 action,adventure,drama movie"><div class="card-win"><div class="poster p-dust" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Odyssey</h4><span>2026 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t19" data-genre="Action,War" data-search="the covenant 2025 action,war series"><div class="card-win"><div class="poster p-arc" style="--tint:#78350F"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Covenant</h4><span>2025 &middot; Action,War</span></article><article class="card" data-open="t35" data-genre="Sci-Fi,Action" data-search="time bound 2026 sci-fi,action movie"><div class="card-win"><div class="poster p-rings" style="--tint:#4338CA"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Time Bound</h4><span>2026 &middot; Sci-Fi,Action</span></article><article class="card" data-open="t26" data-genre="Action,Adventure" data-search="heart of the beast 2026 action,adventure movie"><div class="card-win"><div class="poster p-orb" style="--tint:#A16207"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Heart of the Beast</h4><span>2026 &middot; Action,Adventure</span></article></div></div>
+
+      <div style="height:20px"></div>
+    </section>
+
+    <!-- SEARCH -->
+    <section class="screen" id="search">
+      <div class="top">
+        <div class="logo"><b style="font-size:15px">Search</b></div>
+      </div>
+      <label class="searchbar" style="margin-top:0">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+        <input id="q" placeholder="Search movies/ TV Shows" autocomplete="off">
+      </label>
+      <div class="chips"><button class="chip on" data-genre-filter="All">All</button><button class="chip" data-genre-filter="Action">Action</button><button class="chip" data-genre-filter="Drama">Drama</button><button class="chip" data-genre-filter="Comedy">Comedy</button><button class="chip" data-genre-filter="Thriller">Thriller</button><button class="chip" data-genre-filter="Romance">Romance</button><button class="chip" data-genre-filter="Horror">Horror</button><button class="chip" data-genre-filter="Sci-Fi">Sci-Fi</button><button class="chip" data-genre-filter="Fantasy">Fantasy</button><button class="chip" data-genre-filter="Crime">Crime</button><button class="chip" data-genre-filter="Anime">Anime</button><button class="chip" data-genre-filter="Animation">Animation</button></div>
+      <div class="cnt" id="cnt">80 results</div>
+      <div class="grid" id="allgrid"><article class="card" data-open="t1" data-genre="Action,Drama,Thriller" data-search="the beast 2026 action,drama,thriller movie"><div class="card-win"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Beast</h4><span>2026 &middot; Action,Drama,Thriller</span></article><article class="card" data-open="t2" data-genre="Action,Crime,Drama" data-search="12 12 12 2026 action,crime,drama movie"><div class="card-win"><div class="poster p-diag" style="--tint:#EF4444"><i></i><u></u><b>1</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>12 12 12</h4><span>2026 &middot; Action,Crime,Drama</span></article><article class="card" data-open="t3" data-genre="Action,Adventure,Drama" data-search="the rings of power 2022 action,adventure,drama series"><div class="card-win"><div class="poster p-dust" style="--tint:#F59E0B"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Rings of Power</h4><span>2022 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t4" data-genre="Drama,Family,Music" data-search="the gospel of christmas 2026 drama,family,music movie"><div class="card-win"><div class="poster p-arc" style="--tint:#10B981"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Gospel of Christmas</h4><span>2026 &middot; Drama,Family,Music</span></article><article class="card" data-open="t5" data-genre="Action" data-search="street fighter 2026 action movie"><div class="card-win"><div class="poster p-rings" style="--tint:#F97316"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Street Fighter</h4><span>2026 &middot; Action</span></article><article class="card" data-open="t6" data-genre="Drama,Horror,Mystery" data-search="the body 2026 drama,horror,mystery movie"><div class="card-win"><div class="poster p-orb" style="--tint:#64748B"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Body</h4><span>2026 &middot; Drama,Horror,Mystery</span></article><article class="card" data-open="t7" data-genre="Horror,Thriller" data-search="other mommy 2026 horror,thriller movie"><div class="card-win"><div class="poster p-bars" style="--tint:#BE123C"><i></i><u></u><b>O</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Other Mommy</h4><span>2026 &middot; Horror,Thriller</span></article><article class="card" data-open="t8" data-genre="Action,Adventure,Drama" data-search="the odyssey 2026 action,adventure,drama movie"><div class="card-win"><div class="poster p-diag" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Odyssey</h4><span>2026 &middot; Action,Adventure,Drama</span></article><article class="card" data-open="t9" data-genre="Drama,Fantasy,History" data-search="the remarried empress 2026 drama,fantasy,history series"><div class="card-win"><div class="poster p-dust" style="--tint:#A855F7"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Remarried Empress</h4><span>2026 &middot; Drama,Fantasy,History</span></article><article class="card" data-open="t10" data-genre="Action,Crime,Drama" data-search="tulsa king 2022 action,crime,drama series"><div class="card-win"><div class="poster p-arc" style="--tint:#78716C"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Tulsa King</h4><span>2022 &middot; Action,Crime,Drama</span></article><article class="card" data-open="t11" data-genre="Anime,Action,Adventure" data-search="black clover 2017 anime,action,adventure series"><div class="card-win"><div class="poster p-rings" style="--tint:#22C55E"><i></i><u></u><b>B</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Clover</h4><span>2017 &middot; Anime,Action,Adventure</span></article><article class="card" data-open="t12" data-genre="Romance,Drama" data-search="love in disguise 2026 romance,drama series"><div class="card-win"><div class="poster p-orb" style="--tint:#EC4899"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Love in Disguise</h4><span>2026 &middot; Romance,Drama</span></article><article class="card" data-open="t13" data-genre="Drama,Mystery" data-search="100 days of deception 2026 drama,mystery series"><div class="card-win"><div class="poster p-bars" style="--tint:#6366F1"><i></i><u></u><b>1</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>100 Days of Deception</h4><span>2026 &middot; Drama,Mystery</span></article><article class="card" data-open="t14" data-genre="Crime,Drama" data-search="mobland 2025 crime,drama series"><div class="card-win"><div class="poster p-diag" style="--tint:#B91C1C"><i></i><u></u><b>M</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>MobLand</h4><span>2025 &middot; Crime,Drama</span></article><article class="card" data-open="t15" data-genre="Romance,Teen" data-search="campus drivers 2026 romance,teen series"><div class="card-win"><div class="poster p-dust" style="--tint:#F472B6"><i></i><u></u><b>C</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.3</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Campus Drivers</h4><span>2026 &middot; Romance,Teen</span></article><article class="card" data-open="t16" data-genre="Drama,Family" data-search="homestead 2025 drama,family series"><div class="card-win"><div class="poster p-arc" style="--tint:#84CC16"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Homestead</h4><span>2025 &middot; Drama,Family</span></article><article class="card" data-open="t17" data-genre="Action,Thriller" data-search="black doves 2024 action,thriller series"><div class="card-win"><div class="poster p-rings" style="--tint:#334155"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Doves</h4><span>2024 &middot; Action,Thriller</span></article><article class="card" data-open="t18" data-genre="Drama,Legal" data-search="all's fair 2025 drama,legal series"><div class="card-win"><div class="poster p-orb" style="--tint:#D97706"><i></i><u></u><b>A</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>All's Fair</h4><span>2025 &middot; Drama,Legal</span></article><article class="card" data-open="t19" data-genre="Action,War" data-search="the covenant 2025 action,war series"><div class="card-win"><div class="poster p-bars" style="--tint:#78350F"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Covenant</h4><span>2025 &middot; Action,War</span></article><article class="card" data-open="t20" data-genre="Action,Thriller" data-search="the terminal list 2022 action,thriller series"><div class="card-win"><div class="poster p-diag" style="--tint:#475569"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Terminal List</h4><span>2022 &middot; Action,Thriller</span></article><article class="card" data-open="t21" data-genre="Crime,Mystery" data-search="lupin 2021 crime,mystery series"><div class="card-win"><div class="poster p-dust" style="--tint:#1D4ED8"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Lupin</h4><span>2021 &middot; Crime,Mystery</span></article><article class="card" data-open="t22" data-genre="Drama,Crime" data-search="spinners 2025 drama,crime series"><div class="card-win"><div class="poster p-arc" style="--tint:#0891B2"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Spinners</h4><span>2025 &middot; Drama,Crime</span></article><article class="card" data-open="t23" data-genre="Action,Sci-Fi" data-search="visionquest 2026 action,sci-fi series"><div class="card-win"><div class="poster p-rings" style="--tint:#7C3AED"><i></i><u></u><b>V</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>VisionQuest</h4><span>2026 &middot; Action,Sci-Fi</span></article><article class="card" data-open="t24" data-genre="Drama,Medical" data-search="doctor x 2026 drama,medical series"><div class="card-win"><div class="poster p-orb" style="--tint:#059669"><i></i><u></u><b>D</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Doctor X</h4><span>2026 &middot; Drama,Medical</span></article><article class="card" data-open="t25" data-genre="Drama,Romance" data-search="guarding stars 2026 drama,romance movie"><div class="card-win"><div class="poster p-bars" style="--tint:#F43F5E"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="pbadge">Limited Free</em><em class="rate">&#9733; 7.9</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Guarding Stars</h4><span>2026 &middot; Drama,Romance</span></article><article class="card" data-open="t26" data-genre="Action,Adventure" data-search="heart of the beast 2026 action,adventure movie"><div class="card-win"><div class="poster p-diag" style="--tint:#A16207"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Heart of the Beast</h4><span>2026 &middot; Action,Adventure</span></article><article class="card" data-open="t27" data-genre="Horror,Action" data-search="resident evil 2026 horror,action movie"><div class="card-win"><div class="poster p-dust" style="--tint:#991B1B"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Resident Evil</h4><span>2026 &middot; Horror,Action</span></article><article class="card" data-open="t28" data-genre="Adventure,Fantasy" data-search="forgotten island 2026 adventure,fantasy movie"><div class="card-win"><div class="poster p-arc" style="--tint:#0D9488"><i></i><u></u><b>F</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Forgotten Island</h4><span>2026 &middot; Adventure,Fantasy</span></article><article class="card" data-open="t29" data-genre="Drama,Sci-Fi" data-search="hope 2026 drama,sci-fi movie"><div class="card-win"><div class="poster p-rings" style="--tint:#3B82F6"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Hope</h4><span>2026 &middot; Drama,Sci-Fi</span></article><article class="card" data-open="t30" data-genre="Sci-Fi,Drama" data-search="the dog stars 2026 sci-fi,drama movie"><div class="card-win"><div class="poster p-orb" style="--tint:#7E22CE"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Dog Stars</h4><span>2026 &middot; Sci-Fi,Drama</span></article><article class="card" data-open="t31" data-genre="Thriller,Mystery" data-search="verity 2026 thriller,mystery movie"><div class="card-win"><div class="poster p-bars" style="--tint:#1E293B"><i></i><u></u><b>V</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Verity</h4><span>2026 &middot; Thriller,Mystery</span></article><article class="card" data-open="t32" data-genre="Drama,Family" data-search="heartland 2026 drama,family movie"><div class="card-win"><div class="poster p-diag" style="--tint:#65A30D"><i></i><u></u><b>H</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Heartland</h4><span>2026 &middot; Drama,Family</span></article><article class="card" data-open="t33" data-genre="Action,Drama" data-search="warlord: olori ogun 2026 action,drama movie"><div class="card-win"><div class="poster p-dust" style="--tint:#92400E"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Warlord: Olori Ogun</h4><span>2026 &middot; Action,Drama</span></article><article class="card" data-open="t34" data-genre="Crime,Thriller" data-search="chasing shadows 2026 crime,thriller movie"><div class="card-win"><div class="poster p-arc" style="--tint:#1F2937"><i></i><u></u><b>C</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Chasing Shadows</h4><span>2026 &middot; Crime,Thriller</span></article><article class="card" data-open="t35" data-genre="Sci-Fi,Action" data-search="time bound 2026 sci-fi,action movie"><div class="card-win"><div class="poster p-rings" style="--tint:#4338CA"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Time Bound</h4><span>2026 &middot; Sci-Fi,Action</span></article><article class="card" data-open="t36" data-genre="Drama,Crime" data-search="beyond blood 2026 drama,crime movie"><div class="card-win"><div class="poster p-orb" style="--tint:#7F1D1D"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Beyond Blood</h4><span>2026 &middot; Drama,Crime</span></article><article class="card" data-open="t37" data-genre="Animation,Fantasy" data-search="avatar: seven havens 2026 animation,fantasy series"><div class="card-win"><div class="poster p-bars" style="--tint:#0284C7"><i></i><u></u><b>A</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Avatar: Seven Havens</h4><span>2026 &middot; Animation,Fantasy</span></article><article class="card" data-open="t38" data-genre="Animation,Sci-Fi" data-search="cyberpunk: edgerunners 2022 animation,sci-fi series"><div class="card-win"><div class="poster p-diag" style="--tint:#EAB308"><i></i><u></u><b>C</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Cyberpunk: Edgerunners</h4><span>2022 &middot; Animation,Sci-Fi</span></article><article class="card" data-open="t39" data-genre="Animation,Comedy" data-search="rick and morty 2013 animation,comedy series"><div class="card-win"><div class="poster p-dust" style="--tint:#16A34A"><i></i><u></u><b>R</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Rick and Morty</h4><span>2013 &middot; Animation,Comedy</span></article><article class="card" data-open="t40" data-genre="Animation,Action" data-search="invincible 2021 animation,action series"><div class="card-win"><div class="poster p-arc" style="--tint:#DC2626"><i></i><u></u><b>I</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Invincible</h4><span>2021 &middot; Animation,Action</span></article><article class="card" data-open="t41" data-genre="Fantasy,Drama" data-search="game of thrones 2011 fantasy,drama series"><div class="card-win"><div class="poster p-rings" style="--tint:#4B5563"><i></i><u></u><b>G</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.0</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Game of Thrones</h4><span>2011 &middot; Fantasy,Drama</span></article><article class="card" data-open="t42" data-genre="Fantasy,Drama" data-search="house of the dragon 2022 fantasy,drama series"><div class="card-win"><div class="poster p-orb" style="--tint:#B45309"><i></i><u></u><b>H</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>House of the Dragon</h4><span>2022 &middot; Fantasy,Drama</span></article><article class="card" data-open="t43" data-genre="Fantasy,Action" data-search="the witcher 2019 fantasy,action series"><div class="card-win"><div class="poster p-bars" style="--tint:#9A3412"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Witcher</h4><span>2019 &middot; Fantasy,Action</span></article><article class="card" data-open="t44" data-genre="Comedy,Horror" data-search="wednesday 2022 comedy,horror series"><div class="card-win"><div class="poster p-diag" style="--tint:#3730A3"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Wednesday</h4><span>2022 &middot; Comedy,Horror</span></article><article class="card" data-open="t45" data-genre="Comedy,Romance" data-search="friends 1994 comedy,romance series"><div class="card-win"><div class="poster p-dust" style="--tint:#F59E0B"><i></i><u></u><b>F</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.9</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Friends</h4><span>1994 &middot; Comedy,Romance</span></article><article class="card" data-open="t46" data-genre="Comedy,Romance" data-search="the big bang theory 2007 comedy,romance series"><div class="card-win"><div class="poster p-arc" style="--tint:#0891B2"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Big Bang Theory</h4><span>2007 &middot; Comedy,Romance</span></article><article class="card" data-open="t47" data-genre="Comedy,Family" data-search="modern family 2009 comedy,family series"><div class="card-win"><div class="poster p-rings" style="--tint:#0D9488"><i></i><u></u><b>M</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Modern Family</h4><span>2009 &middot; Comedy,Family</span></article><article class="card" data-open="t48" data-genre="Comedy,Family" data-search="young sheldon 2017 comedy,family series"><div class="card-win"><div class="poster p-orb" style="--tint:#CA8A04"><i></i><u></u><b>Y</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Young Sheldon</h4><span>2017 &middot; Comedy,Family</span></article><article class="card" data-open="t49" data-genre="Comedy,Mockumentary" data-search="the office 2005 comedy,mockumentary series"><div class="card-win"><div class="poster p-bars" style="--tint:#475569"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.9</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Office</h4><span>2005 &middot; Comedy,Mockumentary</span></article><article class="card" data-open="t50" data-genre="Fantasy,Adventure" data-search="percy jackson 2023 fantasy,adventure series"><div class="card-win"><div class="poster p-diag" style="--tint:#0EA5E9"><i></i><u></u><b>P</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Percy Jackson</h4><span>2023 &middot; Fantasy,Adventure</span></article><article class="card" data-open="t51" data-genre="Sci-Fi,Horror" data-search="stranger things 2016 sci-fi,horror series"><div class="card-win"><div class="poster p-dust" style="--tint:#B91C1C"><i></i><u></u><b>S</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Stranger Things</h4><span>2016 &middot; Sci-Fi,Horror</span></article><article class="card" data-open="t52" data-genre="Action,Fantasy" data-search="the umbrella academy 2019 action,fantasy series"><div class="card-win"><div class="poster p-arc" style="--tint:#7C3AED"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Umbrella Academy</h4><span>2019 &middot; Action,Fantasy</span></article><article class="card" data-open="t53" data-genre="Crime,Drama" data-search="peaky blinders 2013 crime,drama series"><div class="card-win"><div class="poster p-rings" style="--tint:#292524"><i></i><u></u><b>P</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Peaky Blinders</h4><span>2013 &middot; Crime,Drama</span></article><article class="card" data-open="t54" data-genre="Crime,Drama" data-search="snowfall 2017 crime,drama series"><div class="card-win"><div class="poster p-orb" style="--tint:#1E3A8A"><i></i><u></u><b>S</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.5</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Snowfall</h4><span>2017 &middot; Crime,Drama</span></article><article class="card" data-open="t55" data-genre="Crime,Drama" data-search="the sopranos 1999 crime,drama series"><div class="card-win"><div class="poster p-bars" style="--tint:#3F3F46"><i></i><u></u><b>T</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.2</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Sopranos</h4><span>1999 &middot; Crime,Drama</span></article><article class="card" data-open="t56" data-genre="Crime,Action" data-search="gangs of london 2020 crime,action series"><div class="card-win"><div class="poster p-diag" style="--tint:#7F1D1D"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Gangs of London</h4><span>2020 &middot; Crime,Action</span></article><article class="card" data-open="t57" data-genre="Action,Crime" data-search="reacher 2022 action,crime series"><div class="card-win"><div class="poster p-dust" style="--tint:#0F766E"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.3</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Reacher</h4><span>2022 &middot; Action,Crime</span></article><article class="card" data-open="t58" data-genre="Action,Drama" data-search="lioness 2023 action,drama series"><div class="card-win"><div class="poster p-arc" style="--tint:#92400E"><i></i><u></u><b>L</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.2</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Lioness</h4><span>2023 &middot; Action,Drama</span></article><article class="card" data-open="t59" data-genre="Action,Thriller" data-search="the night agent 2023 action,thriller series"><div class="card-win"><div class="poster p-rings" style="--tint:#1E40AF"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Night Agent</h4><span>2023 &middot; Action,Thriller</span></article><article class="card" data-open="t60" data-genre="Drama,Teen" data-search="euphoria 2019 drama,teen series"><div class="card-win"><div class="poster p-orb" style="--tint:#9333EA"><i></i><u></u><b>E</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Euphoria</h4><span>2019 &middot; Drama,Teen</span></article><article class="card" data-open="t61" data-genre="Romance,Teen" data-search="xo, kitty 2023 romance,teen series"><div class="card-win"><div class="poster p-bars" style="--tint:#F472B6"><i></i><u></u><b>X</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>XO, Kitty</h4><span>2023 &middot; Romance,Teen</span></article><article class="card" data-open="t62" data-genre="Drama,Comedy" data-search="ginny & georgia 2021 drama,comedy series"><div class="card-win"><div class="poster p-diag" style="--tint:#0E7490"><i></i><u></u><b>G</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Ginny & Georgia</h4><span>2021 &middot; Drama,Comedy</span></article><article class="card" data-open="t63" data-genre="Romance,Teen" data-search="the summer i turned pretty 2022 romance,teen series"><div class="card-win"><div class="poster p-dust" style="--tint:#FB7185"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Summer I Turned Pretty</h4><span>2022 &middot; Romance,Teen</span></article><article class="card" data-open="t64" data-genre="Romance,Drama" data-search="maxton hall 2024 romance,drama series"><div class="card-win"><div class="poster p-arc" style="--tint:#BE185D"><i></i><u></u><b>M</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Maxton Hall</h4><span>2024 &middot; Romance,Drama</span></article><article class="card" data-open="t65" data-genre="Anime,Action" data-search="black clover s2 2017 anime,action series"><div class="card-win"><div class="poster p-rings" style="--tint:#15803D"><i></i><u></u><b>B</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Black Clover S2</h4><span>2017 &middot; Anime,Action</span></article><article class="card" data-open="t66" data-genre="Anime,Adventure" data-search="one piece 2023 anime,adventure series"><div class="card-win"><div class="poster p-orb" style="--tint:#DC2626"><i></i><u></u><b>O</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>One Piece</h4><span>2023 &middot; Anime,Adventure</span></article><article class="card" data-open="t67" data-genre="Anime,Action" data-search="demon slayer 2019 anime,action series"><div class="card-win"><div class="poster p-bars" style="--tint:#065F46"><i></i><u></u><b>D</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.7</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Demon Slayer</h4><span>2019 &middot; Anime,Action</span></article><article class="card" data-open="t68" data-genre="Anime,Action" data-search="jujutsu kaisen 2020 anime,action series"><div class="card-win"><div class="poster p-diag" style="--tint:#4C1D95"><i></i><u></u><b>J</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Jujutsu Kaisen</h4><span>2020 &middot; Anime,Action</span></article><article class="card" data-open="t69" data-genre="Anime,Action" data-search="attack on titan 2013 anime,action series"><div class="card-win"><div class="poster p-dust" style="--tint:#44403C"><i></i><u></u><b>A</b></div><em class="hd">4K</em><em class="rate">&#9733; 9.1</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Attack on Titan</h4><span>2013 &middot; Anime,Action</span></article><article class="card" data-open="t70" data-genre="Anime,Fantasy" data-search="solo leveling 2024 anime,fantasy series"><div class="card-win"><div class="poster p-arc" style="--tint:#1E1B4B"><i></i><u></u><b>S</b></div><em class="hd">4K</em><em class="rate">&#9733; 8.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Solo Leveling</h4><span>2024 &middot; Anime,Fantasy</span></article><article class="card" data-open="t71" data-genre="Drama,Romance" data-search="sistas 2019 drama,romance series"><div class="card-win"><div class="poster p-rings" style="--tint:#A21CAF"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Sistas</h4><span>2019 &middot; Drama,Romance</span></article><article class="card" data-open="t72" data-genre="Drama,Thriller" data-search="the oval 2019 drama,thriller series"><div class="card-win"><div class="poster p-orb" style="--tint:#7C2D12"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.5</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Oval</h4><span>2019 &middot; Drama,Thriller</span></article><article class="card" data-open="t73" data-genre="Drama,Romance" data-search="zatima 2022 drama,romance series"><div class="card-win"><div class="poster p-bars" style="--tint:#9D174D"><i></i><u></u><b>Z</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Zatima</h4><span>2022 &middot; Drama,Romance</span></article><article class="card" data-open="t74" data-genre="Drama,Crime" data-search="ruthless 2020 drama,crime series"><div class="card-win"><div class="poster p-diag" style="--tint:#78350F"><i></i><u></u><b>R</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.4</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Ruthless</h4><span>2020 &middot; Drama,Crime</span></article><article class="card" data-open="t75" data-genre="Drama,History" data-search="sunshine through the rain 2026 drama,history series"><div class="card-win"><div class="poster p-dust" style="--tint:#F59E0B"><i></i><u></u><b>S</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.9</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Sunshine Through the Rain</h4><span>2026 &middot; Drama,History</span></article><article class="card" data-open="t76" data-genre="Romance,Fantasy" data-search="when i meet the moon 2026 romance,fantasy series"><div class="card-win"><div class="poster p-arc" style="--tint:#8B5CF6"><i></i><u></u><b>W</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.1</em><em class="epn">S2</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>When I Meet the Moon</h4><span>2026 &middot; Romance,Fantasy</span></article><article class="card" data-open="t77" data-genre="Drama,Historical" data-search="tigers sniff the rose 2026 drama,historical series"><div class="card-win"><div class="poster p-rings" style="--tint:#B45309"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.7</em><em class="epn">S3</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Tigers Sniff the Rose</h4><span>2026 &middot; Drama,Historical</span></article><article class="card" data-open="t78" data-genre="Drama,Romance" data-search="the lament of autumn 2026 drama,romance series"><div class="card-win"><div class="poster p-orb" style="--tint:#D97706"><i></i><u></u><b>T</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.8</em><em class="epn">S4</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>The Lament of Autumn</h4><span>2026 &middot; Drama,Romance</span></article><article class="card" data-open="t79" data-genre="Drama,History" data-search="blossoms of power 2026 drama,history series"><div class="card-win"><div class="poster p-bars" style="--tint:#BE123C"><i></i><u></u><b>B</b></div><em class="hd">HD</em><em class="rate">&#9733; 8.0</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Blossoms of Power</h4><span>2026 &middot; Drama,History</span></article><article class="card" data-open="t80" data-genre="Drama,History" data-search="princess zhaoyang 2026 drama,history series"><div class="card-win"><div class="poster p-diag" style="--tint:#9F1239"><i></i><u></u><b>P</b></div><em class="hd">HD</em><em class="rate">&#9733; 7.6</em><em class="epn">S1</em><div class="card-play"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div></div><h4>Princess Zhaoyang</h4><span>2026 &middot; Drama,History</span></article></div>
+      <div style="height:20px"></div>
+    </section>
+
+    <!-- LIVE TV -->
+    <section class="screen" id="livetv">
+      <div class="top"><div class="logo"><b style="font-size:15px">Live TV</b></div>
+        <div class="cnt" style="padding:0">12 channels</div></div>
+      <div class="chips"><button class="chip on">All</button><button class="chip">News</button><button class="chip">Entertainment</button><button class="chip">Sports</button><button class="chip">Movies</button><button class="chip">Kids</button><button class="chip">Music</button></div>
+      <div class="cnt" style="padding-top:2px">India &middot; 8 channels</div>
+<div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>A</b></div></div><div class="dl-txt"><h5>Aaj Tak</h5><span>News &middot; IN</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>N</b></div></div><div class="dl-txt"><h5>NDTV 24x7</h5><span>News &middot; IN</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>S</b></div></div><div class="dl-txt"><h5>Star Plus</h5><span>Entertainment &middot; IN</span></div><div class="dl-pct"></div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>S</b></div></div><div class="dl-txt"><h5>Sony SAB</h5><span>Entertainment &middot; IN</span></div><div class="dl-pct"></div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>S</b></div></div><div class="dl-txt"><h5>Star Sports 1</h5><span>Sports &middot; IN</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>C</b></div></div><div class="dl-txt"><h5>Colors TV</h5><span>Entertainment &middot; IN</span></div><div class="dl-pct"></div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>Z</b></div></div><div class="dl-txt"><h5>Zee Cinema</h5><span>Movies &middot; IN</span></div><div class="dl-pct"></div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>B</b></div></div><div class="dl-txt"><h5>BBC One</h5><span>Entertainment &middot; UK</span></div><div class="dl-pct"></div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>S</b></div></div><div class="dl-txt"><h5>Sky News</h5><span>News &middot; UK</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>C</b></div></div><div class="dl-txt"><h5>CNN</h5><span>News &middot; US</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>E</b></div></div><div class="dl-txt"><h5>ESPN</h5><span>Sports &middot; US</span></div><div class="dl-pct">LIVE</div></div><div class="dl-row"><div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><b>H</b></div></div><div class="dl-txt"><h5>HBO</h5><span>Movies &middot; US</span></div><div class="dl-pct"></div></div>
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <rect x="2.5" y="6.5" width="19" height="12" rx="2.5"/><path d="m8.5 18.5-1.5 2m8.5-2 1.5 2"/></svg>
+        <h4>No more channels</h4>
+        <p>Pick another country to browse its live channel lineup.</p>
+      </div>
+    </section>
+
+    <!-- DOWNLOADS -->
+    <section class="screen" id="downloads">
+      <div class="top"><div class="logo"><b style="font-size:15px">Downloads</b></div></div>
+      <div class="cnt" style="padding-top:4px">2 downloading &middot; 1 complete</div>
+      <div class="store"><div class="store-top"><b>Device Storage</b><span>48.2 GB of 64 GB</span></div><div class="store-bar"><i style="width:38%;background:var(--g)"></i><i style="width:22%;background:var(--blue)"></i><i style="width:15%;background:#F59E0B"></i><i style="width:25%;background:var(--surface-2)"></i></div><div class="store-key"><span><em style="background:var(--g)"></em>Downloads 18.3 GB</span><span><em style="background:var(--blue)"></em>Cache 10.6 GB</span><span><em style="background:#F59E0B"></em>App 7.2 GB</span></div></div>
+      <div class="dl-row">
+        <div class="dl-thumb"><div class="poster" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div>
+        <div class="dl-txt"><h5>The Beast</h5><span>2026 &middot; 1080p &middot; 2.1 GB</span>
+          <div class="dl-bar"><i style="width:68%"></i></div></div>
+        <div class="dl-pct">68%</div>
+      </div>
+      <div class="dl-row">
+        <div class="dl-thumb"><div class="poster" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div></div>
+        <div class="dl-txt"><h5>The Odyssey</h5><span>2026 &middot; 720p &middot; 1.4 GB</span>
+          <div class="dl-bar"><i style="width:24%"></i></div></div>
+        <div class="dl-pct">24%</div>
+      </div>
+      <div class="dl-row">
+        <div class="dl-thumb"><div class="poster" style="--tint:#B91C1C"><i></i><u></u><b>S</b></div></div>
+        <div class="dl-txt"><h5>Stranger Things</h5><span>2016 &middot; 1080p &middot; 4.8 GB &middot; Ready</span>
+          <div class="dl-bar"><i style="width:100%"></i></div></div>
+        <div class="dl-pct">100%</div>
+      </div>
+      <div class="empty">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4">
+          <path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2"/></svg>
+        <h4>No more downloads</h4>
+        <p>Download movies and shows to watch offline, anywhere.</p>
+      </div>
+    </section>
+
+    <!-- ME -->
+    <section class="screen" id="me">
+      <div class="me-head">
+        <div class="avatar">S</div>
+        <div><h2>Sameer Khan</h2>
+          <span>Member since 2024</span></div>
+      </div>
+      <div class="stats">
+        <div class="stat"><b>128</b><span>Watched</span></div>
+        <div class="stat"><b>24</b><span>Saved</span></div>
+        <div class="stat"><b>6.4</b><span>Hrs / week</span></div>
+      </div>
+      <div class="menu">
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M5 4h14v16l-7-4-7 4z"/></svg><span>My List</span>
+          <em>24</em><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="8"/><path d="M12 8v4l3 2"/></svg><span>Watch History</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 3l2.6 5.6 6.1.8-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.4l6.1-.8z"/></svg>
+          <span>Downloads</span>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M4 6h16M4 12h16M4 18h10"/></svg><span>Playback Settings</span>
+          <em>1080p</em><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <path d="M12 4v16M4 12h16"/></svg><span>Subtitle Language</span>
+          <em>English</em><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="3.2"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M18.4 5.6L17 7M7 17l-1.4 1.4"/></svg>
+          <span>Appearance</span><em>Dark</em>
+          <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+        <div class="mrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+          <circle cx="12" cy="12" r="8.5"/><path d="M12 16v-4M12 8.5v.5"/></svg><span>About</span>
+          <em>7.7 (26)</em><svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 6l6 6-6 6"/></svg></div>
+      </div>
+      <div style="height:20px"></div>
+    </section>
+
+    <!-- DETAIL -->
+    <section class="screen" id="detail">
+      <div class="dhero">
+        <div class="slide-art" id="d-art" style="--tint:#8B5CF6"><i></i><u></u></div>
+        <div class="dhero-veil"></div>
+        <div class="dhero-body">
+          <div class="dbadges">
+            <span class="db k">HD</span>
+            <span class="db q">4K DOLBY</span>
+            <span class="db f">LIMITED FREE</span>
+          </div>
+          <h1 id="d-title">The Beast</h1>
+          <div class="dmeta" id="d-meta"><span>2026</span><i></i>
+            <span>Action,Drama,Thriller</span><i></i>
+            <span class="star">&#9733; 8.4</span></div>
+          <div class="dact">
+            <label class="btn-play wide" for="r-player">
+              <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+              Play Now</label>
+            <button class="btn-ghost" data-save="t1">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/></svg>My List</button>
+            <button class="btn-ghost" aria-label="Download">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 18h16"/></svg></button>
+          </div>
+        </div>
+      </div>
+      <div class="tags" id="d-tags"></div>
+      <div class="dsec"><h3>Subtitle Preview</h3>
+        <p style="margin-bottom:2px">See how captions sit on the frame before you commit.</p></div>
+      <div class="subs"><div class="scene"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><div class="sub-meta">EN &middot; CC</div><div class="sub-line"><b>&ldquo;The lamp has been burning for forty-one years.<br>Nobody ever asked who lights it.&rdquo;</b></div></div>
+      <div class="dsec"><h3>Cast</h3></div>
+      <div class="cast"><div class="castc"><div class="av"><div class="poster p-arc" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Aditya Kulkarni</b><span>Detective Rao</span></div><div class="castc"><div class="av"><div class="poster p-rings" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Rhea Menon</b><span>Meera</span></div><div class="castc"><div class="av"><div class="poster p-orb" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Sana Bhatt</b><span>Inspector Qureshi</span></div><div class="castc"><div class="av"><div class="poster p-bars" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Ira Sengupta</b><span>Director</span></div><div class="castc"><div class="av"><div class="poster p-diag" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Dev Joshi</b><span>Supervisor</span></div><div class="castc"><div class="av"><div class="poster p-dust" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><b>Saira Khan</b><span>Nurse Farida</span></div></div>
+      <div class="dsec"><h3>Storyline</h3>
+        <p id="d-syn">A father and his two daughters find themselves hunted by a massive rogue lion intent on proving that the savannah has but one apex predator.</p></div>
+      <div class="dsec" id="d-epsec" style="display:none"><h3>Episodes</h3></div>
+      <div class="eps" id="d-eps" style="display:none">
+        <div class="ep"><div class="ep-thumb"><div class="poster" style="--tint:#1D4ED8"><i></i><u></u></div></div>
+          <div class="ep-txt"><h5>E01 &middot; The Opening</h5><span>48 min &middot; 1080p</span></div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="ep"><div class="ep-thumb"><div class="poster" style="--tint:#1D4ED8"><i></i><u></u></div></div>
+          <div class="ep-txt"><h5>E02 &middot; Night Shift</h5><span>52 min &middot; 1080p</span></div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+        <div class="ep"><div class="ep-thumb"><div class="poster" style="--tint:#1D4ED8"><i></i><u></u></div></div>
+          <div class="ep-txt"><h5>E03 &middot; What the Mill Keeps</h5><span>46 min &middot; 1080p</span></div>
+          <svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg></div>
+      </div>
+      <div class="dsec"><h3>Screenshots</h3></div>
+      <div class="shots"><div class="shot"><div class="poster p-rings" style="--tint:#8B5CF6"><i></i><u></u><b>T</b></div></div><div class="shot"><div class="poster p-orb" style="--tint:#0EA5E9"><i></i><u></u><b>T</b></div></div><div class="shot"><div class="poster p-bars" style="--tint:#F59E0B"><i></i><u></u><b>T</b></div></div><div class="shot"><div class="poster p-diag" style="--tint:#B91C1C"><i></i><u></u><b>S</b></div></div></div>
+      <div class="dsec"><h3>Download Quality</h3>
+        <p style="margin-bottom:2px">Pick the copy that fits your data plan.</p></div>
+      <div class="ladder"><div class="lrow top"><span class="lbadge">4K</span><span>Dolby Vision &middot; Atmos</span><div class="lbars"><i class="on" style="height:3px"></i><i class="on" style="height:5px"></i><i class="on" style="height:7px"></i><i class="on" style="height:9px"></i></div><em class="lsize">7.8 GB</em></div><div class="lrow"><span class="lbadge">1080p</span><span>HDR10 &middot; 5.1</span><div class="lbars"><i class="on" style="height:3px"></i><i class="on" style="height:5px"></i><i class="on" style="height:7px"></i><i style="height:9px"></i></div><em class="lsize">2.1 GB</em></div><div class="lrow"><span class="lbadge">720p</span><span>Standard &middot; Stereo</span><div class="lbars"><i class="on" style="height:3px"></i><i class="on" style="height:5px"></i><i style="height:7px"></i><i style="height:9px"></i></div><em class="lsize">980 MB</em></div><div class="lrow"><span class="lbadge">480p</span><span>Data saver</span><div class="lbars"><i class="on" style="height:3px"></i><i style="height:5px"></i><i style="height:7px"></i><i style="height:9px"></i></div><em class="lsize">420 MB</em></div></div>
+      <div class="dsec"><h3>Production Timeline</h3></div>
+      <div class="tl"><div class="tlrow"><div class="tldot"></div><div class="tltxt"><b>Development</b><span>Announced with the original slate</span></div></div><div class="tlrow"><div class="tldot"></div><div class="tltxt"><b>Production</b><span>Shot across three coastal districts</span></div></div><div class="tlrow"><div class="tldot"></div><div class="tltxt"><b>Post</b><span>Score recorded with a 41-piece orchestra</span></div></div><div class="tlrow now"><div class="tldot"></div><div class="tltxt"><b>Release</b><span>Streaming now in 4K Dolby Vision</span></div></div><div class="tlrow"><div class="tldot"></div><div class="tltxt"><b>Next</b><span>Commentary track arriving in December</span></div></div></div>
+      <div class="dsec"><h3>Trivia</h3></div>
+      <div class="trivia"><div class="tq"><b>&#9679;</b><p>The lighthouse was built as a set, then donated to the village.</p></div><div class="tq"><b>&#9679;</b><p>Every radio voice in the film is the same actor, uncredited.</p></div><div class="tq"><b>&#9679;</b><p>Shot in 34 days, mostly between 4 and 6 in the morning.</p></div></div>
+      <div class="dsec"><h3>Details</h3></div>
+      <div class="menu" style="margin-top:0">
+        <div class="mrow"><span style="color:var(--txt-3);font-size:11px">Director</span><em>Ira Sengupta</em></div>
+        <div class="mrow"><span style="color:var(--txt-3);font-size:11px">Cast</span><em>Aditya Kulkarni, Rhea Menon</em></div>
+        <div class="mrow"><span style="color:var(--txt-3);font-size:11px">Language</span><em>Hindi, English</em></div>
+        <div class="mrow"><span style="color:var(--txt-3);font-size:11px">Quality</span><em>1080p &middot; HD</em></div>
+      </div>
+      <div style="height:24px"></div>
+    </section>
+
+    <!-- PLAYER -->
+    <section class="screen" id="player">
+      <div class="pwrap">
+        <div class="pwin">
+          <div class="slide-art" style="--tint:#8B5CF6"><i></i><u></u></div>
+          <button class="pbig"><i><svg viewBox="0 0 24 24" fill="currentColor">
+            <path d="M8 5v14l11-7z"/></svg></i></button>
+          <div class="pui">
+            <div class="ptop">
+              <div><h4>The Beast</h4><span>2026 &middot; 1080p</span></div>
+              <label class="icobtn" for="r-detail" style="color:#fff">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M6 6l12 12M18 6L6 18"/></svg></label>
+            </div>
+            <div class="pbot">
+              <div class="scrub"><i></i></div>
+              <div class="ptime"><span>00:38:14</span><span>02:04:00</span></div>
+              <div class="pctl">
+                <button class="pc"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M11 5L4 12l7 7V5zm9 0l-7 7 7 7V5z"/></svg></button>
+                <button class="pc big"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
+                <button class="pc"><svg viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M13 5l7 7-7 7V5zM4 5l7 7-7 7V5z"/></svg></button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <label class="back" for="r-home">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+      <path d="M15 5l-7 7 7 7"/></svg>
+  </label>
+
+  <nav class="bnav">
+    <label class="nb" for="r-home">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+        <path d="M4 10.5L12 4l8 6.5V20a1 1 0 01-1 1h-4v-6H9v6H5a1 1 0 01-1-1z"/></svg>
+      <span>Home</span></label>
+    <label class="nb" for="r-search">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+        <circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+      <span>Search</span></label>
+    <label class="nb" for="r-livetv">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+        <rect x="2.5" y="6.5" width="19" height="12" rx="2.5"/><path d="m8.5 18.5-1.5 2m8.5-2 1.5 2"/></svg>
+      <span>Live TV</span></label>
+    <label class="nb" for="r-downloads">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+        <path d="M12 3v12m0 0l-4-4m4 4l4-4"/><path d="M4 18h16"/></svg>
+      <span>Downloads</span></label>
+    <label class="nb" for="r-me">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9">
+        <circle cx="12" cy="8" r="3.6"/><path d="M4.5 20c0-3.8 3.4-5.8 7.5-5.8s7.5 2 7.5 5.8"/></svg>
+      <span>Me</span></label>
+  </nav>
+
+</div>
+</div>
+
+<script>window.MB = {"t1": {"title": "The Beast", "year": 2026, "genres": "Action,Drama,Thriller", "rating": 8.4, "kind": "Movie", "tint": "#8B5CF6"}, "t2": {"title": "12 12 12", "year": 2026, "genres": "Action,Crime,Drama", "rating": 7.9, "kind": "Movie", "tint": "#EF4444"}, "t3": {"title": "The Rings of Power", "year": 2022, "genres": "Action,Adventure,Drama", "rating": 8.1, "kind": "Series", "tint": "#F59E0B"}, "t4": {"title": "The Gospel of Christmas", "year": 2026, "genres": "Drama,Family,Music", "rating": 7.6, "kind": "Movie", "tint": "#10B981"}, "t5": {"title": "Street Fighter", "year": 2026, "genres": "Action", "rating": 7.2, "kind": "Movie", "tint": "#F97316"}, "t6": {"title": "The Body", "year": 2026, "genres": "Drama,Horror,Mystery", "rating": 7.8, "kind": "Movie", "tint": "#64748B"}, "t7": {"title": "Other Mommy", "year": 2026, "genres": "Horror,Thriller", "rating": 7.4, "kind": "Movie", "tint": "#BE123C"}, "t8": {"title": "The Odyssey", "year": 2026, "genres": "Action,Adventure,Drama", "rating": 8.6, "kind": "Movie", "tint": "#0EA5E9"}, "t9": {"title": "The Remarried Empress", "year": 2026, "genres": "Drama,Fantasy,History", "rating": 8.3, "kind": "Series", "tint": "#A855F7"}, "t10": {"title": "Tulsa King", "year": 2022, "genres": "Action,Crime,Drama", "rating": 8.8, "kind": "Series", "tint": "#78716C"}, "t11": {"title": "Black Clover", "year": 2017, "genres": "Anime,Action,Adventure", "rating": 8.5, "kind": "Series", "tint": "#22C55E"}, "t12": {"title": "Love in Disguise", "year": 2026, "genres": "Romance,Drama", "rating": 7.7, "kind": "Series", "tint": "#EC4899"}, "t13": {"title": "100 Days of Deception", "year": 2026, "genres": "Drama,Mystery", "rating": 7.5, "kind": "Series", "tint": "#6366F1"}, "t14": {"title": "MobLand", "year": 2025, "genres": "Crime,Drama", "rating": 8.2, "kind": "Series", "tint": "#B91C1C"}, "t15": {"title": "Campus Drivers", "year": 2026, "genres": "Romance,Teen", "rating": 7.3, "kind": "Series", "tint": "#F472B6"}, "t16": {"title": "Homestead", "year": 2025, "genres": "Drama,Family", "rating": 7.1, "kind": "Series", "tint": "#84CC16"}, "t17": {"title": "Black Doves", "year": 2024, "genres": "Action,Thriller", "rating": 8.0, "kind": "Series", "tint": "#334155"}, "t18": {"title": "All's Fair", "year": 2025, "genres": "Drama,Legal", "rating": 7.6, "kind": "Series", "tint": "#D97706"}, "t19": {"title": "The Covenant", "year": 2025, "genres": "Action,War", "rating": 7.9, "kind": "Series", "tint": "#78350F"}, "t20": {"title": "The Terminal List", "year": 2022, "genres": "Action,Thriller", "rating": 8.4, "kind": "Series", "tint": "#475569"}, "t21": {"title": "Lupin", "year": 2021, "genres": "Crime,Mystery", "rating": 8.3, "kind": "Series", "tint": "#1D4ED8"}, "t22": {"title": "Spinners", "year": 2025, "genres": "Drama,Crime", "rating": 7.8, "kind": "Series", "tint": "#0891B2"}, "t23": {"title": "VisionQuest", "year": 2026, "genres": "Action,Sci-Fi", "rating": 7.7, "kind": "Series", "tint": "#7C3AED"}, "t24": {"title": "Doctor X", "year": 2026, "genres": "Drama,Medical", "rating": 8.0, "kind": "Series", "tint": "#059669"}, "t25": {"title": "Guarding Stars", "year": 2026, "genres": "Drama,Romance", "rating": 7.9, "kind": "Movie", "tint": "#F43F5E"}, "t26": {"title": "Heart of the Beast", "year": 2026, "genres": "Action,Adventure", "rating": 7.5, "kind": "Movie", "tint": "#A16207"}, "t27": {"title": "Resident Evil", "year": 2026, "genres": "Horror,Action", "rating": 7.3, "kind": "Movie", "tint": "#991B1B"}, "t28": {"title": "Forgotten Island", "year": 2026, "genres": "Adventure,Fantasy", "rating": 7.4, "kind": "Movie", "tint": "#0D9488"}, "t29": {"title": "Hope", "year": 2026, "genres": "Drama,Sci-Fi", "rating": 8.2, "kind": "Movie", "tint": "#3B82F6"}, "t30": {"title": "The Dog Stars", "year": 2026, "genres": "Sci-Fi,Drama", "rating": 8.0, "kind": "Movie", "tint": "#7E22CE"}, "t31": {"title": "Verity", "year": 2026, "genres": "Thriller,Mystery", "rating": 7.8, "kind": "Movie", "tint": "#1E293B"}, "t32": {"title": "Heartland", "year": 2026, "genres": "Drama,Family", "rating": 7.2, "kind": "Movie", "tint": "#65A30D"}, "t33": {"title": "Warlord: Olori Ogun", "year": 2026, "genres": "Action,Drama", "rating": 7.6, "kind": "Movie", "tint": "#92400E"}, "t34": {"title": "Chasing Shadows", "year": 2026, "genres": "Crime,Thriller", "rating": 7.4, "kind": "Movie", "tint": "#1F2937"}, "t35": {"title": "Time Bound", "year": 2026, "genres": "Sci-Fi,Action", "rating": 7.7, "kind": "Movie", "tint": "#4338CA"}, "t36": {"title": "Beyond Blood", "year": 2026, "genres": "Drama,Crime", "rating": 7.5, "kind": "Movie", "tint": "#7F1D1D"}, "t37": {"title": "Avatar: Seven Havens", "year": 2026, "genres": "Animation,Fantasy", "rating": 8.4, "kind": "Series", "tint": "#0284C7"}, "t38": {"title": "Cyberpunk: Edgerunners", "year": 2022, "genres": "Animation,Sci-Fi", "rating": 8.7, "kind": "Series", "tint": "#EAB308"}, "t39": {"title": "Rick and Morty", "year": 2013, "genres": "Animation,Comedy", "rating": 8.6, "kind": "Series", "tint": "#16A34A"}, "t40": {"title": "Invincible", "year": 2021, "genres": "Animation,Action", "rating": 8.5, "kind": "Series", "tint": "#DC2626"}, "t41": {"title": "Game of Thrones", "year": 2011, "genres": "Fantasy,Drama", "rating": 9.0, "kind": "Series", "tint": "#4B5563"}, "t42": {"title": "House of the Dragon", "year": 2022, "genres": "Fantasy,Drama", "rating": 8.4, "kind": "Series", "tint": "#B45309"}, "t43": {"title": "The Witcher", "year": 2019, "genres": "Fantasy,Action", "rating": 8.0, "kind": "Series", "tint": "#9A3412"}, "t44": {"title": "Wednesday", "year": 2022, "genres": "Comedy,Horror", "rating": 8.3, "kind": "Series", "tint": "#3730A3"}, "t45": {"title": "Friends", "year": 1994, "genres": "Comedy,Romance", "rating": 8.9, "kind": "Series", "tint": "#F59E0B"}, "t46": {"title": "The Big Bang Theory", "year": 2007, "genres": "Comedy,Romance", "rating": 8.6, "kind": "Series", "tint": "#0891B2"}, "t47": {"title": "Modern Family", "year": 2009, "genres": "Comedy,Family", "rating": 8.5, "kind": "Series", "tint": "#0D9488"}, "t48": {"title": "Young Sheldon", "year": 2017, "genres": "Comedy,Family", "rating": 8.2, "kind": "Series", "tint": "#CA8A04"}, "t49": {"title": "The Office", "year": 2005, "genres": "Comedy,Mockumentary", "rating": 8.9, "kind": "Series", "tint": "#475569"}, "t50": {"title": "Percy Jackson", "year": 2023, "genres": "Fantasy,Adventure", "rating": 7.8, "kind": "Series", "tint": "#0EA5E9"}, "t51": {"title": "Stranger Things", "year": 2016, "genres": "Sci-Fi,Horror", "rating": 8.7, "kind": "Series", "tint": "#B91C1C"}, "t52": {"title": "The Umbrella Academy", "year": 2019, "genres": "Action,Fantasy", "rating": 7.9, "kind": "Series", "tint": "#7C3AED"}, "t53": {"title": "Peaky Blinders", "year": 2013, "genres": "Crime,Drama", "rating": 8.8, "kind": "Series", "tint": "#292524"}, "t54": {"title": "Snowfall", "year": 2017, "genres": "Crime,Drama", "rating": 8.5, "kind": "Series", "tint": "#1E3A8A"}, "t55": {"title": "The Sopranos", "year": 1999, "genres": "Crime,Drama", "rating": 9.2, "kind": "Series", "tint": "#3F3F46"}, "t56": {"title": "Gangs of London", "year": 2020, "genres": "Crime,Action", "rating": 8.1, "kind": "Series", "tint": "#7F1D1D"}, "t57": {"title": "Reacher", "year": 2022, "genres": "Action,Crime", "rating": 8.3, "kind": "Series", "tint": "#0F766E"}, "t58": {"title": "Lioness", "year": 2023, "genres": "Action,Drama", "rating": 8.2, "kind": "Series", "tint": "#92400E"}, "t59": {"title": "The Night Agent", "year": 2023, "genres": "Action,Thriller", "rating": 7.9, "kind": "Series", "tint": "#1E40AF"}, "t60": {"title": "Euphoria", "year": 2019, "genres": "Drama,Teen", "rating": 8.1, "kind": "Series", "tint": "#9333EA"}, "t61": {"title": "XO, Kitty", "year": 2023, "genres": "Romance,Teen", "rating": 7.4, "kind": "Series", "tint": "#F472B6"}, "t62": {"title": "Ginny & Georgia", "year": 2021, "genres": "Drama,Comedy", "rating": 8.0, "kind": "Series", "tint": "#0E7490"}, "t63": {"title": "The Summer I Turned Pretty", "year": 2022, "genres": "Romance,Teen", "rating": 7.6, "kind": "Series", "tint": "#FB7185"}, "t64": {"title": "Maxton Hall", "year": 2024, "genres": "Romance,Drama", "rating": 7.9, "kind": "Series", "tint": "#BE185D"}, "t65": {"title": "Black Clover S2", "year": 2017, "genres": "Anime,Action", "rating": 8.6, "kind": "Series", "tint": "#15803D"}, "t66": {"title": "One Piece", "year": 2023, "genres": "Anime,Adventure", "rating": 8.8, "kind": "Series", "tint": "#DC2626"}, "t67": {"title": "Demon Slayer", "year": 2019, "genres": "Anime,Action", "rating": 8.7, "kind": "Series", "tint": "#065F46"}, "t68": {"title": "Jujutsu Kaisen", "year": 2020, "genres": "Anime,Action", "rating": 8.6, "kind": "Series", "tint": "#4C1D95"}, "t69": {"title": "Attack on Titan", "year": 2013, "genres": "Anime,Action", "rating": 9.1, "kind": "Series", "tint": "#44403C"}, "t70": {"title": "Solo Leveling", "year": 2024, "genres": "Anime,Fantasy", "rating": 8.4, "kind": "Series", "tint": "#1E1B4B"}, "t71": {"title": "Sistas", "year": 2019, "genres": "Drama,Romance", "rating": 7.8, "kind": "Series", "tint": "#A21CAF"}, "t72": {"title": "The Oval", "year": 2019, "genres": "Drama,Thriller", "rating": 7.5, "kind": "Series", "tint": "#7C2D12"}, "t73": {"title": "Zatima", "year": 2022, "genres": "Drama,Romance", "rating": 7.6, "kind": "Series", "tint": "#9D174D"}, "t74": {"title": "Ruthless", "year": 2020, "genres": "Drama,Crime", "rating": 7.4, "kind": "Series", "tint": "#78350F"}, "t75": {"title": "Sunshine Through the Rain", "year": 2026, "genres": "Drama,History", "rating": 7.9, "kind": "Series", "tint": "#F59E0B"}, "t76": {"title": "When I Meet the Moon", "year": 2026, "genres": "Romance,Fantasy", "rating": 8.1, "kind": "Series", "tint": "#8B5CF6"}, "t77": {"title": "Tigers Sniff the Rose", "year": 2026, "genres": "Drama,Historical", "rating": 7.7, "kind": "Series", "tint": "#B45309"}, "t78": {"title": "The Lament of Autumn", "year": 2026, "genres": "Drama,Romance", "rating": 7.8, "kind": "Series", "tint": "#D97706"}, "t79": {"title": "Blossoms of Power", "year": 2026, "genres": "Drama,History", "rating": 8.0, "kind": "Series", "tint": "#BE123C"}, "t80": {"title": "Princess Zhaoyang", "year": 2026, "genres": "Drama,History", "rating": 7.6, "kind": "Series", "tint": "#9F1239"}};</script>
+<script>
+/* Enhancement only. Page is complete without this. */
+(function(){
+  try{
+    var SYN = {
+      Movie:"A father and his two daughters find themselves hunted by a massive rogue lion intent on proving that the savannah has but one apex predator.",
+      Series:"A season of slow-burning pressure, where every quiet decision turns out to have been the loudest one."
+    };
+    function go(id){var r=document.getElementById('r-'+id);if(r)r.checked=true;}
+    function set(id,v){var e=document.getElementById(id);if(e)e.textContent=v;}
+
+    document.addEventListener('click',function(e){
+      var o=e.target.closest('[data-open]');
+      if(o){var d=window.MB[o.getAttribute('data-open')];if(d){fill(d);go('detail');}return;}
+      var s=e.target.closest('[data-save]');
+      if(s){s.classList.toggle('on');return;}
+      var g=e.target.closest('[data-genre-filter]');
+      if(g){
+        var all=document.querySelectorAll('[data-genre-filter]');
+        for(var i=0;i<all.length;i++)all[i].classList.remove('on');
+        g.classList.add('on');filter(g.getAttribute('data-genre-filter'));
+      }
+    });
+
+    function fill(d){
+      set('d-title',d.title);
+      var m=document.getElementById('d-meta');
+      if(m)m.innerHTML='<span>'+d.year+'</span><i></i><span>'+d.genres+
+        '</span><i></i><span class="star">\u2605 '+Number(d.rating).toFixed(1)+'</span>';
+      var a=document.getElementById('d-art');
+      if(a)a.style.setProperty('--tint',d.tint);
+      var t=document.getElementById('d-tags');
+      if(t)t.innerHTML=d.genres.split(',').map(function(x){
+        return '<span class="tag">'+x+'</span>';}).join('')+
+        '<span class="tag">'+d.kind+'</span><span class="tag">HD</span>';
+      set('d-syn',SYN[d.kind]||SYN.Movie);
+      var show=d.kind==='Series'?'':'none';
+      var es=document.getElementById('d-epsec'),el=document.getElementById('d-eps');
+      if(es)es.style.display=show; if(el)el.style.display=show;
+      var sc=document.getElementById('detail'); if(sc)sc.scrollTop=0;
+    }
+
+    function filter(genre){
+      var q=(document.getElementById('q')||{}).value||'';
+      q=q.trim().toLowerCase();
+      var cards=document.querySelectorAll('#allgrid .card'),n=0;
+      for(var i=0;i<cards.length;i++){
+        var cg=cards[i].getAttribute('data-genre')||'',cs=cards[i].getAttribute('data-search')||'';
+        var okG=genre==='All'||cg.indexOf(genre)>-1;
+        var okQ=!q||cs.indexOf(q)>-1;
+        cards[i].style.display=(okG&&okQ)?'':'none'; if(okG&&okQ)n++;
+      }
+      set('cnt',n+' results');
+    }
+    var q=document.getElementById('q');
+    if(q)q.addEventListener('input',function(){
+      var on=document.querySelector('[data-genre-filter].on');
+      filter(on?on.getAttribute('data-genre-filter'):'All');
+    });
+
+    /* hero auto-rotate; first slide is already visible without this */
+    var slides=document.querySelectorAll('.slide'),dots=document.querySelectorAll('.dot'),idx=0;
+    if(slides.length>1){
+      setInterval(function(){
+        slides[idx].classList.remove('on'); if(dots[idx])dots[idx].classList.remove('on');
+        idx=(idx+1)%slides.length;
+        slides[idx].classList.add('on'); if(dots[idx])dots[idx].classList.add('on');
+      },4200);
+    }
+  }catch(err){}
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0A0A0C">
+<title>Flixvora &mdash; Design Study</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,700;0,900;1,400;1,700&family=Archivo:wght@300;400;500;600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0A0A0C; --ink-1:#0E0E11; --ink-2:#14141A; --ink-3:#1C1C24;
+  --paper:#F3EDE3; --paper-2:#DCD4C6; --paper-3:#A9A294;
+  --red:#F2402A; --gold:#D8A93B;
+  --line:rgba(243,237,227,.13); --line-soft:rgba(243,237,227,.07);
+  --serif:"Bodoni Moda","Noto Serif",Georgia,"Times New Roman",serif;
+  --sans:"Archivo","Helvetica Neue",Helvetica,Arial,sans-serif;
+  --mono:"DM Mono",ui-monospace,"Courier New",monospace;
+  --ease:cubic-bezier(.2,.8,.2,1);
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;}
+body{
+  background:#07070A; color:var(--paper); font-family:var(--sans);
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:24px 12px;
+}
+.stage{width:100%; max-width:392px;}
+.phone{
+  position:relative; width:100%; height:820px; max-height:calc(100vh - 48px);
+  min-height:560px; border-radius:38px; overflow:hidden;
+  background:var(--ink); border:1px solid rgba(243,237,227,.12);
+  box-shadow:0 40px 80px -30px #000;
+}
+/* hide the radio inputs that drive CSS-only navigation */
+.navradio{position:absolute;left:-9999px;width:1px;height:1px;opacity:0;}
+
+/* ── status bar ─────────────────────────────────────────── */
+.statusbar{
+  position:absolute;top:0;left:0;right:0;height:44px;z-index:50;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 24px 0;pointer-events:none;
+  font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--paper-2);
+}
+.sb-bars{display:flex;gap:4px;align-items:flex-end;}
+.sb-bars i{display:block;width:3px;background:currentColor;border-radius:1px;}
+
+/* ── screens ────────────────────────────────────────────── */
+.screens{position:absolute;top:0;left:0;right:0;bottom:0;}
+.screen{display:none;position:absolute;top:0;left:0;right:0;bottom:0;
+  overflow-y:auto;overflow-x:hidden;padding-bottom:92px;-webkit-overflow-scrolling:touch;}
+.screen::-webkit-scrollbar{width:0;height:0;}
+#r-home:checked ~ .screens > #home,
+#r-browse:checked ~ .screens > #browse,
+#r-live:checked ~ .screens > #live,
+#r-saved:checked ~ .screens > #saved,
+#r-you:checked ~ .screens > #you,
+#r-detail:checked ~ .screens > #detail,
+#r-player:checked ~ .screens > #player{display:block;}
+
+/* ── masthead ───────────────────────────────────────────── */
+.masthead{padding:54px 20px 12px;display:flex;align-items:flex-start;justify-content:space-between;}
+.wordmark{font-family:var(--serif);font-weight:900;font-size:28px;letter-spacing:-.03em;
+  line-height:.92;margin:0;color:var(--paper);}
+.wordmark em{font-style:normal;color:var(--red);}
+.masthead-sub{font-family:var(--mono);font-size:9px;letter-spacing:.24em;color:var(--paper-3);
+  margin-top:7px;text-transform:uppercase;}
+.avatar{width:36px;height:36px;border-radius:50%;border:1px solid var(--line);
+  background:radial-gradient(circle at 30% 25%,#3A3A46,#16161C 70%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:13px;color:var(--paper-2);position:relative;}
+.avatar::after{content:"";position:absolute;right:-1px;bottom:-1px;width:9px;height:9px;
+  border-radius:50%;background:var(--red);box-shadow:0 0 0 2.5px var(--ink);}
+
+/* ── ticker ─────────────────────────────────────────────── */
+.ticker{border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+  overflow:hidden;padding:8px 0;margin-top:10px;}
+.ticker-track{display:flex;gap:24px;width:max-content;animation:slide 34s linear infinite;}
+.ticker span{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--paper-3);
+  text-transform:uppercase;white-space:nowrap;}
+@keyframes slide{to{transform:translateX(-50%);}}
+
+/* ── art (procedural poster art) ────────────────────────── */
+.art{position:absolute;top:0;left:0;right:0;bottom:0;overflow:hidden;}
+.art::before{content:"";position:absolute;top:-10%;left:-10%;right:-10%;bottom:-10%;
+  background:radial-gradient(60% 55% at 22% 12%,var(--a) 0%,transparent 62%),
+             radial-gradient(75% 70% at 88% 88%,var(--b) 0%,transparent 66%),
+             linear-gradient(168deg,#101018 8%,#05050A 92%);}
+.art::after{content:"";position:absolute;top:0;left:0;right:0;bottom:0;
+  background-image:radial-gradient(circle at center,rgba(10,10,12,.85) 1px,transparent 1.4px);
+  background-size:5px 5px;opacity:.28;}
+.art i{position:absolute;display:block;}
+.art.p-arc i{width:74%;height:0;padding-bottom:74%;border-radius:50%;
+  border:1.5px solid rgba(243,237,227,.42);left:-16%;top:6%;
+  box-shadow:0 0 0 20px rgba(243,237,227,.055),0 0 0 48px rgba(243,237,227,.03);}
+.art.p-rings i{width:64%;height:0;padding-bottom:64%;border-radius:50%;
+  border:1.5px solid rgba(243,237,227,.38);right:-14%;top:10%;
+  box-shadow:0 0 0 14px rgba(243,237,227,.06),0 0 0 34px rgba(243,237,227,.035);}
+.art.p-orb i{width:58%;height:0;padding-bottom:58%;border-radius:50%;right:-8%;bottom:14%;
+  background:radial-gradient(circle at 34% 30%,rgba(243,237,227,.5),rgba(243,237,227,.05) 62%,transparent 72%);}
+.art.p-bars i{top:0;left:0;right:0;bottom:0;
+  background:repeating-linear-gradient(102deg,rgba(243,237,227,.15) 0 1.5px,transparent 1.5px 17px);}
+.art.p-diag i{width:180%;height:38%;left:-40%;top:26%;
+  background:linear-gradient(90deg,transparent,rgba(243,237,227,.22),transparent);transform:rotate(-24deg);}
+
+/* ── hero ───────────────────────────────────────────────── */
+.hero{position:relative;margin:14px 14px 0;border-radius:18px;overflow:hidden;
+  height:420px;border:1px solid var(--line);}
+.hero-scrim{position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;
+  background:linear-gradient(to top,#08080C 6%,rgba(8,8,12,.92) 30%,rgba(8,8,12,.28) 62%,transparent 88%);}
+.perf{position:absolute;left:0;top:0;bottom:0;width:12px;z-index:3;opacity:.45;
+  background:repeating-linear-gradient(to bottom,transparent 0 9px,rgba(243,237,227,.16) 9px 17px);}
+.hero-body{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:18px 20px 20px;}
+.kicker{display:block;font-family:var(--mono);font-size:8.5px;letter-spacing:.26em;
+  text-transform:uppercase;color:var(--paper-2);margin-bottom:10px;}
+.hero h1{font-family:var(--serif);font-weight:900;font-size:44px;line-height:.88;
+  letter-spacing:-.035em;margin:0 0 12px;}
+.hero h1 em{font-style:italic;font-weight:400;}
+.meta-row{display:flex;align-items:center;flex-wrap:wrap;gap:8px;
+  font-family:var(--mono);font-size:9px;letter-spacing:.14em;color:var(--paper-2);
+  text-transform:uppercase;margin-bottom:16px;}
+.meta-row .dot{width:3px;height:3px;border-radius:50%;background:var(--paper-3);}
+.meta-row .star{color:var(--gold);letter-spacing:.04em;}
+.actions{display:flex;gap:8px;align-items:center;}
+
+/* ── buttons ────────────────────────────────────────────── */
+.btn{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  border:none;cursor:pointer;display:inline-flex;align-items:center;gap:7px;
+  border-radius:100px;padding:12px 18px;text-decoration:none;
+  transition:transform .2s var(--ease),background .2s;}
+.btn:active{transform:scale(.96);}
+.btn-solid{background:var(--paper);color:#0A0A0C;font-weight:500;}
+.btn-ghost{background:rgba(243,237,227,.08);color:var(--paper);
+  box-shadow:inset 0 0 0 1px rgba(243,237,227,.22);}
+.btn-ghost.on{background:var(--red);color:#fff;box-shadow:none;}
+.icon-btn{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;background:rgba(243,237,227,.08);
+  color:var(--paper);border:none;box-shadow:inset 0 0 0 1px rgba(243,237,227,.2);}
+
+/* ── section headers ────────────────────────────────────── */
+.sec{margin-top:32px;}
+.sec-head{display:flex;align-items:baseline;justify-content:space-between;
+  padding:13px 20px 0;margin-bottom:14px;border-top:1px solid var(--line);}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-style:italic;font-size:22px;
+  letter-spacing:-.02em;margin:0;}
+.sec-head .idx{font-family:var(--mono);font-size:8.5px;letter-spacing:.22em;
+  color:var(--paper-3);text-transform:uppercase;}
+
+/* ── poster ─────────────────────────────────────────────── */
+.rail{display:flex;gap:12px;overflow-x:auto;overflow-y:hidden;padding:0 20px 4px;}
+.rail::-webkit-scrollbar{height:0;}
+.poster{flex:0 0 124px;height:186px;cursor:pointer;position:relative;
+  transition:transform .35s var(--ease);}
+.poster:hover{transform:translateY(-4px);}
+.poster-frame{position:relative;width:100%;height:100%;border-radius:10px;overflow:hidden;
+  border:1px solid rgba(243,237,227,.12);}
+.poster-title{position:absolute;left:0;right:0;bottom:0;z-index:3;padding:9px 9px 8px;
+  background:linear-gradient(to top,rgba(6,6,10,.96) 30%,transparent);}
+.poster-title h4{font-family:var(--serif);font-weight:700;font-size:12.5px;line-height:1.04;
+  letter-spacing:-.01em;margin:0 0 3px;text-transform:uppercase;}
+.poster-title span{font-family:var(--mono);font-size:7.5px;letter-spacing:.14em;
+  color:var(--paper-3);text-transform:uppercase;}
+.poster-num{position:absolute;top:3px;left:6px;z-index:4;font-family:var(--serif);
+  font-size:32px;font-weight:900;font-style:italic;line-height:1;color:var(--paper);
+  text-shadow:0 1px 10px rgba(0,0,0,.95),0 0 24px rgba(0,0,0,.9);}
+.badge{position:absolute;top:7px;right:7px;z-index:4;font-family:var(--mono);font-size:7px;
+  letter-spacing:.14em;text-transform:uppercase;padding:3px 5px;border-radius:3px;
+  background:var(--red);color:#fff;}
+.badge.ghost{background:rgba(10,10,12,.72);color:var(--paper-2);
+  box-shadow:inset 0 0 0 1px rgba(243,237,227,.25);}
+
+/* ── editorial ──────────────────────────────────────────── */
+.editorial{margin:0 14px;padding:18px;border-radius:16px;border:1px solid var(--line);
+  background:linear-gradient(160deg,#12121A,#0B0B10);
+  display:flex;gap:16px;align-items:flex-start;}
+.editorial .poster{flex:0 0 96px;height:144px;}
+.editorial-body{flex:1;min-width:0;}
+.editorial-body h3{font-family:var(--serif);font-weight:700;font-size:22px;line-height:.96;
+  letter-spacing:-.025em;margin:0 0 8px;text-transform:uppercase;}
+.editorial-body p{font-size:12px;line-height:1.6;color:var(--paper-2);margin:0 0 12px;
+  font-weight:300;}
+.link-arrow{font-family:var(--mono);font-size:8.5px;letter-spacing:.2em;text-transform:uppercase;
+  color:var(--paper);background:none;border:none;border-bottom:1px solid var(--red);
+  padding:0 0 3px;cursor:pointer;}
+
+/* ── browse ─────────────────────────────────────────────── */
+.searchwrap{padding:0 20px;}
+.searchfield{display:flex;align-items:center;gap:10px;padding:13px 15px;border-radius:12px;
+  background:var(--ink-2);border:1px solid var(--line);}
+.searchfield input{flex:1;background:none;border:none;outline:none;font-family:var(--sans);
+  font-size:13px;color:var(--paper);}
+.searchfield input::placeholder{color:var(--paper-3);}
+.chips{display:flex;gap:7px;overflow-x:auto;padding:14px 20px 4px;}
+.chips::-webkit-scrollbar{height:0;}
+.chip{flex:0 0 auto;cursor:pointer;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.16em;text-transform:uppercase;padding:7px 12px;border-radius:100px;
+  background:transparent;color:var(--paper-3);border:1px solid var(--line);}
+.chip.on{background:var(--paper);color:#0A0A0C;border-color:var(--paper);font-weight:500;}
+.count-line{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;color:var(--paper-3);
+  text-transform:uppercase;padding:16px 20px 0;}
+.grid{display:flex;flex-wrap:wrap;gap:14px 12px;padding:18px 20px 0;}
+.grid .poster{flex:0 0 calc(50% - 6px);height:200px;}
+.grid .poster-title h4{font-size:13px;}
+
+/* ── live ───────────────────────────────────────────────── */
+.live-row{display:flex;align-items:center;gap:13px;padding:12px 20px;
+  border-bottom:1px solid var(--line-soft);}
+.live-logo{width:48px;height:48px;border-radius:9px;flex:0 0 48px;
+  display:flex;align-items:center;justify-content:center;font-family:var(--serif);
+  font-weight:700;font-size:14px;color:var(--paper);border:1px solid var(--line);}
+.live-info{flex:1;min-width:0;}
+.live-info h5{margin:0 0 3px;font-size:12.5px;font-weight:500;}
+.live-info span{font-family:var(--mono);font-size:8px;letter-spacing:.16em;
+  color:var(--paper-3);text-transform:uppercase;}
+.on-air{display:inline-flex;align-items:center;gap:5px;font-family:var(--mono);
+  font-size:7.5px;letter-spacing:.16em;color:var(--red);text-transform:uppercase;}
+.on-air::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--red);
+  animation:pulse 1.6s ease-in-out infinite;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.off-air{font-family:var(--mono);font-size:7.5px;letter-spacing:.16em;
+  color:var(--paper-3);text-transform:uppercase;}
+
+/* ── profile ────────────────────────────────────────────── */
+.profile-head{padding:60px 20px 0;}
+.profile-name{font-family:var(--serif);font-weight:900;font-size:32px;letter-spacing:-.035em;
+  margin:0 0 6px;line-height:.95;}
+.profile-handle{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--paper-3);
+  text-transform:uppercase;}
+.big-stats{display:flex;margin:22px 14px 0;border-top:1px solid var(--line);
+  border-bottom:1px solid var(--line);}
+.big-stat{flex:1;padding:18px 4px;text-align:center;border-right:1px solid var(--line-soft);}
+.big-stat:last-child{border-right:none;}
+.big-stat b{display:block;font-family:var(--serif);font-size:27px;font-weight:900;
+  letter-spacing:-.03em;line-height:1;margin-bottom:5px;}
+.big-stat span{font-family:var(--mono);font-size:7.5px;letter-spacing:.18em;
+  color:var(--paper-3);text-transform:uppercase;}
+.setting-row{display:flex;align-items:center;justify-content:space-between;
+  padding:15px 20px;border-bottom:1px solid var(--line-soft);}
+.setting-row .lbl{font-size:12.5px;color:var(--paper);}
+.setting-row .val{font-family:var(--mono);font-size:8.5px;letter-spacing:.16em;
+  color:var(--paper-3);text-transform:uppercase;display:flex;align-items:center;gap:8px;}
+.toggle{display:block;width:34px;height:19px;border-radius:100px;position:relative;
+  background:rgba(243,237,227,.14);}
+.toggle::after{content:"";position:absolute;top:2px;left:2px;width:15px;height:15px;
+  border-radius:50%;background:var(--paper-3);transition:transform .25s var(--ease);}
+.toggle.on{background:var(--red);}
+.toggle.on::after{transform:translateX(15px);background:#fff;}
+
+/* ── detail ─────────────────────────────────────────────── */
+.detail-hero{position:relative;height:400px;overflow:hidden;}
+.detail-scrim{position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;
+  background:linear-gradient(to top,#0A0A0C 2%,rgba(10,10,12,.94) 30%,rgba(10,10,12,.4) 70%,rgba(10,10,12,.55));}
+.detail-head{position:absolute;left:0;right:0;bottom:0;z-index:4;padding:0 20px 18px;}
+.detail-head h1{font-family:var(--serif);font-weight:900;font-size:38px;line-height:.88;
+  letter-spacing:-.035em;margin:6px 0 12px;text-transform:uppercase;}
+.tagline{font-family:var(--serif);font-style:italic;font-size:13px;color:var(--paper-2);
+  margin:0 0 14px;line-height:1.4;}
+.stat-strip{display:flex;margin:0 14px;border-radius:12px;overflow:hidden;
+  border:1px solid var(--line);background:var(--ink-1);}
+.stat{flex:1;padding:13px 6px;text-align:center;border-right:1px solid var(--line-soft);}
+.stat:last-child{border-right:none;}
+.stat b{display:block;font-family:var(--serif);font-size:17px;font-weight:700;
+  letter-spacing:-.02em;margin-bottom:3px;}
+.stat span{font-family:var(--mono);font-size:7px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--paper-3);}
+.body-copy{padding:22px 20px 0;font-size:13px;line-height:1.7;color:var(--paper-2);
+  font-weight:300;}
+.credits{padding:20px;}
+.credit-row{display:flex;justify-content:space-between;gap:14px;padding:10px 0;
+  border-bottom:1px solid var(--line-soft);font-size:12px;}
+.credit-row span:first-child{font-family:var(--mono);font-size:8.5px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--paper-3);padding-top:2px;}
+.credit-row span:last-child{text-align:right;color:var(--paper);}
+.ep-list{padding:0 20px;}
+.ep{display:flex;align-items:center;gap:13px;padding:13px 0;
+  border-bottom:1px solid var(--line-soft);}
+.ep-num{font-family:var(--serif);font-size:20px;font-weight:700;font-style:italic;
+  color:var(--paper-3);width:26px;flex:0 0 26px;}
+.ep-txt{flex:1;min-width:0;}
+.ep-txt h5{font-size:12.5px;font-weight:500;margin:0 0 3px;}
+.ep-txt span{font-family:var(--mono);font-size:8px;letter-spacing:.14em;
+  color:var(--paper-3);text-transform:uppercase;}
+.ep-play{width:28px;height:28px;border-radius:50%;flex:0 0 28px;
+  display:flex;align-items:center;justify-content:center;font-size:8px;
+  background:rgba(243,237,227,.08);box-shadow:inset 0 0 0 1px rgba(243,237,227,.16);}
+
+/* ── player ─────────────────────────────────────────────── */
+#player{background:#000;padding-bottom:0;}
+.player-stage{position:relative;height:100%;display:flex;flex-direction:column;
+  justify-content:center;}
+.player-canvas{position:relative;width:100%;height:220px;background:#000;overflow:hidden;}
+.lb{position:absolute;left:0;right:0;height:22px;background:#000;z-index:5;}
+.lb.t{top:0;} .lb.b{bottom:0;}
+.play-big{position:absolute;top:0;left:0;right:0;bottom:0;z-index:6;display:flex;
+  align-items:center;justify-content:center;background:none;border:none;cursor:pointer;}
+.play-big i{width:60px;height:60px;border-radius:50%;background:rgba(243,237,227,.16);
+  box-shadow:inset 0 0 0 1px rgba(243,237,227,.4);display:flex;align-items:center;
+  justify-content:center;}
+.player-ui{position:absolute;top:0;left:0;right:0;bottom:0;z-index:7;display:flex;
+  flex-direction:column;justify-content:space-between;padding:52px 16px 24px;
+  background:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,transparent 26%,transparent 58%,rgba(0,0,0,.9) 100%);}
+.player-top{display:flex;align-items:center;justify-content:space-between;}
+.player-top h4{font-family:var(--serif);font-size:16px;font-weight:700;margin:0;}
+.player-top span{font-family:var(--mono);font-size:8px;letter-spacing:.18em;
+  color:var(--paper-3);text-transform:uppercase;}
+.player-bottom{display:flex;flex-direction:column;gap:12px;}
+.scrub{height:3px;border-radius:2px;background:rgba(243,237,227,.2);position:relative;}
+.scrub-fill{position:absolute;left:0;top:0;bottom:0;width:34%;border-radius:2px;background:var(--red);}
+.scrub-fill::after{content:"";position:absolute;right:-4px;top:50%;margin-top:-4.5px;
+  width:9px;height:9px;border-radius:50%;background:var(--paper);}
+.time-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8.5px;
+  letter-spacing:.1em;color:var(--paper-2);}
+.player-controls{display:flex;align-items:center;justify-content:center;gap:24px;}
+.pc{background:none;border:none;color:var(--paper);cursor:pointer;display:flex;
+  align-items:center;justify-content:center;opacity:.85;}
+.pc.main{width:48px;height:48px;border-radius:50%;background:var(--paper);color:#0A0A0C;
+  opacity:1;}
+
+/* ── bottom nav ─────────────────────────────────────────── */
+.nav{position:absolute;left:0;right:0;bottom:0;z-index:60;padding:8px 8px 10px;
+  background:linear-gradient(to top,#08080B 60%,rgba(8,8,11,.9) 85%,transparent);}
+.nav-inner{display:flex;border-radius:14px;overflow:hidden;background:rgba(20,20,26,.78);
+  box-shadow:inset 0 0 0 1px rgba(243,237,227,.09);}
+.nav-btn{flex:1;cursor:pointer;padding:10px 2px 8px;display:flex;flex-direction:column;
+  align-items:center;gap:4px;color:var(--paper-3);position:relative;}
+.nav-btn span{font-family:var(--mono);font-size:6.5px;letter-spacing:.12em;text-transform:uppercase;}
+#r-home:checked ~ .nav label[for="r-home"],
+#r-browse:checked ~ .nav label[for="r-browse"],
+#r-live:checked ~ .nav label[for="r-live"],
+#r-saved:checked ~ .nav label[for="r-saved"],
+#r-you:checked ~ .nav label[for="r-you"]{color:var(--paper);}
+#r-home:checked ~ .nav label[for="r-home"]::after,
+#r-browse:checked ~ .nav label[for="r-browse"]::after,
+#r-live:checked ~ .nav label[for="r-live"]::after,
+#r-saved:checked ~ .nav label[for="r-saved"]::after,
+#r-you:checked ~ .nav label[for="r-you"]::after{
+  content:"";position:absolute;top:0;left:50%;margin-left:-8px;width:16px;height:1.5px;
+  background:var(--red);border-radius:2px;}
+/* nav hides on full-bleed screens */
+#r-detail:checked ~ .nav, #r-player:checked ~ .nav{display:none;}
+.back-fab{position:absolute;top:52px;left:16px;z-index:80;width:36px;height:36px;
+  border-radius:50%;display:none;align-items:center;justify-content:center;cursor:pointer;
+  background:rgba(10,10,12,.6);color:var(--paper);
+  box-shadow:inset 0 0 0 1px rgba(243,237,227,.22);}
+#r-detail:checked ~ .back-fab{display:flex;}
+
+/* ── slate footer ───────────────────────────────────────── */
+.slate{margin:36px 14px 0;padding:16px 18px;border-radius:10px;border:1px solid var(--line);
+  background:var(--ink-1);}
+.slate-row{display:flex;justify-content:space-between;font-family:var(--mono);font-size:8px;
+  letter-spacing:.18em;text-transform:uppercase;color:var(--paper-3);padding:4px 0;}
+.slate-row b{color:var(--paper-2);font-weight:400;}
+
+/* ── mobile: no dvh, no vh tricks that collapse ─────────── */
+@media (max-width:520px){
+  body{padding:0;display:block;background:var(--ink);}
+  .stage{max-width:none;}
+  .phone{height:100vh;min-height:100vh;max-height:none;border-radius:0;border:none;
+    box-shadow:none;}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="phone">
+
+  <input class="navradio" type="radio" name="nav" id="r-home" checked>
+  <input class="navradio" type="radio" name="nav" id="r-browse">
+  <input class="navradio" type="radio" name="nav" id="r-live">
+  <input class="navradio" type="radio" name="nav" id="r-saved">
+  <input class="navradio" type="radio" name="nav" id="r-you">
+  <input class="navradio" type="radio" name="nav" id="r-detail">
+  <input class="navradio" type="radio" name="nav" id="r-player">
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <div class="sb-bars"><i style="height:5px"></i><i style="height:8px"></i><i style="height:11px"></i></div>
+  </div>
+
+  <div class="screens">
+
+    <!-- HOME -->
+    <section class="screen" id="home">
+      <div class="masthead">
+        <div>
+          <h1 class="wordmark">FLIX<em>VORA</em></h1>
+          <div class="masthead-sub">Cinema &middot; Series &middot; Live</div>
+        </div>
+        <label class="avatar" for="r-you">F</label>
+      </div>
+      <div class="ticker"><div class="ticker-track"><span>Now showing &middot; 24 new titles</span><span>Dolby Vision &middot; 4K</span><span>Original series every Friday</span><span>Live TV &middot; 288 channels</span><span>No ads on Premium</span><span>New this week &middot; Deep Field</span><span>Now showing &middot; 24 new titles</span><span>Dolby Vision &middot; 4K</span><span>Original series every Friday</span><span>Live TV &middot; 288 channels</span><span>No ads on Premium</span><span>New this week &middot; Deep Field</span></div></div>
+      <div class="hero">
+  <div class="perf"></div>
+  <div class="art p-arc" style="--a:#F2402A;--b:#1B1035"><i></i></div>
+  <div class="hero-scrim"></div>
+  <div class="hero-body">
+    <div class="kicker">Premiere &middot; Film</div>
+    <h1>Neon<br><em>Monsoon</em></h1>
+    <div class="meta-row"><span>2025</span><span class="dot"></span><span>Neo-Noir</span>
+      <span class="dot"></span><span>2h 14m</span><span class="dot"></span>
+      <span class="star">&#9733; 8.7</span></div>
+    <div class="actions">
+      <label class="btn btn-solid" for="r-detail">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play</label>
+      <button class="btn btn-ghost" data-save="t1">+ Saved</button>
+      <label class="icon-btn" for="r-detail">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 5v14M5 12h14"/></svg></label>
+    </div>
+  </div>
+</div>
+      <div class="sec">
+        <div class="sec-head"><h2>Now Showing</h2><span class="idx">01 &mdash; 08</span></div>
+        <div class="rail"><article class="poster" data-open="t1" data-genre="Neo-Noir" data-search="neon monsoon neo-noir film a rain-drowned bombay detective takes one last case and finds the city has been keeping his own file. shot entirely on anamorphic glass, the film turns every puddle into a mirror and every neon sign into a witness. aditya kulkarni, rhea menon, sana bhatt"><div class="poster-frame"><div class="art p-arc" style="--a:#F2402A;--b:#1B1035"><i></i></div><div class="badge">Premiere</div><div class="poster-title"><h4>Neon Monsoon</h4><span>2025 &middot; Neo-Noir</span></div></div></article><article class="poster" data-open="t2" data-genre="Drama" data-search="the salt archive drama film three siblings return to a coastal salt pan to settle an estate and instead reopen a ledger of debts written in their mother's hand. a slow, luminous study of inheritance and the things nobody says out loud. meera iyer, joseph fernandes"><div class="poster-frame"><div class="art p-rings" style="--a:#D8A93B;--b:#2E5D4F"><i></i></div><div class="poster-title"><h4>The Salt Archive</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t3" data-genre="Sci-Fi" data-search="zero gravity club sci-fi film a school trip to a decommissioned orbital station goes wrong, and nine teenagers have to run a decaying habitat with a manual written for engineers twice their age. kabir shah, anya desai"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#0B1030"><i></i></div><div class="badge">New</div><div class="poster-title"><h4>Zero Gravity Club</h4><span>2025 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t4" data-genre="Romance" data-search="bitter orange romance film a marmalade maker and a food critic spend one winter arguing about bitterness in a shop that smells like a whole orchard. by spring, neither of them can taste anything else. nikhil bose, leela raghavan"><div class="poster-frame"><div class="art p-diag" style="--a:#F2402A;--b:#7A2E12"><i></i></div><div class="poster-title"><h4>Bitter Orange</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t5" data-genre="Thriller" data-search="iron lullaby thriller series a night-shift supervisor at a steel plant starts hearing a lullaby in the rolling mill. eight episodes, one factory floor, and a lullaby that everybody knows but nobody taught. dev anand joshi, saira khan"><div class="poster-frame"><div class="art p-bars" style="--a:#8E8E9A;--b:#141418"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Iron Lullaby</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t6" data-genre="Comedy" data-search="paper tigers comedy film a failing regional wrestling league accidentally books a reality tv crew, and the wrestlers discover that being a character pays better than being a champion. bunty sharma, farida sheikh"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#3A2A0E"><i></i></div><div class="poster-title"><h4>Paper Tigers</h4><span>2025 &middot; Comedy</span></div></div></article><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="badge">Award</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t8" data-genre="Sports" data-search="the long field sports film a village cricket team that has never won a match keeps showing up, season after season, until the field itself becomes the reason. suresh yadav, kamla devi"><div class="poster-frame"><div class="art p-diag" style="--a:#2E5D4F;--b:#101A14"><i></i></div><div class="poster-title"><h4>The Long Field</h4><span>2023 &middot; Sports</span></div></div></article></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Top of the Week</h2><span class="idx">Ranked</span></div>
+        <div class="rail"><article class="poster" data-open="t13" data-genre="Documentary" data-search="salt & signal documentary film fourteen months with a man who has kept a lamp burning for forty-one years, and the radio voice he has spoken to every night without ever meeting. narayan sawant"><div class="poster-frame"><div class="art p-rings" style="--a:#22D3EE;--b:#0A1E22"><i></i></div><div class="poster-num">1</div><div class="badge">Award</div><div class="poster-title"><h4>Salt &amp; Signal</h4><span>2024 &middot; Documentary</span></div></div></article><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="poster-num">2</div><div class="badge">Award</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t11" data-genre="Romance" data-search="small hours romance film every night at 3 a.m. the same two people wait for the same prescription. neither of them is sick. both of them are lonely. anjali verma, sameer dutta"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#2A1E10"><i></i></div><div class="poster-num">3</div><div class="poster-title"><h4>Small Hours</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t10" data-genre="Sci-Fi" data-search="copper sky sci-fi series a mars settlement of 400 people must decide, every morning, whether to keep breathing the air they make or the air they were promised. naina kapoor, ibrahim qureshi"><div class="poster-frame"><div class="art p-bars" style="--a:#F2402A;--b:#2A1030"><i></i></div><div class="poster-num">4</div><div class="badge">Series</div><div class="poster-title"><h4>Copper Sky</h4><span>2024 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t8" data-genre="Sports" data-search="the long field sports film a village cricket team that has never won a match keeps showing up, season after season, until the field itself becomes the reason. suresh yadav, kamla devi"><div class="poster-frame"><div class="art p-diag" style="--a:#2E5D4F;--b:#101A14"><i></i></div><div class="poster-num">5</div><div class="poster-title"><h4>The Long Field</h4><span>2023 &middot; Sports</span></div></div></article><article class="poster" data-open="t12" data-genre="Thriller" data-search="grand bazaar thriller film a currency trader discovers the antique shop she inherited is a front for the oldest black market in the city, and the inventory list is a hit list. farhan mirza, deepa shetty"><div class="poster-frame"><div class="art p-diag" style="--a:#7C3AED;--b:#141026"><i></i></div><div class="poster-num">6</div><div class="badge">Premiere</div><div class="poster-title"><h4>Grand Bazaar</h4><span>2025 &middot; Thriller</span></div></div></article><article class="poster" data-open="t14" data-genre="Comedy" data-search="midnight tiffin comedy film a tiffin service that only delivers after midnight accidentally becomes the most exclusive restaurant in the city, and its owner cannot cook. guddu pandit, shalini iyer"><div class="poster-frame"><div class="art p-orb" style="--a:#F2402A;--b:#3A1A0C"><i></i></div><div class="poster-num">7</div><div class="poster-title"><h4>Midnight Tiffin</h4><span>2023 &middot; Comedy</span></div></div></article><article class="poster" data-open="t9" data-genre="Horror" data-search="static bloom horror film a family inherits a television that only receives one channel: a live feed of their own house, four minutes in the past. ishita rane, vivek sethi"><div class="poster-frame"><div class="art p-orb" style="--a:#B3220F;--b:#150508"><i></i></div><div class="poster-num">8</div><div class="badge">New</div><div class="poster-title"><h4>Static Bloom</h4><span>2025 &middot; Horror</span></div></div></article></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Editor&rsquo;s Pick</h2><span class="idx">Curated</span></div>
+        <div class="editorial">
+          <article class="poster" data-open="t13" data-genre="Documentary" data-search="salt & signal documentary film fourteen months with a man who has kept a lamp burning for forty-one years, and the radio voice he has spoken to every night without ever meeting. narayan sawant"><div class="poster-frame"><div class="art p-rings" style="--a:#22D3EE;--b:#0A1E22"><i></i></div><div class="poster-title"><h4>Salt &amp; Signal</h4><span>2024 &middot; Documentary</span></div></div></article>
+          <div class="editorial-body">
+            <div class="kicker">Documentary &middot; Award</div>
+            <h3>Salt &amp;<br>Signal</h3>
+            <p>Fourteen months with a man who has kept a lamp burning for forty-one years, and the radio voice he has spoken to every night without ever meeting.</p>
+            <label class="link-arrow" for="r-detail">Read the note &rarr;</label>
+          </div>
+        </div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Because you watched</h2><span class="idx">For you</span></div>
+        <div class="rail"><article class="poster" data-open="t2" data-genre="Drama" data-search="the salt archive drama film three siblings return to a coastal salt pan to settle an estate and instead reopen a ledger of debts written in their mother's hand. a slow, luminous study of inheritance and the things nobody says out loud. meera iyer, joseph fernandes"><div class="poster-frame"><div class="art p-rings" style="--a:#D8A93B;--b:#2E5D4F"><i></i></div><div class="poster-title"><h4>The Salt Archive</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t3" data-genre="Sci-Fi" data-search="zero gravity club sci-fi film a school trip to a decommissioned orbital station goes wrong, and nine teenagers have to run a decaying habitat with a manual written for engineers twice their age. kabir shah, anya desai"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#0B1030"><i></i></div><div class="badge">New</div><div class="poster-title"><h4>Zero Gravity Club</h4><span>2025 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t4" data-genre="Romance" data-search="bitter orange romance film a marmalade maker and a food critic spend one winter arguing about bitterness in a shop that smells like a whole orchard. by spring, neither of them can taste anything else. nikhil bose, leela raghavan"><div class="poster-frame"><div class="art p-diag" style="--a:#F2402A;--b:#7A2E12"><i></i></div><div class="poster-title"><h4>Bitter Orange</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t5" data-genre="Thriller" data-search="iron lullaby thriller series a night-shift supervisor at a steel plant starts hearing a lullaby in the rolling mill. eight episodes, one factory floor, and a lullaby that everybody knows but nobody taught. dev anand joshi, saira khan"><div class="poster-frame"><div class="art p-bars" style="--a:#8E8E9A;--b:#141418"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Iron Lullaby</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t6" data-genre="Comedy" data-search="paper tigers comedy film a failing regional wrestling league accidentally books a reality tv crew, and the wrestlers discover that being a character pays better than being a champion. bunty sharma, farida sheikh"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#3A2A0E"><i></i></div><div class="poster-title"><h4>Paper Tigers</h4><span>2025 &middot; Comedy</span></div></div></article><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="badge">Award</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article></div>
+      </div>
+      <div class="slate">
+        <div class="slate-row"><span>Prod. Flixvora Studios</span><b>Vol. 07</b></div>
+        <div class="slate-row"><span>Format</span><b>4K &middot; Dolby Vision</b></div>
+        <div class="slate-row"><span>Region</span><b>IN &middot; Global</b></div>
+        <div class="slate-row"><span>Build</span><b>Design Study 02</b></div>
+      </div>
+    </section>
+
+    <!-- BROWSE -->
+    <section class="screen" id="browse">
+      <div class="masthead">
+        <div>
+          <h1 class="wordmark" style="font-size:24px">BROWSE</h1>
+          <div class="masthead-sub">Search the archive</div>
+        </div>
+      </div>
+      <div class="searchwrap">
+        <label class="searchfield">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+          <input id="search" placeholder="Titles, people, genres&hellip;" autocomplete="off">
+        </label>
+      </div>
+      <div class="chips" id="chips"><button class="chip on" data-genre-filter="All">All</button><button class="chip" data-genre-filter="Drama">Drama</button><button class="chip" data-genre-filter="Thriller">Thriller</button><button class="chip" data-genre-filter="Sci-Fi">Sci-Fi</button><button class="chip" data-genre-filter="Romance">Romance</button><button class="chip" data-genre-filter="Comedy">Comedy</button><button class="chip" data-genre-filter="Crime">Crime</button><button class="chip" data-genre-filter="Horror">Horror</button><button class="chip" data-genre-filter="Sports">Sports</button><button class="chip" data-genre-filter="Documentary">Documentary</button></div>
+      <div class="count-line" id="count-line">24 titles</div>
+      <div class="grid" id="grid"><article class="poster" data-open="t1" data-genre="Neo-Noir" data-search="neon monsoon neo-noir film a rain-drowned bombay detective takes one last case and finds the city has been keeping his own file. shot entirely on anamorphic glass, the film turns every puddle into a mirror and every neon sign into a witness. aditya kulkarni, rhea menon, sana bhatt"><div class="poster-frame"><div class="art p-arc" style="--a:#F2402A;--b:#1B1035"><i></i></div><div class="badge">Premiere</div><div class="poster-title"><h4>Neon Monsoon</h4><span>2025 &middot; Neo-Noir</span></div></div></article><article class="poster" data-open="t2" data-genre="Drama" data-search="the salt archive drama film three siblings return to a coastal salt pan to settle an estate and instead reopen a ledger of debts written in their mother's hand. a slow, luminous study of inheritance and the things nobody says out loud. meera iyer, joseph fernandes"><div class="poster-frame"><div class="art p-rings" style="--a:#D8A93B;--b:#2E5D4F"><i></i></div><div class="poster-title"><h4>The Salt Archive</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t3" data-genre="Sci-Fi" data-search="zero gravity club sci-fi film a school trip to a decommissioned orbital station goes wrong, and nine teenagers have to run a decaying habitat with a manual written for engineers twice their age. kabir shah, anya desai"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#0B1030"><i></i></div><div class="badge">New</div><div class="poster-title"><h4>Zero Gravity Club</h4><span>2025 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t4" data-genre="Romance" data-search="bitter orange romance film a marmalade maker and a food critic spend one winter arguing about bitterness in a shop that smells like a whole orchard. by spring, neither of them can taste anything else. nikhil bose, leela raghavan"><div class="poster-frame"><div class="art p-diag" style="--a:#F2402A;--b:#7A2E12"><i></i></div><div class="poster-title"><h4>Bitter Orange</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t5" data-genre="Thriller" data-search="iron lullaby thriller series a night-shift supervisor at a steel plant starts hearing a lullaby in the rolling mill. eight episodes, one factory floor, and a lullaby that everybody knows but nobody taught. dev anand joshi, saira khan"><div class="poster-frame"><div class="art p-bars" style="--a:#8E8E9A;--b:#141418"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Iron Lullaby</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t6" data-genre="Comedy" data-search="paper tigers comedy film a failing regional wrestling league accidentally books a reality tv crew, and the wrestlers discover that being a character pays better than being a champion. bunty sharma, farida sheikh"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#3A2A0E"><i></i></div><div class="poster-title"><h4>Paper Tigers</h4><span>2025 &middot; Comedy</span></div></div></article><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="badge">Award</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t8" data-genre="Sports" data-search="the long field sports film a village cricket team that has never won a match keeps showing up, season after season, until the field itself becomes the reason. suresh yadav, kamla devi"><div class="poster-frame"><div class="art p-diag" style="--a:#2E5D4F;--b:#101A14"><i></i></div><div class="poster-title"><h4>The Long Field</h4><span>2023 &middot; Sports</span></div></div></article><article class="poster" data-open="t9" data-genre="Horror" data-search="static bloom horror film a family inherits a television that only receives one channel: a live feed of their own house, four minutes in the past. ishita rane, vivek sethi"><div class="poster-frame"><div class="art p-orb" style="--a:#B3220F;--b:#150508"><i></i></div><div class="badge">New</div><div class="poster-title"><h4>Static Bloom</h4><span>2025 &middot; Horror</span></div></div></article><article class="poster" data-open="t10" data-genre="Sci-Fi" data-search="copper sky sci-fi series a mars settlement of 400 people must decide, every morning, whether to keep breathing the air they make or the air they were promised. naina kapoor, ibrahim qureshi"><div class="poster-frame"><div class="art p-bars" style="--a:#F2402A;--b:#2A1030"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Copper Sky</h4><span>2024 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t11" data-genre="Romance" data-search="small hours romance film every night at 3 a.m. the same two people wait for the same prescription. neither of them is sick. both of them are lonely. anjali verma, sameer dutta"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#2A1E10"><i></i></div><div class="poster-title"><h4>Small Hours</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t12" data-genre="Thriller" data-search="grand bazaar thriller film a currency trader discovers the antique shop she inherited is a front for the oldest black market in the city, and the inventory list is a hit list. farhan mirza, deepa shetty"><div class="poster-frame"><div class="art p-diag" style="--a:#7C3AED;--b:#141026"><i></i></div><div class="badge">Premiere</div><div class="poster-title"><h4>Grand Bazaar</h4><span>2025 &middot; Thriller</span></div></div></article><article class="poster" data-open="t13" data-genre="Documentary" data-search="salt & signal documentary film fourteen months with a man who has kept a lamp burning for forty-one years, and the radio voice he has spoken to every night without ever meeting. narayan sawant"><div class="poster-frame"><div class="art p-rings" style="--a:#22D3EE;--b:#0A1E22"><i></i></div><div class="badge">Award</div><div class="poster-title"><h4>Salt &amp; Signal</h4><span>2024 &middot; Documentary</span></div></div></article><article class="poster" data-open="t14" data-genre="Comedy" data-search="midnight tiffin comedy film a tiffin service that only delivers after midnight accidentally becomes the most exclusive restaurant in the city, and its owner cannot cook. guddu pandit, shalini iyer"><div class="poster-frame"><div class="art p-orb" style="--a:#F2402A;--b:#3A1A0C"><i></i></div><div class="poster-title"><h4>Midnight Tiffin</h4><span>2023 &middot; Comedy</span></div></div></article><article class="poster" data-open="t15" data-genre="Drama" data-search="glass country drama series three generations of a glassblowing family in firozabad, told backwards from the day the furnace goes cold. rukmini jain, hari prasad"><div class="poster-frame"><div class="art p-bars" style="--a:#4B6BFB;--b:#0E1230"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Glass Country</h4><span>2025 &middot; Drama</span></div></div></article><article class="poster" data-open="t16" data-genre="Thriller" data-search="the quiet heist thriller film six deaf thieves plan a robbery in complete silence, using only light, shadow and a shared rhythm. the security system was never the hard part. ayesha noor, karan bhat"><div class="poster-frame"><div class="art p-arc" style="--a:#8E8E9A;--b:#12121A"><i></i></div><div class="badge">Top 10</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>The Quiet Heist</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t17" data-genre="Drama" data-search="monsoon radio drama film a community radio station keeps transmitting through the worst monsoon in memory, and becomes the only map anyone has. vasant kale, priya deshmukh"><div class="poster-frame"><div class="art p-diag" style="--a:#2E5D4F;--b:#0E1A16"><i></i></div><div class="poster-title"><h4>Monsoon Radio</h4><span>2023 &middot; Drama</span></div></div></article><article class="poster" data-open="t18" data-genre="Crime" data-search="red ledger crime series a forensic accountant is handed a single notebook and eighteen months to prove that the city's cleanest businessman is its dirtiest. sameer qadri, lata menon"><div class="poster-frame"><div class="art p-bars" style="--a:#B3220F;--b:#1A0A0E"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Red Ledger</h4><span>2025 &middot; Crime</span></div></div></article><article class="poster" data-open="t19" data-genre="Sports" data-search="feather weight sports film a teenage boxer from a mill town trains for the nationals using a punchbag made of sand and a coach who has never won anything either. pooja rathi, baliram singh"><div class="poster-frame"><div class="art p-rings" style="--a:#D8A93B;--b:#2A1A08"><i></i></div><div class="poster-title"><h4>Feather Weight</h4><span>2024 &middot; Sports</span></div></div></article><article class="poster" data-open="t20" data-genre="Horror" data-search="night bus 41 horror film the 41 bus runs one extra route after midnight. the conductor has been doing this shift for eleven years and has never once reached the depot. ramesh teli, sonal bhatt"><div class="poster-frame"><div class="art p-orb" style="--a:#7C3AED;--b:#100A1E"><i></i></div><div class="poster-title"><h4>Night Bus 41</h4><span>2023 &middot; Horror</span></div></div></article><article class="poster" data-open="t21" data-genre="Drama" data-search="the cartographer drama film a surveyor spends thirty years drawing a district that keeps changing shape, and slowly realises the maps are drawing him back. girish kulkarni, anuradha sen"><div class="poster-frame"><div class="art p-arc" style="--a:#4B6BFB;--b:#0A1428"><i></i></div><div class="badge">Award</div><div class="poster-title"><h4>The Cartographer</h4><span>2025 &middot; Drama</span></div></div></article><article class="poster" data-open="t22" data-genre="Crime" data-search="copperline crime series a telephone lineman in 1998 starts listening to the conversations on his own exchange, and hears a murder being planned in three parts. rajan mehta, sushma rao"><div class="poster-frame"><div class="art p-bars" style="--a:#F2402A;--b:#20101A"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Copperline</h4><span>2024 &middot; Crime</span></div></div></article><article class="poster" data-open="t23" data-genre="Romance" data-search="golden hour romance film a wedding photographer who has never been in love agrees to shoot the wedding of the only person she ever loved. tanvi shah, adil sheikh"><div class="poster-frame"><div class="art p-diag" style="--a:#D8A93B;--b:#3A2208"><i></i></div><div class="poster-title"><h4>Golden Hour</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t24" data-genre="Sci-Fi" data-search="deep field sci-fi film an observatory in the himalayas receives a signal that is not a signal but a memory, and the astronomer who decodes it starts remembering a childhood she never had. ira bhatt, neeraj sood"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#08142A"><i></i></div><div class="badge">New</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Deep Field</h4><span>2025 &middot; Sci-Fi</span></div></div></article></div>
+      <div class="slate">
+        <div class="slate-row"><span>Index</span><b id="slate-count">24</b></div>
+        <div class="slate-row"><span>Filter</span><b id="slate-filter">All</b></div>
+      </div>
+    </section>
+
+    <!-- LIVE -->
+    <section class="screen" id="live">
+      <div class="masthead">
+        <div>
+          <h1 class="wordmark" style="font-size:24px">LIVE TV</h1>
+          <div class="masthead-sub">288 channels &middot; India</div>
+        </div>
+        <div class="avatar" style="font-family:var(--mono);font-size:9px;letter-spacing:.08em">IN</div>
+      </div>
+      <div class="ticker"><div class="ticker-track">
+        <span>On air now &middot; 14 channels</span><span>Sports &middot; 3 live</span>
+        <span>News &middot; 6 live</span><span>On air now &middot; 14 channels</span>
+        <span>Sports &middot; 3 live</span><span>News &middot; 6 live</span>
+      </div></div>
+      <div class="chips" id="live-chips"><button class="chip on" data-live-filter="All">All</button><button class="chip" data-live-filter="Sports">Sports</button><button class="chip" data-live-filter="News">News</button><button class="chip" data-live-filter="Movies">Movies</button><button class="chip" data-live-filter="Entertainment">Entertainment</button><button class="chip" data-live-filter="Music">Music</button><button class="chip" data-live-filter="General">General</button><button class="chip" data-live-filter="Factual">Factual</button></div>
+      <div id="live-list"><div class="live-row" data-cat="Sports"><div class="live-logo" style="background:linear-gradient(150deg,#F2402A33,#2A0E0A)">SS1</div><div class="live-info"><h5>Star Sports 1</h5><span>Sports</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="Sports"><div class="live-logo" style="background:linear-gradient(150deg,#22D3EE33,#08222A)">ST2</div><div class="live-info"><h5>Sony Ten 2</h5><span>Sports</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="News"><div class="live-logo" style="background:linear-gradient(150deg,#4B6BFB33,#0A1230)">ND</div><div class="live-info"><h5>NDTV 24x7</h5><span>News</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="News"><div class="live-logo" style="background:linear-gradient(150deg,#D8A93B33,#2A1E08)">RB</div><div class="live-info"><h5>Republic Bharat</h5><span>News</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="Movies"><div class="live-logo" style="background:linear-gradient(150deg,#7C3AED33,#160A26)">ZC</div><div class="live-info"><h5>Zee Cinema</h5><span>Movies</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="Entertainment"><div class="live-logo" style="background:linear-gradient(150deg,#F2402A33,#2A0A18)">CO</div><div class="live-info"><h5>Colors HD</h5><span>Entertainment</span></div><span class="off-air">Off air</span></div><div class="live-row" data-cat="Music"><div class="live-logo" style="background:linear-gradient(150deg,#2E5D4F33,#0C1A14)">SM</div><div class="live-info"><h5>Sun Music</h5><span>Music</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="General"><div class="live-logo" style="background:linear-gradient(150deg,#8E8E9A33,#14141A)">DD</div><div class="live-info"><h5>DD National</h5><span>General</span></div><span class="on-air">On air</span></div><div class="live-row" data-cat="Factual"><div class="live-logo" style="background:linear-gradient(150deg,#D8A93B33,#2A2008)">DT</div><div class="live-info"><h5>Discovery Turbo</h5><span>Factual</span></div><span class="off-air">Off air</span></div><div class="live-row" data-cat="Movies"><div class="live-logo" style="background:linear-gradient(150deg,#B3220F33,#1A0608)">SG</div><div class="live-info"><h5>Star Gold</h5><span>Movies</span></div><span class="on-air">On air</span></div></div>
+    </section>
+
+    <!-- SAVED -->
+    <section class="screen" id="saved">
+      <div class="masthead">
+        <div>
+          <h1 class="wordmark" style="font-size:24px">SAVED</h1>
+          <div class="masthead-sub">Your private screening room</div>
+        </div>
+      </div>
+      <div class="count-line">3 titles</div>
+      <div class="grid"><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t16" data-genre="Thriller" data-search="the quiet heist thriller film six deaf thieves plan a robbery in complete silence, using only light, shadow and a shared rhythm. the security system was never the hard part. ayesha noor, karan bhat"><div class="poster-frame"><div class="art p-arc" style="--a:#8E8E9A;--b:#12121A"><i></i></div><div class="badge ghost">Saved</div><div class="poster-title"><h4>The Quiet Heist</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t24" data-genre="Sci-Fi" data-search="deep field sci-fi film an observatory in the himalayas receives a signal that is not a signal but a memory, and the astronomer who decodes it starts remembering a childhood she never had. ira bhatt, neeraj sood"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#08142A"><i></i></div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Deep Field</h4><span>2025 &middot; Sci-Fi</span></div></div></article></div>
+    </section>
+
+    <!-- YOU -->
+    <section class="screen" id="you">
+      <div class="profile-head">
+        <h1 class="profile-name">Sameer<br>Khan</h1>
+        <div class="profile-handle">Member since 2024 &middot; Premium</div>
+      </div>
+      <div class="big-stats">
+        <div class="big-stat"><b>128</b><span>Watched</span></div>
+        <div class="big-stat"><b>24</b><span>Saved</span></div>
+        <div class="big-stat"><b>6.4</b><span>Avg / week</span></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Playback</h2><span class="idx">01</span></div>
+        <div class="setting-row"><span class="lbl">Auto-play next episode</span><span class="val"><i class="toggle on" data-toggle></i></span></div><div class="setting-row"><span class="lbl">Download over Wi-Fi only</span><span class="val"><i class="toggle on" data-toggle></i></span></div><div class="setting-row"><span class="lbl">Data saver</span><span class="val"><i class="toggle" data-toggle></i></span></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>Appearance</h2><span class="idx">02</span></div>
+        <div class="setting-row"><span class="lbl">Theme</span><span class="val">Film Print &rsaquo;</span></div><div class="setting-row"><span class="lbl">Subtitle language</span><span class="val">English &rsaquo;</span></div><div class="setting-row"><span class="lbl">Video quality</span><span class="val">4K Dolby &rsaquo;</span></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>About</h2><span class="idx">03</span></div>
+        <div class="setting-row"><span class="lbl">Version</span><span class="val">7.7 (26)</span></div><div class="setting-row"><span class="lbl">Updates</span><span class="val">Up to date</span></div>
+      </div>
+    </section>
+
+    <!-- DETAIL -->
+    <section class="screen" id="detail">
+      <div id="detail-hero"><div class="detail-hero">
+  <div class="art p-arc" style="--a:#F2402A;--b:#1B1035"><i></i></div>
+  <div class="detail-scrim"></div>
+  <div class="detail-head">
+    <div class="kicker">Film &middot; Premiere</div>
+    <h1>Neon Monsoon</h1>
+    <p class="tagline">Every drop remembers a debt.</p>
+    <div class="meta-row"><span>2025</span><span class="dot"></span><span>Neo-Noir</span>
+      <span class="dot"></span><span>2h 14m</span><span class="dot"></span>
+      <span class="star">&#9733; 8.7</span></div>
+    <div class="actions">
+      <label class="btn btn-solid" for="r-player">
+        <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>Play</label>
+      <button class="btn btn-ghost" data-save="t1">+ Saved</button>
+      <button class="icon-btn"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M12 16V4M8 8l4-4 4 4"/><path d="M4 15v4a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-4"/></svg></button>
+    </div>
+  </div>
+</div></div>
+      <div class="stat-strip">
+        <div class="stat"><b>8.7</b><span>Rating</span></div>
+        <div class="stat"><b>2025</b><span>Year</span></div>
+        <div class="stat"><b>4K</b><span>Quality</span></div>
+        <div class="stat"><b>1</b><span>Feature</span></div>
+      </div>
+      <p class="body-copy" id="detail-syn">A rain-drowned Bombay detective takes one last case and finds the city has been keeping his own file. Shot entirely on anamorphic glass, the film turns every puddle into a mirror and every neon sign into a witness.</p>
+      <div class="credits">
+        <div class="credit-row"><span>Director</span><span id="c-dir">Ira Sengupta</span></div>
+        <div class="credit-row"><span>Cast</span><span id="c-cast">Aditya Kulkarni, Rhea Menon, Sana Bhatt</span></div>
+        <div class="credit-row"><span>Language</span><span id="c-lang">Hindi &middot; English</span></div>
+        <div class="credit-row"><span>Quality</span><span id="c-qual">4K HDR &middot; Dolby Atmos</span></div>
+      </div>
+      <div class="sec" id="episodes-sec" style="display:none">
+        <div class="sec-head"><h2>Episodes</h2><span class="idx">Season 1</span></div>
+        <div class="ep-list"><div class="ep"><div class="ep-num">01</div><div class="ep-txt"><h5>The Machine Sings</h5><span>48 min &middot; 4K</span></div><div class="ep-play">&#9654;</div></div><div class="ep"><div class="ep-num">02</div><div class="ep-txt"><h5>Night Shift</h5><span>52 min &middot; 4K</span></div><div class="ep-play">&#9654;</div></div><div class="ep"><div class="ep-num">03</div><div class="ep-txt"><h5>What the Mill Keeps</h5><span>46 min &middot; 4K</span></div><div class="ep-play">&#9654;</div></div><div class="ep"><div class="ep-num">04</div><div class="ep-txt"><h5>Third Shift</h5><span>51 min &middot; 4K</span></div><div class="ep-play">&#9654;</div></div><div class="ep"><div class="ep-num">05</div><div class="ep-txt"><h5>The Lullaby</h5><span>49 min &middot; 4K</span></div><div class="ep-play">&#9654;</div></div></div>
+      </div>
+      <div class="sec">
+        <div class="sec-head"><h2>More like this</h2><span class="idx">Same mood</span></div>
+        <div class="rail"><article class="poster" data-open="t2" data-genre="Drama" data-search="the salt archive drama film three siblings return to a coastal salt pan to settle an estate and instead reopen a ledger of debts written in their mother's hand. a slow, luminous study of inheritance and the things nobody says out loud. meera iyer, joseph fernandes"><div class="poster-frame"><div class="art p-rings" style="--a:#D8A93B;--b:#2E5D4F"><i></i></div><div class="poster-title"><h4>The Salt Archive</h4><span>2024 &middot; Drama</span></div></div></article><article class="poster" data-open="t3" data-genre="Sci-Fi" data-search="zero gravity club sci-fi film a school trip to a decommissioned orbital station goes wrong, and nine teenagers have to run a decaying habitat with a manual written for engineers twice their age. kabir shah, anya desai"><div class="poster-frame"><div class="art p-orb" style="--a:#22D3EE;--b:#0B1030"><i></i></div><div class="badge">New</div><div class="poster-title"><h4>Zero Gravity Club</h4><span>2025 &middot; Sci-Fi</span></div></div></article><article class="poster" data-open="t4" data-genre="Romance" data-search="bitter orange romance film a marmalade maker and a food critic spend one winter arguing about bitterness in a shop that smells like a whole orchard. by spring, neither of them can taste anything else. nikhil bose, leela raghavan"><div class="poster-frame"><div class="art p-diag" style="--a:#F2402A;--b:#7A2E12"><i></i></div><div class="poster-title"><h4>Bitter Orange</h4><span>2023 &middot; Romance</span></div></div></article><article class="poster" data-open="t5" data-genre="Thriller" data-search="iron lullaby thriller series a night-shift supervisor at a steel plant starts hearing a lullaby in the rolling mill. eight episodes, one factory floor, and a lullaby that everybody knows but nobody taught. dev anand joshi, saira khan"><div class="poster-frame"><div class="art p-bars" style="--a:#8E8E9A;--b:#141418"><i></i></div><div class="badge">Series</div><div class="poster-title"><h4>Iron Lullaby</h4><span>2024 &middot; Thriller</span></div></div></article><article class="poster" data-open="t6" data-genre="Comedy" data-search="paper tigers comedy film a failing regional wrestling league accidentally books a reality tv crew, and the wrestlers discover that being a character pays better than being a champion. bunty sharma, farida sheikh"><div class="poster-frame"><div class="art p-arc" style="--a:#D8A93B;--b:#3A2A0E"><i></i></div><div class="poster-title"><h4>Paper Tigers</h4><span>2025 &middot; Comedy</span></div></div></article><article class="poster" data-open="t7" data-genre="Drama" data-search="blue hour drama film a cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place. zoya ahmed, prakash menon"><div class="poster-frame"><div class="art p-rings" style="--a:#4B6BFB;--b:#0A0E24"><i></i></div><div class="badge">Award</div><div class="badge ghost">Saved</div><div class="poster-title"><h4>Blue Hour</h4><span>2024 &middot; Drama</span></div></div></article></div>
+      </div>
+      <div class="slate">
+        <div class="slate-row"><span>Source</span><b>Official catalogue</b></div>
+        <div class="slate-row"><span>Playback</span><b>Adaptive &middot; HLS</b></div>
+      </div>
+    </section>
+
+    <!-- PLAYER -->
+    <section class="screen" id="player">
+      <div class="player-stage">
+        <div class="player-canvas">
+          <div class="art p-arc" style="--a:#F2402A;--b:#1B1035"><i></i></div>
+          <div class="lb t"></div><div class="lb b"></div>
+          <button class="play-big"><i>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+          </i></button>
+        </div>
+        <div class="player-ui">
+          <div class="player-top">
+            <div><h4>Neon Monsoon</h4><span>Season 1 &middot; Episode 3</span></div>
+            <label class="icon-btn" for="r-detail" style="width:32px;height:32px">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg>
+            </label>
+          </div>
+          <div class="player-bottom">
+            <div class="scrub"><div class="scrub-fill"></div></div>
+            <div class="time-row"><span>00:41:12</span><span>02:14:00</span></div>
+            <div class="player-controls">
+              <button class="pc"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+              <button class="pc"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M11 5L4 12l7 7V5zm9 0l-7 7 7 7V5z"/></svg></button>
+              <button class="pc main"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg></button>
+              <button class="pc"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M13 5l7 7-7 7V5zM4 5l7 7-7 7V5z"/></svg></button>
+              <button class="pc"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </div>
+
+  <label class="back-fab" for="r-home">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 5l-7 7 7 7"/></svg>
+  </label>
+
+  <nav class="nav"><div class="nav-inner"><label class="nav-btn" for="r-home"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10l9-7 9 7v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></label><label class="nav-btn" for="r-browse"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><span>Browse</span></label><label class="nav-btn" for="r-live"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="6" width="19" height="13" rx="2"/><path d="M8 2.5l4 3.5 4-3.5"/></svg><span>Live</span></label><label class="nav-btn" for="r-saved"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12a1 1 0 0 1 1 1v17l-7-4.5L5 21V4a1 1 0 0 1 1-1z"/></svg><span>Saved</span></label><label class="nav-btn" for="r-you"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6.5 8-6.5s8 2.5 8 6.5"/></svg><span>You</span></label></div></nav>
+
+</div>
+</div>
+
+<script>
+window.FLIXVORA = {"t1": {"title": "Neon Monsoon", "year": 2025, "genre": "Neo-Noir", "rating": 8.7, "runtime": "2h 14m", "kind": "Film", "tag": "Premiere", "a": "#F2402A", "b": "#1B1035", "pattern": "arc", "tagline": "Every drop remembers a debt.", "syn": "A rain-drowned Bombay detective takes one last case and finds the city has been keeping his own file. Shot entirely on anamorphic glass, the film turns every puddle into a mirror and every neon sign into a witness.", "cast": "Aditya Kulkarni, Rhea Menon, Sana Bhatt", "director": "Ira Sengupta", "lang": "Hindi · English", "quality": "4K HDR"}, "t2": {"title": "The Salt Archive", "year": 2024, "genre": "Drama", "rating": 8.2, "runtime": "1h 58m", "kind": "Film", "tag": "", "a": "#D8A93B", "b": "#2E5D4F", "pattern": "rings", "tagline": "What the tide keeps, the family inherits.", "syn": "Three siblings return to a coastal salt pan to settle an estate and instead reopen a ledger of debts written in their mother's hand. A slow, luminous study of inheritance and the things nobody says out loud.", "cast": "Meera Iyer, Joseph Fernandes", "director": "Nandita Roy", "lang": "Malayalam", "quality": "4K"}, "t3": {"title": "Zero Gravity Club", "year": 2025, "genre": "Sci-Fi", "rating": 7.9, "runtime": "2h 06m", "kind": "Film", "tag": "New", "a": "#22D3EE", "b": "#0B1030", "pattern": "orb", "tagline": "Nine kids. One orbit. No adults.", "syn": "A school trip to a decommissioned orbital station goes wrong, and nine teenagers have to run a decaying habitat with a manual written for engineers twice their age.", "cast": "Kabir Shah, Anya Desai", "director": "Faraz Ali", "lang": "Hindi", "quality": "4K HDR"}, "t4": {"title": "Bitter Orange", "year": 2023, "genre": "Romance", "rating": 8.4, "runtime": "1h 44m", "kind": "Film", "tag": "", "a": "#F2402A", "b": "#7A2E12", "pattern": "diag", "tagline": "Love, preserved.", "syn": "A marmalade maker and a food critic spend one winter arguing about bitterness in a shop that smells like a whole orchard. By spring, neither of them can taste anything else.", "cast": "Nikhil Bose, Leela Raghavan", "director": "Priya Chandra", "lang": "Bengali · Hindi", "quality": "4K"}, "t5": {"title": "Iron Lullaby", "year": 2024, "genre": "Thriller", "rating": 8.0, "runtime": "2h 21m", "kind": "Series", "tag": "Series", "a": "#8E8E9A", "b": "#141418", "pattern": "bars", "tagline": "The machine sings at 3 a.m.", "syn": "A night-shift supervisor at a steel plant starts hearing a lullaby in the rolling mill. Eight episodes, one factory floor, and a lullaby that everybody knows but nobody taught.", "cast": "Dev Anand Joshi, Saira Khan", "director": "Arjun Bhasin", "lang": "Hindi", "quality": "4K"}, "t6": {"title": "Paper Tigers", "year": 2025, "genre": "Comedy", "rating": 7.6, "runtime": "1h 51m", "kind": "Film", "tag": "", "a": "#D8A93B", "b": "#3A2A0E", "pattern": "arc", "tagline": "They came to conquer. They stayed for the buffet.", "syn": "A failing regional wrestling league accidentally books a reality TV crew, and the wrestlers discover that being a character pays better than being a champion.", "cast": "Bunty Sharma, Farida Sheikh", "director": "Sneha Kulkarni", "lang": "Hindi · Marathi", "quality": "4K"}, "t7": {"title": "Blue Hour", "year": 2024, "genre": "Drama", "rating": 8.8, "runtime": "2h 02m", "kind": "Film", "tag": "Award", "a": "#4B6BFB", "b": "#0A0E24", "pattern": "rings", "tagline": "Nineteen minutes between day and night.", "syn": "A cab driver works the exact nineteen minutes of dusk when the city turns blue, ferrying strangers who all seem to be going to the same place.", "cast": "Zoya Ahmed, Prakash Menon", "director": "Ritwik Basu", "lang": "Hindi · Urdu", "quality": "4K HDR"}, "t8": {"title": "The Long Field", "year": 2023, "genre": "Sports", "rating": 7.8, "runtime": "2h 17m", "kind": "Film", "tag": "", "a": "#2E5D4F", "b": "#101A14", "pattern": "diag", "tagline": "Eleven players. One field. Forty years.", "syn": "A village cricket team that has never won a match keeps showing up, season after season, until the field itself becomes the reason.", "cast": "Suresh Yadav, Kamla Devi", "director": "Harsh Vardhan", "lang": "Hindi", "quality": "4K"}, "t9": {"title": "Static Bloom", "year": 2025, "genre": "Horror", "rating": 7.4, "runtime": "1h 47m", "kind": "Film", "tag": "New", "a": "#B3220F", "b": "#150508", "pattern": "orb", "tagline": "Don't adjust the antenna.", "syn": "A family inherits a television that only receives one channel: a live feed of their own house, four minutes in the past.", "cast": "Ishita Rane, Vivek Sethi", "director": "Anand Kamath", "lang": "Hindi", "quality": "4K"}, "t10": {"title": "Copper Sky", "year": 2024, "genre": "Sci-Fi", "rating": 8.1, "runtime": "2h 09m", "kind": "Series", "tag": "Series", "a": "#F2402A", "b": "#2A1030", "pattern": "bars", "tagline": "The colony votes at dawn.", "syn": "A Mars settlement of 400 people must decide, every morning, whether to keep breathing the air they make or the air they were promised.", "cast": "Naina Kapoor, Ibrahim Qureshi", "director": "Tara Malhotra", "lang": "English · Hindi", "quality": "4K HDR"}, "t11": {"title": "Small Hours", "year": 2023, "genre": "Romance", "rating": 8.5, "runtime": "1h 39m", "kind": "Film", "tag": "", "a": "#D8A93B", "b": "#2A1E10", "pattern": "arc", "tagline": "Two insomniacs, one pharmacy queue.", "syn": "Every night at 3 a.m. the same two people wait for the same prescription. Neither of them is sick. Both of them are lonely.", "cast": "Anjali Verma, Sameer Dutta", "director": "Kavya Nair", "lang": "Hindi", "quality": "4K"}, "t12": {"title": "Grand Bazaar", "year": 2025, "genre": "Thriller", "rating": 7.7, "runtime": "2h 24m", "kind": "Film", "tag": "Premiere", "a": "#7C3AED", "b": "#141026", "pattern": "diag", "tagline": "Everything is for sale. Including the exit.", "syn": "A currency trader discovers the antique shop she inherited is a front for the oldest black market in the city, and the inventory list is a hit list.", "cast": "Farhan Mirza, Deepa Shetty", "director": "Imran Sheikh", "lang": "Hindi · English", "quality": "4K"}, "t13": {"title": "Salt & Signal", "year": 2024, "genre": "Documentary", "rating": 8.9, "runtime": "1h 32m", "kind": "Film", "tag": "Award", "a": "#22D3EE", "b": "#0A1E22", "pattern": "rings", "tagline": "The last lighthouse keeper of the Konkan coast.", "syn": "Fourteen months with a man who has kept a lamp burning for forty-one years, and the radio voice he has spoken to every night without ever meeting.", "cast": "Narayan Sawant", "director": "Aditi Rao", "lang": "Marathi", "quality": "4K"}, "t14": {"title": "Midnight Tiffin", "year": 2023, "genre": "Comedy", "rating": 7.5, "runtime": "1h 46m", "kind": "Film", "tag": "", "a": "#F2402A", "b": "#3A1A0C", "pattern": "orb", "tagline": "Dinner is served at 2 a.m. sharp.", "syn": "A tiffin service that only delivers after midnight accidentally becomes the most exclusive restaurant in the city, and its owner cannot cook.", "cast": "Guddu Pandit, Shalini Iyer", "director": "Rohit Bhatia", "lang": "Hindi", "quality": "4K"}, "t15": {"title": "Glass Country", "year": 2025, "genre": "Drama", "rating": 8.3, "runtime": "2h 11m", "kind": "Series", "tag": "Series", "a": "#4B6BFB", "b": "#0E1230", "pattern": "bars", "tagline": "A family business, built on sand.", "syn": "Three generations of a glassblowing family in Firozabad, told backwards from the day the furnace goes cold.", "cast": "Rukmini Jain, Hari Prasad", "director": "Sunita Agarwal", "lang": "Hindi", "quality": "4K"}, "t16": {"title": "The Quiet Heist", "year": 2024, "genre": "Thriller", "rating": 8.6, "runtime": "2h 03m", "kind": "Film", "tag": "Top 10", "a": "#8E8E9A", "b": "#12121A", "pattern": "arc", "tagline": "No guns. No shouting. No witnesses.", "syn": "Six deaf thieves plan a robbery in complete silence, using only light, shadow and a shared rhythm. The security system was never the hard part.", "cast": "Ayesha Noor, Karan Bhat", "director": "Neeraj Pillai", "lang": "Hindi · ISL", "quality": "4K HDR"}, "t17": {"title": "Monsoon Radio", "year": 2023, "genre": "Drama", "rating": 8.0, "runtime": "1h 55m", "kind": "Film", "tag": "", "a": "#2E5D4F", "b": "#0E1A16", "pattern": "diag", "tagline": "Broadcasting through the flood.", "syn": "A community radio station keeps transmitting through the worst monsoon in memory, and becomes the only map anyone has.", "cast": "Vasant Kale, Priya Deshmukh", "director": "Mihir Joshi", "lang": "Marathi · Hindi", "quality": "4K"}, "t18": {"title": "Red Ledger", "year": 2025, "genre": "Crime", "rating": 7.9, "runtime": "2h 18m", "kind": "Series", "tag": "Series", "a": "#B3220F", "b": "#1A0A0E", "pattern": "bars", "tagline": "Every entry is a name. Every name is a debt.", "syn": "A forensic accountant is handed a single notebook and eighteen months to prove that the city's cleanest businessman is its dirtiest.", "cast": "Sameer Qadri, Lata Menon", "director": "Aakash Rane", "lang": "Hindi", "quality": "4K"}, "t19": {"title": "Feather Weight", "year": 2024, "genre": "Sports", "rating": 8.2, "runtime": "1h 58m", "kind": "Film", "tag": "", "a": "#D8A93B", "b": "#2A1A08", "pattern": "rings", "tagline": "Forty-nine kilos of stubborn.", "syn": "A teenage boxer from a mill town trains for the nationals using a punchbag made of sand and a coach who has never won anything either.", "cast": "Pooja Rathi, Baliram Singh", "director": "Gauri Deshpande", "lang": "Hindi", "quality": "4K"}, "t20": {"title": "Night Bus 41", "year": 2023, "genre": "Horror", "rating": 7.3, "runtime": "1h 41m", "kind": "Film", "tag": "", "a": "#7C3AED", "b": "#100A1E", "pattern": "orb", "tagline": "Last stop is not on the map.", "syn": "The 41 bus runs one extra route after midnight. The conductor has been doing this shift for eleven years and has never once reached the depot.", "cast": "Ramesh Teli, Sonal Bhatt", "director": "Vikas Dubey", "lang": "Hindi", "quality": "4K"}, "t21": {"title": "The Cartographer", "year": 2025, "genre": "Drama", "rating": 8.7, "runtime": "2h 26m", "kind": "Film", "tag": "Award", "a": "#4B6BFB", "b": "#0A1428", "pattern": "arc", "tagline": "He mapped everything except himself.", "syn": "A surveyor spends thirty years drawing a district that keeps changing shape, and slowly realises the maps are drawing him back.", "cast": "Girish Kulkarni, Anuradha Sen", "director": "Sudha Ranganathan", "lang": "Hindi · Kannada", "quality": "4K HDR"}, "t22": {"title": "Copperline", "year": 2024, "genre": "Crime", "rating": 7.8, "runtime": "2h 07m", "kind": "Series", "tag": "Series", "a": "#F2402A", "b": "#20101A", "pattern": "bars", "tagline": "The wire taps back.", "syn": "A telephone lineman in 1998 starts listening to the conversations on his own exchange, and hears a murder being planned in three parts.", "cast": "Rajan Mehta, Sushma Rao", "director": "Kunal Bhardwaj", "lang": "Hindi", "quality": "4K"}, "t23": {"title": "Golden Hour", "year": 2023, "genre": "Romance", "rating": 8.1, "runtime": "1h 48m", "kind": "Film", "tag": "", "a": "#D8A93B", "b": "#3A2208", "pattern": "diag", "tagline": "Sixty minutes of perfect light.", "syn": "A wedding photographer who has never been in love agrees to shoot the wedding of the only person she ever loved.", "cast": "Tanvi Shah, Adil Sheikh", "director": "Rhea Kapadia", "lang": "Hindi · Gujarati", "quality": "4K"}, "t24": {"title": "Deep Field", "year": 2025, "genre": "Sci-Fi", "rating": 8.5, "runtime": "2h 12m", "kind": "Film", "tag": "New", "a": "#22D3EE", "b": "#08142A", "pattern": "orb", "tagline": "Ten thousand galaxies. One message.", "syn": "An observatory in the Himalayas receives a signal that is not a signal but a memory, and the astronomer who decodes it starts remembering a childhood she never had.", "cast": "Ira Bhatt, Neeraj Sood", "director": "Aparna Iyengar", "lang": "English · Hindi", "quality": "4K HDR"}};
+</script>
+<script>
+/* Enhancement only. Everything above already works without this script. */
+(function(){
+  try{
+    var radios = document.querySelectorAll('.navradio');
+    function go(id){ var r = document.getElementById('r-'+id); if(r){ r.checked = true; } }
+
+    // poster -> detail (fills the detail screen with that title)
+    document.addEventListener('click', function(e){
+      var p = e.target.closest('[data-open]');
+      if(p){
+        var id = p.getAttribute('data-open');
+        var d = window.FLIXVORA && window.FLIXVORA[id];
+        if(d){ fillDetail(d); }
+        go('detail');
+        return;
+      }
+      var s = e.target.closest('[data-save]');
+      if(s){
+        var on = s.classList.toggle('on');
+        s.textContent = on ? '\u2713 Saved' : '+ Saved';
+        return;
+      }
+      var t = e.target.closest('[data-toggle]');
+      if(t){ t.classList.toggle('on'); return; }
+    });
+
+    function fillDetail(d){
+      var h = document.querySelector('#detail .detail-head h1');
+      if(h) h.textContent = d.title;
+      var tg = document.querySelector('#detail .tagline');
+      if(tg) tg.textContent = d.tagline;
+      var syn = document.getElementById('detail-syn');
+      if(syn) syn.textContent = d.syn;
+      var dir = document.getElementById('c-dir');
+      if(dir) dir.textContent = d.director;
+      var cast = document.getElementById('c-cast');
+      if(cast) cast.textContent = d.cast;
+      var lang = document.getElementById('c-lang');
+      if(lang) lang.textContent = d.lang;
+      var art = document.querySelector('#detail .detail-hero .art');
+      if(art){
+        art.className = 'art p-' + d.pattern;
+        art.style.setProperty('--a', d.a);
+        art.style.setProperty('--b', d.b);
+      }
+      var m = document.querySelector('#detail .meta-row');
+      if(m) m.innerHTML = '<span>'+d.year+'</span><span class="dot"></span><span>'+d.genre+
+        '</span><span class="dot"></span><span>'+d.runtime+'</span><span class="dot"></span>'+
+        '<span class="star">\u2605 '+d.rating+'</span>';
+      var ep = document.getElementById('episodes-sec');
+      if(ep) ep.style.display = d.kind === 'Series' ? '' : 'none';
+      var kick = document.querySelector('#detail .kicker');
+      if(kick){
+        var tg = (d.tag && d.tag !== d.kind) ? d.tag : 'Now streaming';
+        kick.innerHTML = d.kind + ' &middot; ' + tg;
+      }
+      var qual = document.getElementById('c-qual');
+      if(qual) qual.textContent = (d.quality||'4K') + ' \u00b7 Dolby Atmos';
+      var st = document.querySelectorAll('#detail .stat b');
+      if(st.length===4){
+        st[0].textContent = Number(d.rating).toFixed(1);
+        st[1].textContent = d.year;
+        st[2].textContent = (d.quality||'4K').split(' ')[0];
+        st[3].textContent = d.kind === 'Series' ? '8' : '1';
+      }
+    }
+
+    // search
+    var input = document.getElementById('search');
+    if(input){
+      input.addEventListener('input', function(){
+        filterGrid();
+      });
+    }
+
+    var activeGenre = 'All';
+    document.addEventListener('click', function(e){
+      var c = e.target.closest('[data-genre-filter]');
+      if(c){
+        activeGenre = c.getAttribute('data-genre-filter');
+        var all = document.querySelectorAll('[data-genre-filter]');
+        for(var i=0;i<all.length;i++) all[i].classList.remove('on');
+        c.classList.add('on');
+        filterGrid();
+      }
+      var l = e.target.closest('[data-live-filter]');
+      if(l){
+        var cat = l.getAttribute('data-live-filter');
+        var chips = document.querySelectorAll('[data-live-filter]');
+        for(var j=0;j<chips.length;j++) chips[j].classList.remove('on');
+        l.classList.add('on');
+        var rows = document.querySelectorAll('#live-list .live-row');
+        for(var k=0;k<rows.length;k++){
+          rows[k].style.display = (cat==='All' || rows[k].getAttribute('data-cat')===cat) ? '' : 'none';
+        }
+      }
+    });
+
+    function filterGrid(){
+      var q = (input && input.value || '').trim().toLowerCase();
+      var cards = document.querySelectorAll('#grid .poster');
+      var shown = 0;
+      for(var i=0;i<cards.length;i++){
+        var g = cards[i].getAttribute('data-genre');
+        var s = cards[i].getAttribute('data-search') || '';
+        var ok = (activeGenre==='All' || g===activeGenre) && (!q || s.indexOf(q) > -1);
+        cards[i].style.display = ok ? '' : 'none';
+        if(ok) shown++;
+      }
+      var cl = document.getElementById('count-line');
+      if(cl) cl.textContent = shown + (shown===1?' title':' titles');
+      var sc = document.getElementById('slate-count');
+      if(sc) sc.textContent = shown;
+      var sf = document.getElementById('slate-filter');
+      if(sf) sf.textContent = activeGenre;
+    }
+  }catch(err){ /* static demo still fully usable */ }
+})();
+</script>
+</body>
+</html>

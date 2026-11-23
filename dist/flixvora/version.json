@@ -1,0 +1,9 @@
+{
+  "versionName": "9.7",
+  "versionCode": 46,
+  "forceUpdate": false,
+  "changelog": "9.7 - Stream recovery aur error-cache fix. Catalogue kuch titles ke liye decoy clip bhejta hai; app ab signCookie ki signed CloudFront policy se asli manifest banati hai, phir resource-position/v2 se link recover karti hai, aur resource/v2 se extra mirrors jodti hai. Saath hi ek bug fix: server error responses (jaise 406) ab cache nahi hote, isliye upstream theek hone par app turant naya data laata hai, purana error repeat nahi karta.",
+  "downloadUrl": "https://work-1-vjjhalkhxmwfcrus.prod-runtime.all-hands.dev/flixvora/Flixvora.apk",
+  "sha256": "37441c60ac832e79bb064639b8a4fc15bca59cd6081a3631e19af245aa8632b9",
+  "size": 6748822
+}

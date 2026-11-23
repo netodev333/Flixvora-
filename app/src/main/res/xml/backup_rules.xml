@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup rules for API < 31.
+  Session / visitor / auth tokens live in the "flixvora_prefs" SharedPreferences
+  file. Never copy those to cloud backup or device transfer.
+-->
+<full-backup-content>
+    <exclude domain="sharedpref" path="flixvora_prefs.xml" />
+</full-backup-content>

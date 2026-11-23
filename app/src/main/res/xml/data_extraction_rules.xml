@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Backup / transfer rules for API 31+.
+  Exclude the SharedPreferences file that holds session and visitor tokens so
+  credentials are never restored onto another device.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="sharedpref" path="flixvora_prefs.xml" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="sharedpref" path="flixvora_prefs.xml" />
+    </device-transfer>
+</data-extraction-rules>

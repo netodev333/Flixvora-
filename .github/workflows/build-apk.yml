@@ -1,0 +1,43 @@
+name: Build and Release Flixvora APK
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      - name: Build Debug APK
+        run: ./gradlew assembleDebug --stacktrace
+
+      - name: Upload Debug APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flixvora-Debug-APK
+          path: app/build/outputs/apk/debug/*.apk
+
+      - name: Build Release APK
+        run: ./gradlew assembleRelease --stacktrace
+        continue-on-error: true
+
+      - name: Upload Release APK (if built)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Flixvora-Release-APK
+          path: app/build/outputs/apk/release/*.apk
