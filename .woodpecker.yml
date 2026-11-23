@@ -1,0 +1,24 @@
+when:
+  - event: [push, manual]
+    branch: main
+
+steps:
+  - name: build-apk
+    image: openjdk:21-jdk-slim
+    environment:
+      ANDROID_COMPILE_SDK: "36"
+      ANDROID_BUILD_TOOLS: "35.0.0"
+      ANDROID_SDK_TOOLS: "11076708"
+    commands:
+      - apt-get update -qq
+      - apt-get install -y -qq wget tar unzip git curl
+      - export ANDROID_HOME="${PWD}/android-sdk-root"
+      - mkdir -p "${ANDROID_HOME}/cmdline-tools"
+      - wget --quiet --output-document="${ANDROID_HOME}/cmdline-tools.zip" https://dl.google.com/android/repository/commandlinetools-linux-${ANDROID_SDK_TOOLS}_latest.zip
+      - unzip -q -d "${ANDROID_HOME}/cmdline-tools" "${ANDROID_HOME}/cmdline-tools.zip"
+      - mv "${ANDROID_HOME}/cmdline-tools/cmdline-tools" "${ANDROID_HOME}/cmdline-tools/latest"
+      - export PATH="${ANDROID_HOME}/cmdline-tools/latest/bin:${ANDROID_HOME}/platform-tools:${PATH}"
+      - yes | sdkmanager --licenses || true
+      - sdkmanager --install "platforms;android-36" "build-tools;35.0.0" "platform-tools"
+      - chmod +x ./gradlew
+      - ./gradlew assembleDebug --stacktrace
