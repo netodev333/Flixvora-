@@ -1,9 +1,12 @@
-name: Build and Release Flixvora APK
+name: Build and Create GitHub Release
 
 on:
   push:
     branches: [ main, master ]
   workflow_dispatch:
+
+permissions:
+  contents: write
 
 jobs:
   build:
@@ -26,18 +29,31 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Upload Debug APK
+      - name: Prepare Release Assets
+        run: |
+          mkdir -p release-out
+          cp app/build/outputs/apk/debug/*.apk release-out/Flixvora-v9.7-debug.apk
+          echo "APK generated successfully"
+
+      - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Flixvora-Debug-APK
-          path: app/build/outputs/apk/debug/*.apk
+          path: release-out/*.apk
 
-      - name: Build Release APK
-        run: ./gradlew assembleRelease --stacktrace
-        continue-on-error: true
-
-      - name: Upload Release APK (if built)
-        uses: actions/upload-artifact@v4
+      - name: Create GitHub Release with APK
+        uses: softprops/action-gh-release@v2
+        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/master')
         with:
-          name: Flixvora-Release-APK
-          path: app/build/outputs/apk/release/*.apk
+          tag_name: v9.7-fixed
+          name: "Flixvora v9.7 Fixed (Stable)"
+          body: |
+            ### 🚀 Flixvora v9.7 Update & Bugfixes
+            
+            - **Adult Content Filter Fix**: Filter bypass (UllU/Vivamax) permanently resolved. Toggle in Settings fully functional.
+            - **Search Screen Improvements**: Debounced search and job cancellation to eliminate keystroke race condition.
+            - **Pagination & Caching Fixes**: Fixed result count limit bug and added instant cache invalidation upon setting change.
+            - **Modern Architecture**: Jetpack Compose, Material3 & ExoPlayer/Media3 streaming engine.
+          files: release-out/*.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
