@@ -523,11 +523,11 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         viewModelScope.launch(Dispatchers.IO) {
             if (isManualCheck) isCheckingUpdate = true
             try {
-                // Update manifest is hosted on a self-managed HTTPS endpoint (no GitHub).
-                // Override at build time with -PupdateManifestUrl=... if it ever moves.
+                // Update manifest is fetched from GitHub Releases API.
+                // Primary: latest release; Fallback: releases list (for versionCode comparison).
                 val endpoints = listOfNotNull(
-                    BuildConfig.UPDATE_MANIFEST_URL,
-                    BuildConfig.UPDATE_MANIFEST_URL_2
+                    BuildConfig.UPDATE_MANIFEST_URL,        // https://api.github.com/repos/netodev333/Flixvora-/releases/latest
+                    BuildConfig.UPDATE_MANIFEST_URL_2       // https://api.github.com/repos/netodev333/Flixvora-/releases
                 ).filter { it.isNotBlank() }
 
                 val client = okhttp3.OkHttpClient.Builder()
@@ -535,138 +535,68 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                     .readTimeout(10, java.util.concurrent.TimeUnit.SECONDS)
                     .build()
 
-                // Query every endpoint and keep the highest version. A CDN can serve a
-                // stale cached manifest, so "first success wins" could hide real updates.
                 var bodyString: String? = null
-                var bestCode = -1
                 var lastError: String? = null
-                // A cold start often fires before the network is usable, and the
-                // update server may be restarting. One attempt silently loses the
-                // update for that whole session, so retry with backoff before
-                // giving up.
-                // A manual tap deserves a real try, not a single 10s shot.
                 val attempts = if (isManualCheck) 2 else 3
-                for (attempt in 0 until attempts) {
-                    for (targetUrl in endpoints) {
+
+                // Try each endpoint in order until we find a valid APK
+                for (endpoint in endpoints) {
+                    for (attempt in 0 until attempts) {
                         try {
-                            val finalUrl = "$targetUrl?t=${System.currentTimeMillis()}"
+                            val finalUrl = "$endpoint?t=${System.currentTimeMillis()}"
                             val request = okhttp3.Request.Builder()
                                 .url(finalUrl)
                                 .header("User-Agent", "FlixvoraApp")
+                                .header("Accept", "application/vnd.github.v3+json")
                                 .header("Cache-Control", "no-cache")
                                 .build()
 
                             val response = client.newCall(request).execute()
                             if (!response.isSuccessful) {
-                                lastError = "HTTP ${response.code} from ${java.net.URI(targetUrl).host}"
+                                lastError = "HTTP ${response.code} from ${java.net.URI(endpoint).host}"
                             }
                             if (response.isSuccessful) {
                                 val candidate = response.body?.string()
                                 if (!candidate.isNullOrBlank()) {
-                                    val candidateCode = try {
-                                        org.json.JSONObject(candidate).optInt("versionCode", 0)
-                                    } catch (_: Exception) { -1 }
-                                    if (candidateCode > bestCode) {
-                                        bestCode = candidateCode
-                                        bodyString = candidate
-                                    }
+                                    bodyString = candidate
+                                    break // Found valid response, exit retry loop
                                 }
                             }
                         } catch (e: Exception) {
-                            // Keep the reason: "unable to reach" alone gives no clue
-                            // whether it was DNS, TLS, or a timeout.
-                            lastError = "${e.javaClass.simpleName}: ${e.message ?: "no detail"} (${runCatching { java.net.URI(targetUrl).host }.getOrNull()})"
+                            lastError = "${e.javaClass.simpleName}: ${e.message ?: "no detail"} (${runCatching { java.net.URI(endpoint).host }.getOrNull()})"
+                        }
+                        if (attempt < attempts - 1) {
+                            kotlinx.coroutines.delay(3_000L * (attempt + 1))
                         }
                     }
-                    if (!bodyString.isNullOrBlank()) break
-                    if (attempt < attempts - 1) {
-                        kotlinx.coroutines.delay(3_000L * (attempt + 1))
-                    }
+                    if (!bodyString.isNullOrBlank()) break // Found valid response, exit endpoint loop
                 }
 
                 if (!bodyString.isNullOrBlank()) {
                     val json = org.json.JSONObject(bodyString)
 
-                    val remoteVersionName = json.optString("versionName", "").trim()
-                    val remoteVersionCode = json.optInt("versionCode", 0)
+                    // Parse GitHub release format
+                    val tagName = json.optString("tag_name", "").trim()  // e.g., "v9.9"
+                    val remoteVersionName = tagName.removePrefix("v")
+                    val remoteVersionCode = remoteVersionName.toIntOrNull() ?: 0
                     val forceUpdate = json.optBoolean("forceUpdate", false)
-                    val changelog = json.optString("changelog", "").trim()
-                    val downloadUrl = json.optString("downloadUrl", "").trim()
-                    val sha256 = json.optString("sha256", "").trim()
+                    val changelog = json.optString("body", "").trim()  // GitHub uses "body"
+                    if (changelog.isEmpty()) changelog = "Bug fixes and improvements."
 
-                    // Only ever install over TLS from the release manifest.
-                    if (!downloadUrl.startsWith("https://", ignoreCase = true)) {
-                        withContext(Dispatchers.Main) {
-                            if (isManualCheck) onComplete?.invoke(false, "Update manifest has an invalid download URL.")
-                        }
-                        return@launch
-                    }
-
-                    val currentVersionCode = try {
-                        val pInfo = getApplication<Application>().packageManager.getPackageInfo(getApplication<Application>().packageName, 0)
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pInfo.longVersionCode.toInt() else pInfo.versionCode
-                    } catch (e: Exception) { 2 }
-
-                    val currentVersionName = try {
-                        getApplication<Application>().packageManager.getPackageInfo(getApplication<Application>().packageName, 0).versionName ?: "2.0"
-                    } catch (e: Exception) { "2.0" }
-
-                    val hasNewerVersion = (remoteVersionCode > currentVersionCode) || isVersionGreater(remoteVersionName, currentVersionName)
-
-                    if (hasNewerVersion && downloadUrl.isNotEmpty()) {
-                        val lastDismissedMillis = prefs.lastUpdateDismissedMillis
-                        val fiveDaysMillis = 5L * 24 * 60 * 60 * 1000 // 5 days cooldown
-                        val isCooldownPassed = (System.currentTimeMillis() - lastDismissedMillis) >= fiveDaysMillis
-
-                        // Force updates always show; optional updates obey the 5-day cooldown unless manually checked from settings
-                        if (forceUpdate || isManualCheck || isCooldownPassed) {
-                            withContext(Dispatchers.Main) {
-                                availableUpdateInfo = AppUpdateInfo(
-                                    latestVersionName = remoteVersionName.ifEmpty { "v$remoteVersionCode" },
-                                    latestVersionCode = remoteVersionCode,
-                                    changelog = changelog,
-                                    downloadUrl = downloadUrl,
-                                    isForceUpdate = forceUpdate,
-                                    sha256 = sha256
-                                )
-                                onComplete?.invoke(true, "New update v$remoteVersionName available!")
-                            }
-                        } else {
-                            withContext(Dispatchers.Main) {
-                                if (isManualCheck) {
-                                    onComplete?.invoke(true, "New update v$remoteVersionName available!")
-                                }
-                            }
-                        }
-                    } else {
-                        withContext(Dispatchers.Main) {
-                            if (isManualCheck) {
-                                onComplete?.invoke(false, "You are using the latest version ($currentVersionName)")
+                    // Find APK asset in release
+                    val assets = json.optJSONArray("assets")
+                    var downloadUrl = ""
+                    var sha256 = ""
+                    if (assets != null) {
+                        for (i in 0 until assets.length()) {
+                            val asset = assets.getJSONObject(i)
+                            val name = asset.optString("name", "")
+                            if (name.endsWith(".apk", ignoreCase = true)) {
+                                downloadUrl = asset.optString("browser_download_url", "")
+                                break
                             }
                         }
                     }
-                } else {
-                    withContext(Dispatchers.Main) {
-                        if (isManualCheck) {
-                            onComplete?.invoke(
-                                false,
-                                if (lastError != null) "Update check failed - $lastError"
-                                else "Unable to reach update server. Check your internet connection."
-                            )
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    if (isManualCheck) onComplete?.invoke(false, "Update check failed - ${e.javaClass.simpleName}: ${e.message ?: "no detail"}")
-                }
-            } finally {
-                withContext(Dispatchers.Main) {
-                    isCheckingUpdate = false
-                }
-            }
-        }
-    }
 
     private fun isVersionGreater(remote: String, local: String): Boolean {
         if (remote.isEmpty() || local.isEmpty()) return false
@@ -684,7 +614,51 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
     fun dismissUpdate() {
         prefs.lastUpdateDismissedMillis = System.currentTimeMillis()
-        availableUpdateInfo = null
+        // Don't clear availableUpdateInfo if APK is already downloaded
+        // so user can still install it later
+        val apkFile = getCachedUpdateApk()
+        if (!apkFile.exists()) {
+            availableUpdateInfo = null
+        }
+    }
+
+    /**
+     * Check if a valid update APK exists in cache
+     */
+    fun getCachedUpdateApk(): java.io.File {
+        val app = getApplication<android.app.Application>()
+        val cacheDir = app.externalCacheDir ?: app.cacheDir
+        return java.io.File(cacheDir, "update.apk")
+    }
+
+    /**
+     * Check if cached update APK is valid (exists and has reasonable size)
+     */
+    fun hasValidCachedUpdate(): Boolean {
+        val apkFile = getCachedUpdateApk()
+        return apkFile.exists() && apkFile.length() > 1024 * 1024 // At least 1MB
+    }
+
+    /**
+     * Install the already-downloaded update APK from cache
+     */
+    fun installCachedUpdate(context: android.content.Context) {
+        val apkFile = getCachedUpdateApk()
+        if (apkFile.exists()) {
+            installApk(context, apkFile)
+        } else {
+            Toast.makeText(context, "Update file not found. Please download again.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    fun dismissUpdate() {
+        prefs.lastUpdateDismissedMillis = System.currentTimeMillis()
+        // Don't clear availableUpdateInfo if APK is already downloaded
+        // so user can still install it later
+        val apkFile = getCachedUpdateApk()
+        if (!apkFile.exists()) {
+            availableUpdateInfo = null
+        }
     }
 
     fun downloadAndInstallUpdate(context: android.content.Context, downloadUrl: String, expectedSha256: String = "") {

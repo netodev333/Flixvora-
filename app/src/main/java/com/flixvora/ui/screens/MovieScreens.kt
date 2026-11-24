@@ -506,7 +506,9 @@ fun ForceUpdateFullScreen(
     isDownloading: Boolean,
     progress: Int,
     statusText: String,
+    hasCachedApk: Boolean,
     onUpdateClick: () -> Unit,
+    onInstallClick: () -> Unit,
     onGoToDownloads: () -> Unit
 ) {
     Box(
@@ -623,30 +625,59 @@ fun ForceUpdateFullScreen(
                     )
                 }
             } else {
-                Button(
-                    onClick = onUpdateClick,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .clip(RoundedCornerShape(15.dp))
-                        .background(BrandGradient),
-                    shape = RoundedCornerShape(15.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                    contentPadding = PaddingValues(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Download,
-                        contentDescription = "Download",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Update Now",
-                        color = Color.White,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold
-                    )
+                // Show Install button if APK is already cached, otherwise Download
+                if (hasCachedApk) {
+                    Button(
+                        onClick = onInstallClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(BrandGradient),
+                        shape = RoundedCornerShape(15.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Install",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Install Update",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
+                } else {
+                    Button(
+                        onClick = onUpdateClick,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp)
+                            .clip(RoundedCornerShape(15.dp))
+                            .background(BrandGradient),
+                        shape = RoundedCornerShape(15.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Download,
+                            contentDescription = "Download",
+                            tint = Color.White,
+                            modifier = Modifier.size(20.dp)
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = "Update Now",
+                            color = Color.White,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(14.dp))
@@ -684,7 +715,9 @@ fun AppUpdateDialog(
     isDownloading: Boolean,
     progress: Int,
     statusText: String,
+    hasCachedApk: Boolean,
     onUpdateClick: () -> Unit,
+    onInstallClick: () -> Unit,
     onDismiss: () -> Unit
 ) {
     androidx.compose.ui.window.Dialog(
@@ -808,31 +841,61 @@ fun AppUpdateDialog(
                         )
                     }
                 } else {
-                    Button(
-                        onClick = onUpdateClick,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(44.dp),
-                        shape = RoundedCornerShape(10.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = BrandGreen,
-                            contentColor = BrandGreenInk
-                        ),
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Download,
-                            contentDescription = "Download",
-                            tint = BrandGreenInk,
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(7.dp))
-                        Text(
-                            text = "Download & Install",
-                            color = BrandGreenInk,
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Bold
-                        )
+                    // Show Install button if APK is already cached, otherwise Download
+                    if (hasCachedApk) {
+                        Button(
+                            onClick = onInstallClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = BrandGreen,
+                                contentColor = BrandGreenInk
+                            ),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.CheckCircle,
+                                contentDescription = "Install",
+                                tint = BrandGreenInk,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(7.dp))
+                            Text(
+                                text = "Install Update",
+                                color = BrandGreenInk,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    } else {
+                        Button(
+                            onClick = onUpdateClick,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(44.dp),
+                            shape = RoundedCornerShape(10.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = BrandGreen,
+                                contentColor = BrandGreenInk
+                            ),
+                            contentPadding = PaddingValues(0.dp)
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Download,
+                                contentDescription = "Download",
+                                tint = BrandGreenInk,
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(7.dp))
+                            Text(
+                                text = "Download & Install",
+                                color = BrandGreenInk,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
                     }
 
                     if (!updateInfo.isForceUpdate) {
@@ -1150,6 +1213,7 @@ fun MainContent(viewModel: MovieViewModel) {
 
         // In-App Smart/Force Update Screen
         val updateInfo = viewModel.availableUpdateInfo
+        val hasCachedApk = viewModel.hasValidCachedUpdate()
         if (updateInfo != null && viewModel.playInfo == null) {
             if (updateInfo.isForceUpdate) {
                 if (activeTab != "download") {
@@ -1158,8 +1222,12 @@ fun MainContent(viewModel: MovieViewModel) {
                         isDownloading = viewModel.isDownloadingUpdate,
                         progress = viewModel.updateDownloadProgress,
                         statusText = viewModel.updateStatusMessage,
+                        hasCachedApk = hasCachedApk,
                         onUpdateClick = {
                             viewModel.downloadAndInstallUpdate(context, updateInfo.downloadUrl, updateInfo.sha256)
+                        },
+                        onInstallClick = {
+                            viewModel.installCachedUpdate(context)
                         },
                         onGoToDownloads = {
                             activeTab = "download"
@@ -1172,8 +1240,12 @@ fun MainContent(viewModel: MovieViewModel) {
                     isDownloading = viewModel.isDownloadingUpdate,
                     progress = viewModel.updateDownloadProgress,
                     statusText = viewModel.updateStatusMessage,
+                    hasCachedApk = hasCachedApk,
                     onUpdateClick = {
                         viewModel.downloadAndInstallUpdate(context, updateInfo.downloadUrl, updateInfo.sha256)
+                    },
+                    onInstallClick = {
+                        viewModel.installCachedUpdate(context)
                     },
                     onDismiss = {
                         viewModel.dismissUpdate()

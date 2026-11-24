@@ -27,23 +27,21 @@ android {
 
   // Self-hosted (non-GitHub) endpoint that serves the update manifest. Override
   // with -PupdateManifestUrl=https://... at build time; no code change needed.
-  val updateManifestUrl = (project.findProperty("updateManifestUrl") as String?) ?: "https://work-1-vjjhalkhxmwfcrus.prod-runtime.all-hands.dev/flixvora/version.json"
-  // Second host on a different port. Carriers and some Wi-Fi networks block or
-  // break individual hostnames; without a fallback one bad DNS answer silently
-  // hides every future update.
-  val updateManifestUrl2 = (project.findProperty("updateManifestUrl2") as String?) ?: "https://work-2-vjjhalkhxmwfcrus.prod-runtime.all-hands.dev/flixvora/version.json"
+  val updateManifestUrl = (project.findProperty("updateManifestUrl") as String?) ?: "https://api.github.com/repos/netodev333/Flixvora-/releases/latest"
+  // Fallback: GitHub releases list endpoint
+  val updateManifestUrl2 = (project.findProperty("updateManifestUrl2") as String?) ?: "https://api.github.com/repos/netodev333/Flixvora-/releases"
 
   defaultConfig {
     applicationId = "com.flixvora.app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 46
-    versionName = "9.7"
+    versionCode = 50
+    versionName = "9.9"
 
     buildConfigField("String", "TMDB_API_KEY_1", "\"$tmdbApiKey1\"")
     buildConfigField("String", "TMDB_API_KEY_2", "\"$tmdbApiKey2\"")
     buildConfigField("String", "OPENSUBTITLES_API_KEY", "\"$openSubtitlesApiKey\"")
-    // Self-hosted update manifest endpoint (replaces the old GitHub/jsDelivr URLs).
+    // GitHub Releases API for update manifest
     buildConfigField("String", "UPDATE_MANIFEST_URL", "\"$updateManifestUrl\"")
     buildConfigField("String", "UPDATE_MANIFEST_URL_2", "\"$updateManifestUrl2\"")
   }
