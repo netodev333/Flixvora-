@@ -611,7 +611,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                     val remoteVersionName = tagName.removePrefix("v")
                     val remoteVersionCode = remoteVersionName.toIntOrNull() ?: 0
                     val forceUpdate = json.optBoolean("forceUpdate", false)
-                    val changelog = json.optString("body", "").trim()  // GitHub uses "body"
+                    var changelog = json.optString("body", "").trim()  // GitHub uses "body"
                     if (changelog.isEmpty()) changelog = "Bug fixes and improvements."
 
                     // Find APK asset in release
