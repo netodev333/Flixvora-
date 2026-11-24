@@ -248,7 +248,37 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         _categoryMovies.value = emptyList()
         _categorySections.value = emptyList()
         _animeRails.value = emptyList()
+        // Force a complete UI refresh by triggering recomposition
         loadDashboardContent()
+    }
+
+    /**
+     * Check if a valid update APK exists in cache
+     */
+    fun getCachedUpdateApk(): java.io.File {
+        val app = getApplication<android.app.Application>()
+        val cacheDir = app.externalCacheDir ?: app.cacheDir
+        return java.io.File(cacheDir, "update.apk")
+    }
+
+    /**
+     * Check if cached update APK is valid (exists and has reasonable size)
+     */
+    fun hasValidCachedUpdate(): Boolean {
+        val apkFile = getCachedUpdateApk()
+        return apkFile.exists() && apkFile.length() > 1024 * 1024 // At least 1MB
+    }
+
+    /**
+     * Install the already-downloaded update APK from cache
+     */
+    fun installCachedUpdate(context: android.content.Context) {
+        val apkFile = getCachedUpdateApk()
+        if (apkFile.exists()) {
+            installApk(context, apkFile)
+        } else {
+            Toast.makeText(context, "Update file not found. Please download again.", Toast.LENGTH_SHORT).show()
+        }
     }
 
     // Anime shelves merged into the main feed so both catalogues are always on.
@@ -536,6 +566,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                     .build()
 
                 var bodyString: String? = null
+                var bestCode = -1
                 var lastError: String? = null
                 val attempts = if (isManualCheck) 2 else 3
 
@@ -598,6 +629,80 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                         }
                     }
 
+                    // Only ever install over TLS from the release manifest.
+                    if (!downloadUrl.startsWith("https://", ignoreCase = true)) {
+                        withContext(Dispatchers.Main) {
+                            if (isManualCheck) onComplete?.invoke(false, "Update manifest has an invalid download URL.")
+                        }
+                        return@launch
+                    }
+
+                    val currentVersionCode = try {
+                        val pInfo = getApplication<Application>().packageManager.getPackageInfo(getApplication<Application>().packageName, 0)
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) pInfo.longVersionCode.toInt() else pInfo.versionCode
+                    } catch (e: Exception) { 2 }
+
+                    val currentVersionName = try {
+                        getApplication<Application>().packageManager.getPackageInfo(getApplication<Application>().packageName, 0).versionName ?: "2.0"
+                    } catch (e: Exception) { "2.0" }
+
+                    val hasNewerVersion = (remoteVersionCode > currentVersionCode) || isVersionGreater(remoteVersionName, currentVersionName)
+
+                    if (hasNewerVersion && downloadUrl.isNotEmpty()) {
+                        val lastDismissedMillis = prefs.lastUpdateDismissedMillis
+                        val fiveDaysMillis = 5L * 24 * 60 * 60 * 1000 // 5 days cooldown
+                        val isCooldownPassed = (System.currentTimeMillis() - lastDismissedMillis) >= fiveDaysMillis
+
+                        // Force updates always show; optional updates obey the 5-day cooldown unless manually checked from settings
+                        if (forceUpdate || isManualCheck || isCooldownPassed) {
+                            withContext(Dispatchers.Main) {
+                                availableUpdateInfo = AppUpdateInfo(
+                                    latestVersionName = remoteVersionName.ifEmpty { "v$remoteVersionCode" },
+                                    latestVersionCode = remoteVersionCode,
+                                    changelog = changelog,
+                                    downloadUrl = downloadUrl,
+                                    isForceUpdate = forceUpdate,
+                                    sha256 = sha256
+                                )
+                                onComplete?.invoke(true, "New update v$remoteVersionName available!")
+                            }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                if (isManualCheck) {
+                                    onComplete?.invoke(true, "New update v$remoteVersionName available!")
+                                }
+                            }
+                        }
+                    } else {
+                        withContext(Dispatchers.Main) {
+                            if (isManualCheck) {
+                                onComplete?.invoke(false, "You are using the latest version ($currentVersionName)")
+                            }
+                        }
+                    }
+                } else {
+                    withContext(Dispatchers.Main) {
+                        if (isManualCheck) {
+                            onComplete?.invoke(
+                                false,
+                                if (lastError != null) "Update check failed - $lastError"
+                                else "Unable to reach update server. Check your internet connection."
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    if (isManualCheck) onComplete?.invoke(false, "Update check failed - ${e.javaClass.simpleName}: ${e.message ?: "no detail"}")
+                }
+            } finally {
+                withContext(Dispatchers.Main) {
+                    isCheckingUpdate = false
+                }
+            }
+        }
+    }
+
     private fun isVersionGreater(remote: String, local: String): Boolean {
         if (remote.isEmpty() || local.isEmpty()) return false
         val rParts = remote.split(".").mapNotNull { it.filter { char -> char.isDigit() }.toIntOrNull() }
@@ -648,16 +753,6 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
             installApk(context, apkFile)
         } else {
             Toast.makeText(context, "Update file not found. Please download again.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    fun dismissUpdate() {
-        prefs.lastUpdateDismissedMillis = System.currentTimeMillis()
-        // Don't clear availableUpdateInfo if APK is already downloaded
-        // so user can still install it later
-        val apkFile = getCachedUpdateApk()
-        if (!apkFile.exists()) {
-            availableUpdateInfo = null
         }
     }
 
@@ -786,8 +881,8 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
                 withContext(Dispatchers.Main) {
                     isDownloadingUpdate = false
-                    updateStatusMessage = "Ready to install"
-                    installApk(context, apkFile)
+                    updateStatusMessage = "Ready to install — tap Update to install"
+                    // Don't auto-install; let user tap Update button when ready
                 }
             } catch (e: Exception) {
                 withContext(Dispatchers.Main) {
