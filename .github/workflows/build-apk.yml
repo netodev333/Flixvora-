@@ -1,4 +1,4 @@
-name: Build and Create GitHub Release
+name: Build Debug APK (Artifact Only)
 
 on:
   push:
@@ -6,7 +6,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -29,31 +29,9 @@ jobs:
       - name: Build Debug APK
         run: ./gradlew assembleDebug --stacktrace
 
-      - name: Prepare Release Assets
-        run: |
-          mkdir -p release-out
-          cp app/build/outputs/apk/debug/*.apk release-out/Flixvora-v9.7-debug.apk
-          echo "APK generated successfully"
-
       - name: Upload Debug APK Artifact
         uses: actions/upload-artifact@v4
         with:
           name: Flixvora-Debug-APK
-          path: release-out/*.apk
-
-      - name: Create GitHub Release with APK
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/heads/main') || startsWith(github.ref, 'refs/heads/master')
-        with:
-          tag_name: v9.7-fixed
-          name: "Flixvora v9.7 Fixed (Stable)"
-          body: |
-            ### 🚀 Flixvora v9.7 Update & Bugfixes
-            
-            - **Adult Content Filter Fix**: Filter bypass (UllU/Vivamax) permanently resolved. Toggle in Settings fully functional.
-            - **Search Screen Improvements**: Debounced search and job cancellation to eliminate keystroke race condition.
-            - **Pagination & Caching Fixes**: Fixed result count limit bug and added instant cache invalidation upon setting change.
-            - **Modern Architecture**: Jetpack Compose, Material3 & ExoPlayer/Media3 streaming engine.
-          files: release-out/*.apk
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          path: app/build/outputs/apk/debug/*.apk
+          retention-days: 7
