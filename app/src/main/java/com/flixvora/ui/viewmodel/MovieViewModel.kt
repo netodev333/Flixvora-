@@ -727,35 +727,6 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    /**
-     * Check if a valid update APK exists in cache
-     */
-    fun getCachedUpdateApk(): java.io.File {
-        val app = getApplication<android.app.Application>()
-        val cacheDir = app.externalCacheDir ?: app.cacheDir
-        return java.io.File(cacheDir, "update.apk")
-    }
-
-    /**
-     * Check if cached update APK is valid (exists and has reasonable size)
-     */
-    fun hasValidCachedUpdate(): Boolean {
-        val apkFile = getCachedUpdateApk()
-        return apkFile.exists() && apkFile.length() > 1024 * 1024 // At least 1MB
-    }
-
-    /**
-     * Install the already-downloaded update APK from cache
-     */
-    fun installCachedUpdate(context: android.content.Context) {
-        val apkFile = getCachedUpdateApk()
-        if (apkFile.exists()) {
-            installApk(context, apkFile)
-        } else {
-            Toast.makeText(context, "Update file not found. Please download again.", Toast.LENGTH_SHORT).show()
-        }
-    }
-
     fun downloadAndInstallUpdate(context: android.content.Context, downloadUrl: String, expectedSha256: String = "") {
         if (isDownloadingUpdate) return
         if (!downloadUrl.startsWith("https://", ignoreCase = true)) {
