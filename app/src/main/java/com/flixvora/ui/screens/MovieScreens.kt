@@ -4640,9 +4640,7 @@ fun saveVideoToCameraRoll(context: android.content.Context, file: java.io.File) 
     }
 
     val appContext = context.applicationContext
-    val scope = (context as? androidx.lifecycle.LifecycleOwner)?.lifecycleScope
-        ?: kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
-    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
+    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO).launch {
         try {
             val displayName = file.name
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
