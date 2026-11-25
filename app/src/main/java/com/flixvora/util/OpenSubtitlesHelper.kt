@@ -82,13 +82,13 @@ object OpenSubtitlesHelper {
                 .header("Accept", "application/json")
                 .build()
 
-            val searchResponse = client.newCall(searchRequest).execute()
-            if (!searchResponse.isSuccessful) {
-                Log.w(TAG, "Search request failed with HTTP ${searchResponse.code}")
-                return null
-            }
-
-            val searchJsonStr = searchResponse.body?.string() ?: return null
+            val searchJsonStr = client.newCall(searchRequest).execute().use { searchResponse ->
+                if (!searchResponse.isSuccessful) {
+                    Log.w(TAG, "Search request failed with HTTP ${searchResponse.code}")
+                    return null
+                }
+                searchResponse.body?.string()
+            } ?: return null
             val searchJson = JSONObject(searchJsonStr)
             val dataArray = searchJson.optJSONArray("data")
             if (dataArray == null || dataArray.length() == 0) {
@@ -135,13 +135,13 @@ object OpenSubtitlesHelper {
                 .post(jsonBody.toRequestBody("application/json; charset=utf-8".toMediaType()))
                 .build()
 
-            val downloadResponse = client.newCall(downloadRequest).execute()
-            if (!downloadResponse.isSuccessful) {
-                Log.w(TAG, "Download ticket request failed with HTTP ${downloadResponse.code}")
-                return null
-            }
-
-            val downloadJsonStr = downloadResponse.body?.string() ?: return null
+            val downloadJsonStr = client.newCall(downloadRequest).execute().use { downloadResponse ->
+                if (!downloadResponse.isSuccessful) {
+                    Log.w(TAG, "Download ticket request failed with HTTP ${downloadResponse.code}")
+                    return null
+                }
+                downloadResponse.body?.string()
+            } ?: return null
             val downloadJson = JSONObject(downloadJsonStr)
             val directLink = downloadJson.optString("link", "")
 

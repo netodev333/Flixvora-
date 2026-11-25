@@ -117,14 +117,20 @@ object AniFamRetrofitClient {
      * concurrent callers (the previous mutable `instance`/`currentToken` pair
      * was racy and relied on `instance!!`).
      */
+    @Volatile
+    private var prefsRef: PreferencesManager? = null
+
     fun getApi(prefs: PreferencesManager? = null): AniFamApi {
+        if (prefs != null) {
+            prefsRef = prefs
+        }
         instance?.let { return it }
         return synchronized(this) {
-            instance ?: buildApi(prefs).also { instance = it }
+            instance ?: buildApi().also { instance = it }
         }
     }
 
-    private fun buildApi(prefs: PreferencesManager?): AniFamApi {
+    private fun buildApi(): AniFamApi {
         val okHttpClient = OkHttpClient.Builder()
             .connectTimeout(25, TimeUnit.SECONDS)
             .readTimeout(30, TimeUnit.SECONDS)
@@ -138,7 +144,7 @@ object AniFamRetrofitClient {
                     .header("x-app-platform", "android")
                     .header("user-agent", "okhttp/4.12.0")
 
-                val token = prefs?.anifamAuthToken
+                val token = prefsRef?.anifamAuthToken
                 if (!token.isNullOrEmpty()) {
                     builder.header("authorization", "Bearer $token")
                 }

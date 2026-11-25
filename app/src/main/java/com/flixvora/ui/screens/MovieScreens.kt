@@ -118,15 +118,16 @@ fun downloadVideo(context: android.content.Context, url: String, title: String, 
         if (posterUrl.isNotEmpty()) {
             val safeShowName = Regex("(.*?)(_S\\d+E\\d+.*|$)").find(safeTitle)?.groupValues?.get(1)?.trim() ?: safeTitle
 
-            // 1. Instant Direct HTTP download (saves in 1-2 seconds)
-            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+            // Direct HTTP download for poster (avoids racing with DownloadManager on the same file)
+            kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO).launch {
+                var conn: java.net.HttpURLConnection? = null
                 try {
                     val flixvoraDir = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES), "Flixvora")
                     if (!flixvoraDir.exists()) flixvoraDir.mkdirs()
                     val titlePoster = java.io.File(flixvoraDir, "$safeTitle.jpg")
                     val showPoster = if (safeShowName.isNotEmpty() && safeShowName != safeTitle) java.io.File(flixvoraDir, "$safeShowName.jpg") else null
 
-                    val conn = (java.net.URL(posterUrl).openConnection() as java.net.HttpURLConnection).apply {
+                    conn = (java.net.URL(posterUrl).openConnection() as java.net.HttpURLConnection).apply {
                         connectTimeout = 6000
                         readTimeout = 6000
                         instanceFollowRedirects = true
@@ -140,28 +141,11 @@ fun downloadVideo(context: android.content.Context, url: String, title: String, 
                             if (showPoster != null && !showPoster.exists()) showPoster.writeBytes(bytes)
                         }
                     }
-                } catch (e: Exception) { }
-            }
-
-            // 2. Also register in DownloadManager as system fallback
-            try {
-                val posterRequest = android.app.DownloadManager.Request(android.net.Uri.parse(posterUrl))
-                posterRequest.setTitle("$title Poster")
-                posterRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_HIDDEN)
-                posterRequest.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_MOVIES, "Flixvora/$safeTitle.jpg")
-                manager.enqueue(posterRequest)
-
-                if (safeShowName.isNotEmpty() && safeShowName != safeTitle) {
-                    val showPosterFile = java.io.File(android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES), "Flixvora/$safeShowName.jpg")
-                    if (!showPosterFile.exists()) {
-                        val showPosterRequest = android.app.DownloadManager.Request(android.net.Uri.parse(posterUrl))
-                        showPosterRequest.setTitle("$safeShowName Poster")
-                        showPosterRequest.setNotificationVisibility(android.app.DownloadManager.Request.VISIBILITY_HIDDEN)
-                        showPosterRequest.setDestinationInExternalPublicDir(android.os.Environment.DIRECTORY_MOVIES, "Flixvora/$safeShowName.jpg")
-                        manager.enqueue(showPosterRequest)
-                    }
+                } catch (_: Exception) {
+                } finally {
+                    conn?.disconnect()
                 }
-            } catch (e: Exception) { }
+            }
         }
 
         val moviesDir = android.os.Environment.getExternalStoragePublicDirectory(android.os.Environment.DIRECTORY_MOVIES)
@@ -4079,7 +4063,7 @@ fun PlayerScreen(viewModel: MovieViewModel) {
                                         Text("Off", color = Color.White, fontSize = 13.sp, fontWeight = if (isOff) FontWeight.Bold else FontWeight.Medium)
                                     }
                                 }
-                                items(playerSubList, key = { it.language + it.url }) { sub ->
+                                itemsIndexed(playerSubList, key = { index, sub -> "${sub.language}_${sub.url}_$index" }) { _, sub ->
                                     val isSel = viewModel.selectedSubtitle?.url == sub.url
                                     Box(
                                         modifier = Modifier
@@ -4107,7 +4091,7 @@ fun PlayerScreen(viewModel: MovieViewModel) {
                                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                                 modifier = Modifier.fillMaxWidth().padding(bottom = 24.dp)
                             ) {
-                                items(viewModel.detailRecommendations, key = { it.id }) { rec ->
+                                itemsIndexed(viewModel.detailRecommendations, key = { index, rec -> "${rec.id}_$index" }) { _, rec ->
                                     MovieGridItem(rec, modifier = Modifier.width(110.dp)) {
                                         viewModel.playDirect(rec)
                                     }
@@ -4655,7 +4639,10 @@ fun saveVideoToCameraRoll(context: android.content.Context, file: java.io.File) 
         return
     }
 
-    kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.IO).launch {
+    val appContext = context.applicationContext
+    val scope = (context as? androidx.lifecycle.LifecycleOwner)?.lifecycleScope
+        ?: kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.SupervisorJob() + kotlinx.coroutines.Dispatchers.IO)
+    scope.launch(kotlinx.coroutines.Dispatchers.IO) {
         try {
             val displayName = file.name
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {

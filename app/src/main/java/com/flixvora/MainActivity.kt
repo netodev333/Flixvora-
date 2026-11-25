@@ -169,11 +169,21 @@ class MainActivity : AppCompatActivity() {
 
     override fun onUserLeaveHint() {
         super.onUserLeaveHint()
-        if (viewModel.playInfo != null) {
-            val pipBuilder = android.app.PictureInPictureParams.Builder()
-            val aspectRatio = android.util.Rational(16, 9)
-            pipBuilder.setAspectRatio(aspectRatio)
-            enterPictureInPictureMode(pipBuilder.build())
+        val isPlaying = viewModel.playInfo != null ||
+            viewModel.isLiveTvPlaying ||
+            viewModel.playingDownloadedFile != null
+        if (!isPlaying) return
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O &&
+            packageManager.hasSystemFeature(android.content.pm.PackageManager.FEATURE_PICTURE_IN_PICTURE)
+        ) {
+            try {
+                val pipBuilder = android.app.PictureInPictureParams.Builder()
+                val aspectRatio = android.util.Rational(16, 9)
+                pipBuilder.setAspectRatio(aspectRatio)
+                enterPictureInPictureMode(pipBuilder.build())
+            } catch (_: Exception) {
+                // Ignore if activity is not in a valid state for PiP
+            }
         }
     }
 }

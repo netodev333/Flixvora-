@@ -173,7 +173,7 @@ class DownloadService : Service() {
     }
 
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
-    private val taskList = mutableListOf<DownloadTask>()
+    private val taskList = java.util.concurrent.CopyOnWriteArrayList<DownloadTask>()
     private val client: OkHttpClient = OkHttpClient.Builder()
         .connectTimeout(20, TimeUnit.SECONDS)
         .readTimeout(30, TimeUnit.SECONDS)
@@ -301,7 +301,11 @@ class DownloadService : Service() {
         while (scope.isActive) {
             val next = taskList.firstOrNull { it.status == DownloadStatus.QUEUED }
             if (next == null) {
-                stopEverything()
+                android.os.Handler(android.os.Looper.getMainLooper()).post {
+                    if (taskList.none { it.status == DownloadStatus.QUEUED || it.status == DownloadStatus.RUNNING }) {
+                        stopEverything()
+                    }
+                }
                 return
             }
             next.status = DownloadStatus.RUNNING
