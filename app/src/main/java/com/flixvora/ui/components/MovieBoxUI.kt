@@ -46,7 +46,7 @@ import com.flixvora.util.ImageOptimizer
 fun MbPosterCard(
     movie: MovieSubject,
     modifier: Modifier = Modifier,
-    width: androidx.compose.ui.unit.Dp = 104.dp,
+    width: androidx.compose.ui.unit.Dp = 122.dp,
     showSeasonBadge: Boolean = movie.isTvShow,
     onClick: () -> Unit
 ) {
@@ -59,9 +59,9 @@ fun MbPosterCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .height(width * 1.462f)
-                .clip(RoundedCornerShape(10.dp))
-                .background(SurfaceRaised)
-                .border(1.dp, Color.White.copy(alpha = 0.07f), RoundedCornerShape(10.dp))
+                .clip(RoundedCornerShape(14.dp))
+                .background(com.flixvora.ui.theme.BgCard)
+                .border(1.dp, com.flixvora.ui.theme.BorderGlass, RoundedCornerShape(14.dp))
         ) {
             val url = androidx.compose.runtime.remember(movie.poster) {
                 ImageOptimizer.getOptimalUrl(movie.poster, 360)
@@ -338,19 +338,19 @@ fun MbSectionHeader(
         Row(verticalAlignment = Alignment.CenterVertically) {
             Box(
                 modifier = Modifier
-                    .width(3.dp)
-                    .height(16.dp)
+                    .width(4.dp)
+                    .height(20.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(BrandGreen)
+                    .background(BrandGradient)
             )
-            Spacer(Modifier.width(9.dp))
+            Spacer(Modifier.width(10.dp))
             Column {
                 Text(
                     text = title,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.ExtraBold,
                     color = TextPrimary,
-                    letterSpacing = (-0.2).sp
+                    letterSpacing = (-0.3).sp
                 )
                 if (!subtitle.isNullOrBlank()) {
                     Text(
