@@ -43,7 +43,8 @@ interface AniFamApi {
 
     @GET("api/v1/app/anime/{id}/episodes")
     suspend fun getEpisodes(
-        @Path("id") id: Int
+        @Path("id") id: Int,
+        @Query("page") page: Int = 1
     ): AniFamEpisodesResponse
 
     @POST("api/v1/app/episodes/{id}/play")

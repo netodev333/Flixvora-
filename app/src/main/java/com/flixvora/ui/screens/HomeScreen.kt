@@ -157,16 +157,16 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize(),
-            contentPadding = PaddingValues(top = topInset + 88.dp)
+            contentPadding = PaddingValues(top = topInset + 72.dp, bottom = 100.dp)
         ) {
-            // Hero Slider/Banner Section (Auto-cycling Carousel)
+            // Hero Slider/Banner Section (Full-bleed Cinematic Carousel)
             if (bannerMovies.isNotEmpty()) {
                 item {
                     val pagerState = androidx.compose.foundation.pager.rememberPagerState(pageCount = { bannerMovies.size })
 
                     LaunchedEffect(pagerState, bannerMovies) {
                         while (bannerMovies.isNotEmpty()) {
-                            kotlinx.coroutines.delay(4000)
+                            kotlinx.coroutines.delay(4500)
                             val nextPage = (pagerState.currentPage + 1) % bannerMovies.size
                             pagerState.animateScrollToPage(nextPage)
                         }
@@ -175,9 +175,7 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .height(400.dp)
-                            .clip(RoundedCornerShape(14.dp))
+                            .height(450.dp)
                     ) {
                         androidx.compose.foundation.pager.HorizontalPager(
                             state = pagerState,
@@ -237,16 +235,16 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .clip(RoundedCornerShape(4.dp))
-                                            .background(BrandGreen)
-                                            .padding(horizontal = 7.dp, vertical = 3.dp)
+                                            .clip(RoundedCornerShape(6.dp))
+                                            .background(com.flixvora.ui.components.BrandGradient)
+                                            .padding(horizontal = 9.dp, vertical = 4.dp)
                                     ) {
                                         Text(
                                             text = if (heroMovie.isTvShow) "SERIES" else "MOVIE",
-                                            fontSize = 8.sp,
+                                            fontSize = 9.sp,
                                             fontWeight = FontWeight.ExtraBold,
-                                            color = BrandGreenInk,
-                                            letterSpacing = 0.8.sp
+                                            color = Color.White,
+                                            letterSpacing = 1.sp
                                         )
                                     }
                                     Spacer(modifier = Modifier.height(8.dp))
@@ -898,7 +896,7 @@ private fun ContinueWatchingCard(
                     modifier = Modifier
                         .fillMaxWidth(fraction)
                         .fillMaxHeight()
-                        .background(BrandGreen)
+                        .background(com.flixvora.ui.components.BrandGradient)
                 )
             }
         }

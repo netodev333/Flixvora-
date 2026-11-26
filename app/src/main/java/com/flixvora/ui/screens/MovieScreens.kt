@@ -907,20 +907,20 @@ private fun androidx.compose.foundation.layout.RowScope.MbTabItem(
     tag: String,
     onClick: () -> Unit
 ) {
-    // Flat bar, but the active tab carries a short accent rule above the icon
-    // and eases its colour in. A hard colour swap reads as a glitch at 60fps.
     val tint by androidx.compose.animation.animateColorAsState(
-        targetValue = if (selected) BrandGreen else TextTertiary,
-        animationSpec = androidx.compose.animation.core.tween(180),
+        targetValue = if (selected) FlixPurple else TextTertiary,
+        animationSpec = androidx.compose.animation.core.tween(200),
         label = "tab_tint"
     )
-    val indicatorWidth by androidx.compose.animation.core.animateDpAsState(
-        targetValue = if (selected) 16.dp else 0.dp,
-        animationSpec = androidx.compose.animation.core.spring(
-            dampingRatio = 0.7f,
-            stiffness = 900f
-        ),
-        label = "tab_indicator"
+    val bgAlpha by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (selected) 1f else 0f,
+        animationSpec = androidx.compose.animation.core.tween(200),
+        label = "tab_bg"
+    )
+    val scale by androidx.compose.animation.core.animateFloatAsState(
+        targetValue = if (selected) 1.1f else 1f,
+        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = 800f),
+        label = "tab_scale"
     )
 
     Column(
@@ -928,32 +928,44 @@ private fun androidx.compose.foundation.layout.RowScope.MbTabItem(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .weight(1f)
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
-            .padding(top = 6.dp, bottom = 8.dp)
+            .padding(vertical = 8.dp, horizontal = 4.dp)
             .testTag(tag)
     ) {
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .width(indicatorWidth)
-                .height(2.5.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(if (selected) BrandGreen else Color.Transparent)
-        )
-        Spacer(modifier = Modifier.height(5.dp))
-        Icon(
-            imageVector = icon,
-            contentDescription = label,
-            tint = tint,
-            modifier = Modifier.size(20.dp)
-        )
+                .size(if (selected) 40.dp else 36.dp)
+                .clip(RoundedCornerShape(12.dp))
+                .background(
+                    if (selected) FlixPurple.copy(alpha = 0.18f * bgAlpha)
+                    else Color.Transparent
+                )
+                .graphicsLayer { scaleX = scale; scaleY = scale }
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = label,
+                tint = tint,
+                modifier = Modifier.size(20.dp)
+            )
+        }
         Spacer(modifier = Modifier.height(3.dp))
         Text(
             text = label,
-            fontSize = 8.5.sp,
+            fontSize = 9.sp,
             fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
             color = tint,
             maxLines = 1
+        )
+        // Active indicator dot
+        Box(
+            modifier = Modifier
+                .padding(top = 2.dp)
+                .size(4.dp)
+                .clip(RoundedCornerShape(2.dp))
+                .background(if (selected) FlixPurple else Color.Transparent)
         )
     }
 }
@@ -1017,32 +1029,47 @@ fun MainContent(viewModel: MovieViewModel) {
             containerColor = Color.Transparent,
             bottomBar = {
                 if (viewModel.playInfo == null && viewModel.playingDownloadedFile == null && !viewModel.isLiveTvPlaying) {
-                    // Flat opaque tab bar, edge to edge, hairline top rule — the
-                    // demo has no floating dock and no rounded pill.
-                    Column(
+                    // Premium glass morphism bottom navigation bar
+                    Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(SurfaceBase)
                             .navigationBarsPadding()
                     ) {
+                        // Background blur surface
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(1.dp)
-                                .background(OutlineSubtle)
+                                .background(
+                                    Brush.verticalGradient(
+                                        listOf(
+                                            Color.Transparent,
+                                            BgDeep.copy(alpha = 0.95f)
+                                        )
+                                    )
+                                )
                         )
-                        Row(
+                        // Glass pill container
+                        Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 6.dp),
-                            horizontalArrangement = Arrangement.SpaceEvenly,
-                            verticalAlignment = Alignment.CenterVertically
+                                .padding(horizontal = 16.dp, vertical = 8.dp)
+                                .clip(RoundedCornerShape(28.dp))
+                                .background(BgCard.copy(alpha = 0.85f))
+                                .border(1.dp, BorderGlass, RoundedCornerShape(28.dp))
                         ) {
-                            MbTabItem("Home", Icons.Filled.Home, activeTab == "home", "nav_home") { activeTab = "home" }
-                            MbTabItem("Search", Icons.Filled.Search, activeTab == "search", "nav_search") { activeTab = "search" }
-                            MbTabItem("Live TV", Icons.Filled.LiveTv, activeTab == "livetv", "nav_livetv") { activeTab = "livetv" }
-                            MbTabItem("Downloads", Icons.Filled.Download, activeTab == "download", "nav_download") { activeTab = "download" }
-                            MbTabItem("Me", Icons.Filled.Person, activeTab == "settings", "nav_me") { activeTab = "settings" }
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                                horizontalArrangement = Arrangement.SpaceEvenly,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                MbTabItem("Home", Icons.Filled.Home, activeTab == "home", "nav_home") { activeTab = "home" }
+                                MbTabItem("Search", Icons.Filled.Search, activeTab == "search", "nav_search") { activeTab = "search" }
+                                MbTabItem("Live TV", Icons.Filled.LiveTv, activeTab == "livetv", "nav_livetv") { activeTab = "livetv" }
+                                MbTabItem("Downloads", Icons.Filled.Download, activeTab == "download", "nav_download") { activeTab = "download" }
+                                MbTabItem("Me", Icons.Filled.Person, activeTab == "settings", "nav_me") { activeTab = "settings" }
+                            }
                         }
                     }
                 }
@@ -2682,12 +2709,29 @@ fun PlayerScreen(viewModel: MovieViewModel) {
             val builder = exoPlayer.trackSelectionParameters.buildUpon()
             builder.setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_AUDIO, false)
             if (viewModel.isAniFam) {
-                val isDub = viewModel.selectedResource?.resourceId?.lowercase()?.contains("dub") == true ||
-                            viewModel.selectedResource?.name?.lowercase()?.contains("dub") == true
-                if (isDub) {
-                    builder.setPreferredAudioLanguage("en")
-                } else {
-                    builder.setPreferredAudioLanguage("ja")
+                val resSuffix = (viewModel.selectedResource?.resourceId?.lowercase() ?: "") +
+                                (viewModel.selectedResource?.name?.lowercase() ?: "")
+                val langCode = when {
+                    resSuffix.contains("hindi") || resSuffix.contains("_hi") -> "hi"
+                    resSuffix.contains("dub") -> "en"
+                    else -> "ja"
+                }
+                builder.setPreferredAudioLanguage(langCode)
+            } else {
+                // For non-AniFam content, prefer audio by resource name language hint
+                val resName = viewModel.selectedResource?.name?.lowercase() ?: ""
+                val langCode = when {
+                    resName.contains("hindi") || resName.contains("hin") -> "hi"
+                    resName.contains("english") || resName.contains("eng") -> "en"
+                    resName.contains("tamil") || resName.contains("tam") -> "ta"
+                    resName.contains("telugu") || resName.contains("tel") -> "te"
+                    resName.contains("kannada") || resName.contains("kan") -> "kn"
+                    resName.contains("malayalam") || resName.contains("mal") -> "ml"
+                    resName.contains("japanese") || resName.contains("jpn") -> "ja"
+                    else -> null
+                }
+                if (langCode != null) {
+                    builder.setPreferredAudioLanguage(langCode)
                 }
             }
             if (q == "Auto") {
@@ -2705,22 +2749,36 @@ fun PlayerScreen(viewModel: MovieViewModel) {
         }
     }
 
-    // Dynamic audio track preference sync for AniFam
+    // Dynamic audio track preference sync for AniFam and language-dubbed content
     LaunchedEffect(viewModel.selectedResource) {
-        if (viewModel.isAniFam) {
-            try {
-                val isDub = viewModel.selectedResource?.resourceId?.lowercase()?.contains("dub") == true ||
-                            viewModel.selectedResource?.name?.lowercase()?.contains("dub") == true
-                val builder = exoPlayer.trackSelectionParameters.buildUpon()
-                builder.setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_AUDIO, false)
-                if (isDub) {
-                    builder.setPreferredAudioLanguage("en")
-                } else {
-                    builder.setPreferredAudioLanguage("ja")
+        try {
+            val builder = exoPlayer.trackSelectionParameters.buildUpon()
+            builder.setTrackTypeDisabled(androidx.media3.common.C.TRACK_TYPE_AUDIO, false)
+            if (viewModel.isAniFam) {
+                val resSuffix = (viewModel.selectedResource?.resourceId?.lowercase() ?: "") +
+                                (viewModel.selectedResource?.name?.lowercase() ?: "")
+                val langCode = when {
+                    resSuffix.contains("hindi") || resSuffix.contains("_hi") -> "hi"
+                    resSuffix.contains("dub") -> "en"
+                    else -> "ja"
                 }
-                exoPlayer.trackSelectionParameters = builder.build()
-            } catch (_: Exception) {}
-        }
+                builder.setPreferredAudioLanguage(langCode)
+            } else {
+                val resName = viewModel.selectedResource?.name?.lowercase() ?: ""
+                val langCode = when {
+                    resName.contains("hindi") || resName.contains("hin") -> "hi"
+                    resName.contains("english") || resName.contains("eng") -> "en"
+                    resName.contains("tamil") || resName.contains("tam") -> "ta"
+                    resName.contains("telugu") || resName.contains("tel") -> "te"
+                    resName.contains("kannada") || resName.contains("kan") -> "kn"
+                    resName.contains("malayalam") || resName.contains("mal") -> "ml"
+                    resName.contains("japanese") || resName.contains("jpn") -> "ja"
+                    else -> null
+                }
+                if (langCode != null) builder.setPreferredAudioLanguage(langCode)
+            }
+            exoPlayer.trackSelectionParameters = builder.build()
+        } catch (_: Exception) {}
     }
 
     // Listen to player progress ticking

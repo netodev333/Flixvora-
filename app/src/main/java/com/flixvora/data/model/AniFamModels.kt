@@ -88,8 +88,20 @@ data class AniFamBrowseResponse(
 @JsonClass(generateAdapter = true)
 data class AniFamEpisodesResponse(
     val data: List<AniFamEpisodeItem> = emptyList(),
-    val ranges: Any? = null
-)
+    val ranges: Any? = null,
+    val total_episodes: Int? = null,
+    val per_page: Int? = null,
+    val current_page: Int? = null,
+    val last_page: Int? = null
+) {
+    /** True when there are more pages to fetch */
+    val hasNextPage: Boolean
+        get() {
+            val lp = last_page ?: return false
+            val cp = current_page ?: return false
+            return cp < lp
+        }
+}
 
 @JsonClass(generateAdapter = true)
 data class AniFamEpisodeItem(

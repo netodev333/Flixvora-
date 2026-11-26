@@ -500,6 +500,35 @@ class MovieRepository(
         return subjectId.removePrefix("anifam_").toIntOrNull()
     }
 
+    /**
+     * Fetches ALL episodes for an AniFam anime by walking through every page.
+     * The API may return paginated results (last_page > 1); this collects them all.
+     */
+    private suspend fun fetchAllAniFamEpisodes(numId: Int): List<com.flixvora.data.model.AniFamEpisodeItem> {
+        val allEpisodes = mutableListOf<com.flixvora.data.model.AniFamEpisodeItem>()
+        try {
+            var page = 1
+            while (true) {
+                val response = aniFamApi.getEpisodes(numId, page)
+                allEpisodes.addAll(response.data)
+                // If the API signals pagination via last_page/current_page, use that.
+                // Otherwise fall back: if the page had data and we got a full page (~100),
+                // try fetching the next page until we get an empty response.
+                val hasNext = when {
+                    response.last_page != null -> page < (response.last_page ?: 1)
+                    response.data.size >= 100 -> true  // assume paginated at 100
+                    else -> false
+                }
+                if (!hasNext) break
+                page++
+                if (page > 50) break  // safety cap: never fetch more than 50 pages
+            }
+        } catch (e: Exception) {
+            android.util.Log.w("MovieRepository", "fetchAllAniFamEpisodes failed for $numId: ${e.message}")
+        }
+        return allEpisodes
+    }
+
     suspend fun getDetail(subjectId: String): MovieSubject? = withContext(Dispatchers.IO) {
         val cached = detailCache[subjectId]
         if (cached != null) return@withContext cached
@@ -510,9 +539,8 @@ class MovieRepository(
                 val detail = aniFamApi.getAnimeDetail(numId)
                 aniFamDetailCache[numId] = detail
 
-                // Pre-fetch episodes so seasonList is properly populated
-                val epResponse = try { aniFamApi.getEpisodes(numId) } catch (e: Exception) { null }
-                val epList = epResponse?.data ?: emptyList()
+                // Pre-fetch ALL episodes (paginated) so seasonList is fully populated
+                val epList = fetchAllAniFamEpisodes(numId)
 
                 epList.forEach { ep ->
                     aniFamEpisodeMap["${numId}_${ep.episodeNumber}"] = ep.id
@@ -599,10 +627,10 @@ class MovieRepository(
         if (isAniFamSubject(subjectId)) {
             val numId = parseAniFamId(subjectId) ?: return@withContext emptyList()
             try {
-                val epResponse = aniFamApi.getEpisodes(numId)
+                val epList = fetchAllAniFamEpisodes(numId)
                 val detail = detailCache[subjectId] ?: detailCache["anifam_$numId"] ?: detailCache[numId.toString()]
                 val still = detail?.poster ?: ""
-                epResponse.data.map { ep ->
+                epList.map { ep ->
                     aniFamEpisodeMap["${numId}_${ep.episodeNumber}"] = ep.id
                     aniFamEpisodeItemMap[ep.id] = ep
                     Episode(
@@ -649,9 +677,12 @@ class MovieRepository(
             val numId = parseAniFamId(subjectId) ?: return@withContext PlayInfo()
             val epId = aniFamEpisodeMap["${numId}_${episode}"]
                 ?: try {
-                    val epResponse = aniFamApi.getEpisodes(numId)
-                    val found = epResponse.data.find { it.episodeNumber == episode }
-                    found?.id
+                    val allEps = fetchAllAniFamEpisodes(numId)
+                    allEps.forEach { ep ->
+                        aniFamEpisodeMap["${numId}_${ep.episodeNumber}"] = ep.id
+                        aniFamEpisodeItemMap[ep.id] = ep
+                    }
+                    allEps.find { it.episodeNumber == episode }?.id
                 } catch (e: Exception) { null }
 
             if (epId == null) return@withContext PlayInfo()
