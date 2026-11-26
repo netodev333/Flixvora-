@@ -133,13 +133,28 @@ fun AuroraBackground(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
 ) {
-    // The demo's canvas is flat: a single near-black fill with no glow. A
-    // drifting bloom made text contrast shift as it moved, so it is gone.
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(SurfaceBase)
     ) {
+        // Ultra-premium subtle ambient cyber lighting (Purple & Cyan cinematic glow)
+        Canvas(modifier = Modifier.fillMaxSize()) {
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(com.flixvora.ui.theme.FlixPurpleDark.copy(alpha = 0.16f), Color.Transparent),
+                    center = Offset(size.width * 0.85f, size.height * 0.08f),
+                    radius = size.width * 0.75f
+                )
+            )
+            drawCircle(
+                brush = Brush.radialGradient(
+                    colors = listOf(com.flixvora.ui.theme.FlixNeonPink.copy(alpha = 0.10f), Color.Transparent),
+                    center = Offset(size.width * 0.15f, size.height * 0.45f),
+                    radius = size.width * 0.65f
+                )
+            )
+        }
         content()
     }
 }

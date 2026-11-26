@@ -604,21 +604,31 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
                 }
 
                 if (!bodyString.isNullOrBlank()) {
-                    val json = org.json.JSONObject(bodyString)
+                    var json = org.json.JSONObject()
+                    val trimmed = bodyString.trim()
+                    if (trimmed.startsWith("[")) {
+                        val arr = org.json.JSONArray(trimmed)
+                        if (arr.length() > 0) {
+                            json = arr.getJSONObject(0)
+                        }
+                    } else if (trimmed.startsWith("{")) {
+                        json = org.json.JSONObject(trimmed)
+                    }
 
-                    // Parse GitHub release format
-                    val tagName = json.optString("tag_name", "").trim()  // e.g., "v9.9"
-                    val remoteVersionName = tagName.removePrefix("v")
-                    val remoteVersionCode = remoteVersionName.toIntOrNull() ?: 0
+                    // Check if response has direct version.json format (versionName, versionCode, downloadUrl)
+                    val isCustomManifest = json.has("versionName") && json.has("downloadUrl")
+
+                    val tagName = json.optString("tag_name", "").trim()
+                    val remoteVersionName = if (isCustomManifest) json.optString("versionName", "") else tagName.removePrefix("v")
+                    val remoteVersionCode = if (isCustomManifest) json.optInt("versionCode", 0) else (remoteVersionName.filter { it.isDigit() }.toIntOrNull() ?: 0)
                     val forceUpdate = json.optBoolean("forceUpdate", false)
-                    var changelog = json.optString("body", "").trim()  // GitHub uses "body"
+                    var changelog = if (isCustomManifest) json.optString("changelog", "").trim() else json.optString("body", "").trim()
                     if (changelog.isEmpty()) changelog = "Bug fixes and improvements."
 
-                    // Find APK asset in release
+                    // Find APK asset in release or direct downloadUrl
+                    var downloadUrl = if (isCustomManifest) json.optString("downloadUrl", "") else ""
                     val assets = json.optJSONArray("assets")
-                    var downloadUrl = ""
-                    var sha256 = ""
-                    if (assets != null) {
+                    if (downloadUrl.isEmpty() && assets != null) {
                         for (i in 0 until assets.length()) {
                             val asset = assets.getJSONObject(i)
                             val name = asset.optString("name", "")

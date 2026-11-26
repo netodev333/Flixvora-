@@ -34,8 +34,8 @@ import com.flixvora.ui.theme.TextPrimary
 import com.flixvora.ui.theme.TextSecondary
 import com.flixvora.ui.theme.TextTertiary
 
-private val Accent = Color(0xFF1DD171)
-private val Surface = Color(0xFF1A1B1F)
+private val Accent = com.flixvora.ui.theme.FlixPurple
+private val Surface = com.flixvora.ui.theme.BgCard
 
 
 private data class QualityRow(

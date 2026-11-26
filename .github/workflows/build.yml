@@ -119,7 +119,7 @@ jobs:
             **SHA256:** ${{ steps.apk_info.outputs.sha256 }}
             **Size:** ${{ steps.apk_info.outputs.size }} bytes
           files: |
-            ${{ steps.apk.outputs.path }}#Flixvora.apk
+            ${{ steps.apk.outputs.path }}
             version.json
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
