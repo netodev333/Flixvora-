@@ -627,6 +627,7 @@ class MovieViewModel(application: Application) : AndroidViewModel(application) {
 
                     // Find APK asset in release or direct downloadUrl
                     var downloadUrl = if (isCustomManifest) json.optString("downloadUrl", "") else ""
+                    var sha256 = json.optString("sha256", "")
                     val assets = json.optJSONArray("assets")
                     if (downloadUrl.isEmpty() && assets != null) {
                         for (i in 0 until assets.length()) {
