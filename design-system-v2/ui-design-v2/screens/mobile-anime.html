@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Anime Section</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">📺 ANIME</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Header -->
+      <div style="margin-bottom: var(--space-8);">
+        <h1 class="text-3xl font-bold mb-2">Anime Collection</h1>
+        <p class="text-gray-500">247 anime titles • Sub & Dub available</p>
+      </div>
+
+      <!-- Filter Chips -->
+      <div style="display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <button class="btn btn-primary btn-sm">All Anime</button>
+        <button class="btn btn-secondary btn-sm">Action</button>
+        <button class="btn btn-secondary btn-sm">Adventure</button>
+        <button class="btn btn-secondary btn-sm">Fantasy</button>
+        <button class="btn btn-secondary btn-sm">Romance</button>
+        <button class="btn btn-secondary btn-sm">Horror</button>
+        <button class="btn btn-secondary btn-sm">Sci-Fi</button>
+        <button class="btn btn-secondary btn-sm">Isekai</button>
+        <button class="btn btn-secondary btn-sm">Sub/Dub</button>
+      </div>
+
+      <!-- Trending Anime -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">🔥</div>
+          <span>Trending Anime</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1575818682772-d84744687217?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-anime">Sub/Dub</span>
+            <div class="content-info">
+              <div class="content-title">Attack on Titan Final Season</div>
+              <div class="content-meta">★ 9.0 • 2013 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517883801712-9e1a54930d4b?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-movie">Movie</span>
+            <div class="content-info">
+              <div class="content-title">Your Name</div>
+              <div class="content-meta">★ 8.4 • 2016 • 112 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1518399992413-c5f549a3e6d8?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-anime">Series</span>
+            <div class="content-info">
+              <div class="content-title">Jujutsu Kaisen</div>
+              <div class="content-meta">★ 8.6 • 2020 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1591757987807-27228827f039?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-anime">Series</span>
+            <div class="content-info">
+              <div class="content-title">Demon Slayer</div>
+              <div class="content-meta">★ 8.7 • 2019 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-anime">Series</span>
+            <div class="content-info">
+              <div class="content-title">Naruto Shippuden</div>
+              <div class="content-meta">★ 8.4 • 2007 • 24 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Releases -->
+      <div class="section-header mb-6 mt-8">
+        <div class="section-title">
+          <div class="section-icon">🆕</div>
+          <span>New This Week</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Spy x Family S2</div>
+              <div class="content-meta">★ 8.5 • 2023 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Chainsaw Man</div>
+              <div class="content-meta">★ 8.3 • 2022 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1591757987807-27228827f039?w=200&h=300&fit=crop" alt="Anime" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Jujutsu Kaisen S2</div>
+              <div class="content-meta">★ 8.9 • 2023 • 24 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sub vs Dub Toggle -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); margin-top: var(--space-8);">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div class="text-base font-semibold">Subtitle Language</div>
+            <div class="text-xs text-gray-500">English, Hindi, Japanese</div>
+          </div>
+          <select style="background: var(--bg-dark); border: 1px solid var(--border-subtle); color: white; padding: var(--space-2) var(--space-4); border-radius: var(--radius-md); font-size: var(--text-sm);">
+            <option>English Sub</option>
+            <option>Hindi Sub</option>
+            <option>Japanese Sub</option>
+            <option>Tamil Sub</option>
+            <option>Telugu Sub</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item active">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

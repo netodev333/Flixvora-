@@ -3,57 +3,80 @@ package com.flixvora.ui.theme
 import androidx.compose.ui.graphics.Color
 
 // ─────────────────────────────────────────────────────────────────────────────
-// MovieBox palette (mirrors dist/flixvora/ui-demo/index.html)
-//
-// Near-black neutral canvas, one vivid green accent, flat elevated surfaces.
-// Deliberately restrained: the demo gets depth from poster art and hairlines,
-// not from gradients or glow, so the tokens here stay flat.
+// Flixvora v10.0 - UI Design System v2 Tokens
+// Cinematic Dark Theme with Purple, Neon Pink & Cyber Accents
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Accent ramp — one green, three stops for pressed/disabled states.
-val BrandGreen = Color(0xFF1DD171)        // primary accent
-val BrandGreenLight = Color(0xFF2FF58B)   // hover / highlight
-val BrandGreenDark = Color(0xFF07B84E)    // pressed
-val BrandGreenInk = Color(0xFF06170E)     // text on green fills
-val BrandBlue = Color(0xFF2166E5)         // quality / info badge
+// Brand Colors (Figma Design System v2)
+val FlixPurple = Color(0xFF8B5CF6)
+val FlixPurpleDark = Color(0xFF6D28D9)
+val FlixPurpleLight = Color(0xFFA78BFA)
+val FlixNeonPink = Color(0xFFEC4899)
+val FlixNeonBlue = Color(0xFF06B6D4)
+val FlixNeonGreen = Color(0xFF10B981)
+val FlixOrange = Color(0xFFF59E0B)
+val FlixRed = Color(0xFFEF4444)
 
-// Core canvas + surfaces
-val ObsidianDark = Color(0xFF101114)      // app background
-val ObsidianCard = Color(0xFF1A1B1F)      // legacy card token
-val SurfaceBase = Color(0xFF101114)       // level 0
-val SurfaceRaised = Color(0xFF1A1B1F)     // level 1 — cards, sheets
-val SurfaceOverlay = Color(0xFF28292E)    // level 2 — chips, inputs
-val SurfaceHover = Color(0xFF33343A)      // level 3 — pressed / focused
-val OutlineSubtle = Color(0xFF26272C)     // hairline borders
-val OutlineStrong = Color(0xFF3A3B42)
+// Surface & Dark Canvas
+val BgDeep = Color(0xFF050507)          // Pure deep background
+val BgDark = Color(0xFF0A0A0C)          // Slightly lifted dark background
+val BgCard = Color(0xFF111114)          // Card surface
+val BgCardHover = Color(0xFF18181D)     // Card hover/highlight
+val BgElevated = Color(0xFF16161B)      // Elevated surface (modals/sheets)
+val BgOverlay = Color(0xE6050507)       // Overlay scrim (90% deep)
 
-// Legacy accent aliases kept so existing call sites compile unchanged.
-val PlasmaRed = BrandGreen
-val PlasmaEmber = BrandGreenLight
-val PlasmaGold = BrandGreen
-val PlasmaViolet = BrandBlue
-val PlasmaCyan = BrandGreenLight
+// Borders & Glass
+val BorderSubtle = Color(0xFF1F1F23)
+val BorderBrand = Color(0xFF8B5CF6)
+val BorderGlass = Color(0x14FFFFFF)     // 8% white glass border
 
-val CinematicRed = BrandGreen
-val AccentPrimary = BrandGreen
-val AccentDeep = BrandGreenDark
-val AccentGlow = BrandGreenLight
-val AccentEmber = BrandGreenLight
-val AccentGold = BrandGreen
-val CrimsonRed = BrandGreenDark
-val AccentAmber = BrandGreen
+// Core Canvas aliases
+val ObsidianDark = BgDeep
+val ObsidianCard = BgCard
+val SurfaceBase = BgDeep
+val SurfaceRaised = BgCard
+val SurfaceOverlay = BgElevated
+val SurfaceHover = BgCardHover
+val OutlineSubtle = BorderSubtle
+val OutlineStrong = Color(0xFF2E2E36)
+
+// Accent ramp mapping (Flix Purple & Accents)
+val BrandPurple = FlixPurple
+val BrandPurpleDark = FlixPurpleDark
+val BrandPurpleLight = FlixPurpleLight
+val BrandGreen = FlixNeonGreen
+val BrandGreenLight = Color(0xFF34D399)
+val BrandGreenDark = Color(0xFF059669)
+val BrandGreenInk = Color(0xFF06170E)
+val BrandBlue = FlixNeonBlue
+
+// Accent aliases (for compatibility across existing screens)
+val PlasmaRed = FlixPurple
+val PlasmaEmber = FlixNeonPink
+val PlasmaGold = FlixOrange
+val PlasmaViolet = FlixPurple
+val PlasmaCyan = FlixNeonBlue
+
+val CinematicRed = FlixPurple
+val AccentPrimary = FlixPurple
+val AccentDeep = FlixPurpleDark
+val AccentGlow = FlixPurpleLight
+val AccentEmber = FlixNeonPink
+val AccentGold = FlixOrange
+val CrimsonRed = FlixRed
+val AccentAmber = FlixOrange
 
 // Text ramp
 val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFFA9ABB3)
-val TextTertiary = Color(0xFF6E7078)
-val TextDisabled = Color(0xFF4A4C52)
-val TextOnAccent = Color(0xFF06170E)
+val TextSecondary = Color(0xFF9CA3AF)
+val TextTertiary = Color(0xFF6B7280)
+val TextDisabled = Color(0xFF374151)
+val TextOnAccent = Color(0xFFFFFFFF)
 
 // Semantic feedback
-val SuccessGreen = Color(0xFF1DD171)
-val WarningAmber = Color(0xFFF5A524)
-val ErrorRed = Color(0xFFEF4444)
+val SuccessGreen = FlixNeonGreen
+val WarningAmber = FlixOrange
+val ErrorRed = FlixRed
 
 // Legacy compatibility
 val Purple80 = Color(0xFFD0BCFF)

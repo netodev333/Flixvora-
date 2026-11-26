@@ -1,0 +1,452 @@
+/* ==========================================================================
+   FLIXVORA v10.0 - ANIMATION & TRANSITION EFFECTS
+   Professional UI Animations like Figma prototypes
+   ========================================================================== */
+
+/* ========== PAGE TRANSITIONS ========== */
+.page-transition {
+  animation: pageFade var(--transition-normal) ease-out;
+}
+
+@keyframes pageFade {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ========== CARD HOVER EFFECTS ========== */
+@keyframes cardLift {
+  0% { transform: translateY(0); box-shadow: var(--shadow-sm); }
+  50% { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+  100% { transform: translateY(-4px); box-shadow: var(--shadow-md); }
+}
+
+.content-card:hover {
+  animation: cardLift var(--transition-normal) ease-out;
+}
+
+/* ========== BUTTON PRESS EFFECT ========== */
+@keyframes buttonPress {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.95); }
+  100% { transform: scale(1); }
+}
+
+.btn:active {
+  animation: buttonPress 0.15s ease-out;
+}
+
+/* ========== LOADING SPINNER ========== */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--border-subtle);
+  border-top: 3px solid var(--flix-purple);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* ========== PULSE DOT (LIVE INDICATOR) ========== */
+@keyframes pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.3); opacity: 0.7; }
+}
+
+.live-dot {
+  width: 10px;
+  height: 10px;
+  background: var(--flix-red);
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+  box-shadow: 0 0 10px var(--flix-red);
+}
+
+/* ========== SHIMMER EFFECT ========== */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.skeleton-shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--bg-card) 25%,
+    var(--bg-card-hover) 50%,
+    var(--bg-card) 75%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: var(--radius-md);
+}
+
+/* ========== FADE IN DOWN ========== */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-down {
+  animation: fadeInDown var(--transition-normal) ease-out;
+}
+
+/* ========== SLIDE IN FROM LEFT ========== */
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-left {
+  animation: slideInLeft var(--transition-normal) ease-out;
+}
+
+/* ========== ZOOM IN ========== */
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-zoom-in {
+  animation: zoomIn var(--transition-normal) ease-out;
+}
+
+/* ========== BOUNCE IN ========== */
+@keyframes bounceIn {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+  70% {
+    transform: scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-bounce-in {
+  animation: bounceIn var(--transition-bounce);
+}
+
+/* ========== ROTATE IN ========== */
+@keyframes rotateIn {
+  from {
+    opacity: 0;
+    transform: rotate(-10deg) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: rotate(0) scale(1);
+  }
+}
+
+.animate-rotate-in {
+  animation: rotateIn var(--transition-normal) ease-out;
+}
+
+/* ========== FLIP CARD ========== */
+.flip-card {
+  perspective: 1000px;
+}
+
+.flip-card-inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.6s;
+  transform-style: preserve-3d;
+}
+
+.flip-card:hover .flip-card-inner {
+  transform: rotateY(180deg);
+}
+
+.flip-card-front, .flip-card-back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  border-radius: var(--radius-lg);
+}
+
+.flip-card-back {
+  background: var(--bg-elevated);
+  color: white;
+  transform: rotateY(180deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-4);
+}
+
+/* ========== PROGRESS BAR ANIMATION ========== */
+@keyframes progressFill {
+  from { width: 0%; }
+  to { width: var(--progress-width); }
+}
+
+.progress-animated {
+  height: 8px;
+  background: linear-gradient(90deg, var(--flix-purple), var(--flix-neon-pink));
+  border-radius: var(--radius-full);
+  animation: progressFill 1s ease-out forwards;
+}
+
+/* ========== TEXT TYPING EFFECT ========== */
+@keyframes typing {
+  from { width: 0; }
+  to { width: 100%; }
+}
+
+@keyframes blink {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: var(--flix-purple); }
+}
+
+.typing-text {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid var(--flix-purple);
+  animation: typing 2s steps(40, end), blink 0.75s step-end infinite;
+}
+
+/* ========== GRADIENT TEXT ANIMATION ========== */
+@keyframes gradientMove {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.gradient-text {
+  background: linear-gradient(
+    90deg,
+    var(--flix-purple),
+    var(--flix-neon-pink),
+    var(--flix-neon-blue),
+    var(--flix-purple)
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientMove 4s linear infinite;
+}
+
+/* ========== FLOATING ANIMATION ========== */
+@keyframes float {
+  0% { transform: translateY(0px); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0px); }
+}
+
+.floating {
+  animation: float 3s ease-in-out infinite;
+}
+
+/* ========== MODAL ENTRANCE ========== */
+@keyframes modalEntrance {
+  from {
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.modal-entrance {
+  animation: modalEntrance var(--transition-bounce) ease-out;
+}
+
+/* ========== TOAST NOTIFICATION ========== */
+@keyframes toastSlideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes toastSlideOut {
+  from {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  to {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.toast {
+  position: fixed;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-glass);
+  border-left: 4px solid var(--flix-neon-green);
+  border-radius: var(--radius-md);
+  padding: var(--space-4) var(--space-6);
+  color: white;
+  box-shadow: var(--shadow-lg);
+  z-index: 3000;
+  animation: toastSlideIn var(--transition-normal) ease-out;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 350px;
+}
+
+.toast-exit {
+  animation: toastSlideOut var(--transition-normal) ease-out forwards;
+}
+
+/* ========== STAGGERED CHILDREN ========== */
+.stagger-container > * {
+  opacity: 0;
+  animation: staggerFade var(--transition-normal) ease-out forwards;
+}
+
+@keyframes staggerFade {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stagger-container > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-container > *:nth-child(2) { animation-delay: 0.1s; }
+.stagger-container > *:nth-child(3) { animation-delay: 0.15s; }
+.stagger-container > *:nth-child(4) { animation-delay: 0.2s; }
+.stagger-container > *:nth-child(5) { animation-delay: 0.25s; }
+.stagger-container > *:nth-child(6) { animation-delay: 0.3s; }
+.stagger-container > *:nth-child(7) { animation-delay: 0.35s; }
+.stagger-container > *:nth-child(8) { animation-delay: 0.4s; }
+
+/* ========== HOVER GLOW ========== */
+@keyframes glow {
+  0% { box-shadow: 0 0 10px var(--flix-purple); }
+  50% { box-shadow: 0 0 30px var(--flix-purple); }
+  100% { box-shadow: 0 0 10px var(--flix-purple); }
+}
+
+.glow-effect {
+  animation: glow 2s ease-in-out infinite;
+}
+
+/* ========== HOVER UNDERLINE ========== */
+.hover-underline {
+  position: relative;
+  display: inline-block;
+}
+
+.hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--flix-purple);
+  transition: width var(--transition-normal);
+}
+
+.hover-underline:hover::after {
+  width: 100%;
+}
+
+/* ========== BACKDROP BLUR HOVER ========== */
+.glass-hover {
+  position: relative;
+  overflow: hidden;
+}
+
+.glass-hover::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    135deg,
+    rgba(139, 92, 246, 0.1) 0%,
+    rgba(236, 72, 153, 0.1) 100%
+  );
+  opacity: 0;
+  transition: opacity var(--transition-normal);
+  border-radius: var(--radius-xl);
+}
+
+.glass-hover:hover::before {
+  opacity: 1;
+}
+
+/* ========== TV FOCUS RING ========== */
+.tv-focus-ring {
+  position: relative;
+}
+
+.tv-focus-ring:focus-within {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--flix-purple), 0 0 20px rgba(139, 92, 246, 0.3);
+  border-radius: var(--radius-lg);
+}
+
+/* ========== SMOOTH SCROLL ========== */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ========== CUSTOM SCROLLBAR WITH GLOW ========== */
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, var(--flix-purple), var(--flix-neon-pink));
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, var(--flix-purple-dark), var(--flix-neon-pink));
+}
+
+/* ========== RESPONSIVE ANIMATIONS ========== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

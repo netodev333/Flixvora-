@@ -1,0 +1,148 @@
+{
+  "$schema": "https://schemas.figma.com/variables/v1",
+  "name": "Flixvora Design System v1.0",
+  "description": "Complete design tokens for Flixvora streaming app - Mobile, TV, Tablet, Backend",
+  "version": "1.0.0",
+  "collections": {
+    "Colors": {
+      "modes": {
+        "Dark": {
+          "color/brand/primary": "#6D28D9",
+          "color/brand/secondary": "#EC4899",
+          "color/brand/accent": "#10B981",
+          "color/brand/primary-hover": "#7C3AED",
+          "color/brand/secondary-hover": "#F97316",
+          "color/surface/background": "#0A0A0B",
+          "color/surface/elevated": "#141417",
+          "color/surface/raised": "#1C1C21",
+          "color/surface/overlay": "rgba(10,10,11,0.85)",
+          "color/surface/scrim": "rgba(0,0,0,0.6)",
+          "color/text/primary": "#FFFFFF",
+          "color/text/secondary": "#A1A1AA",
+          "color/text/tertiary": "#71717A",
+          "color/text/inverse": "#000000",
+          "color/text/disabled": "#52525B",
+          "color/border": "#27272A",
+          "color/border/focus": "#6D28D9",
+          "color/adult/restricted": "#EF4444",
+          "color/adult/safe": "#22C55E",
+          "color/adult/warning": "#F59E0B",
+          "color/status/online": "#22C55E",
+          "color/status/offline": "#EF4444",
+          "color/status/pending": "#F59E0B",
+          "color/gradient/primary-start": "#6D28D9",
+          "color/gradient/primary-end": "#4F46E5",
+          "color/gradient/movie-start": "#111827",
+          "color/gradient/movie-end": "#000000"
+        }
+      },
+      "variables": [
+        { "name": "color/brand/primary", "type": "COLOR", "value": "#6D28D9" },
+        { "name": "color/brand/secondary", "type": "COLOR", "value": "#EC4899" },
+        { "name": "color/brand/accent", "type": "COLOR", "value": "#10B981" },
+        { "name": "color/surface/background", "type": "COLOR", "value": "#0A0A0B" },
+        { "name": "color/surface/elevated", "type": "COLOR", "value": "#141417" },
+        { "name": "color/surface/raised", "type": "COLOR", "value": "#1C1C21" },
+        { "name": "color/text/primary", "type": "COLOR", "value": "#FFFFFF" },
+        { "name": "color/text/secondary", "type": "COLOR", "value": "#A1A1AA" },
+        { "name": "color/text/tertiary", "type": "COLOR", "value": "#71717A" },
+        { "name": "color/border", "type": "COLOR", "value": "#27272A" },
+        { "name": "color/adult/restricted", "type": "COLOR", "value": "#EF4444" },
+        { "name": "color/adult/safe", "type": "COLOR", "value": "#22C55E" }
+      ]
+    },
+    "Typography": {
+      "modes": {
+        "Default": {
+          "type/display-large/size": "32sp",
+          "type/display-large/weight": "Bold",
+          "type/display-large/lineHeight": "40sp",
+          "type/display-large/letterSpacing": "0",
+          "type/display-medium/size": "28sp",
+          "type/display-medium/weight": "Bold",
+          "type/display-medium/lineHeight": "36sp",
+          "type/headline-large/size": "24sp",
+          "type/headline-large/weight": "Bold",
+          "type/headline-large/lineHeight": "32sp",
+          "type/headline-medium/size": "20sp",
+          "type/headline-medium/weight": "SemiBold",
+          "type/headline-medium/lineHeight": "28sp",
+          "type/body-large/size": "16sp",
+          "type/body-large/weight": "Regular",
+          "type/body-large/lineHeight": "24sp",
+          "type/body-medium/size": "14sp",
+          "type/body-medium/weight": "Regular",
+          "type/body-medium/lineHeight": "20sp",
+          "type/label-large/size": "14sp",
+          "type/label-large/weight": "SemiBold",
+          "type/label-large/lineHeight": "20sp",
+          "type/label-medium/size": "12sp",
+          "type/label-medium/weight": "Medium",
+          "type/label-medium/lineHeight": "16sp",
+          "type/caption/size": "11sp",
+          "type/caption/weight": "Regular",
+          "type/caption/lineHeight": "16sp"
+        }
+      },
+      "variables": [
+        { "name": "type/font-family", "type": "FONT", "value": "Roboto" },
+        { "name": "type/display-large", "type": "FONT", "value": { "family": "Roboto", "weight": 700, "size": 32, "lineHeight": 40 } },
+        { "name": "type/headline-large", "type": "FONT", "value": { "family": "Roboto", "weight": 700, "size": 24, "lineHeight": 32 } },
+        { "name": "type/body-large", "type": "FONT", "value": { "family": "Roboto", "weight": 400, "size": 16, "lineHeight": 24 } },
+        { "name": "type/label-large", "type": "FONT", "value": { "family": "Roboto", "weight": 600, "size": 14, "lineHeight": 20 } }
+      ]
+    },
+    "Spacing": {
+      "modes": {
+        "Default": {
+          "space/0": "0dp",
+          "space/2": "4dp",
+          "space/4": "8dp",
+          "space/6": "12dp",
+          "space/8": "16dp",
+          "space/10": "20dp",
+          "space/12": "24dp",
+          "space/16": "32dp",
+          "space/20": "40dp",
+          "space/24": "48dp",
+          "space/32": "64dp"
+        }
+      },
+      "variables": [
+        { "name": "space/4", "type": "FLOAT", "value": 8 },
+        { "name": "space/8", "type": "FLOAT", "value": 16 },
+        { "name": "space/12", "type": "FLOAT", "value": 24 },
+        { "name": "space/16", "type": "FLOAT", "value": 32 },
+        { "name": "space/20", "type": "FLOAT", "value": 40 }
+      ]
+    },
+    "BorderRadius": {
+      "modes": {
+        "Default": {
+          "radius/sm": "4dp",
+          "radius/md": "8dp",
+          "radius/lg": "12dp",
+          "radius/xl": "16dp",
+          "radius/full": "999dp"
+        }
+      },
+      "variables": [
+        { "name": "radius/sm", "type": "FLOAT", "value": 4 },
+        { "name": "radius/md", "type": "FLOAT", "value": 8 },
+        { "name": "radius/lg", "type": "FLOAT", "value": 12 },
+        { "name": "radius/xl", "type": "FLOAT", "value": 16 },
+        { "name": "radius/full", "type": "FLOAT", "value": 999 }
+      ]
+    },
+    "Elevation": {
+      "modes": {
+        "Default": {
+          "elevation/0": "none",
+          "elevation/1": "0dp 2dp 4dp rgba(0,0,0,0.25)",
+          "elevation/2": "0dp 4dp 8dp rgba(0,0,0,0.30)",
+          "elevation/3": "0dp 8dp 16dp rgba(0,0,0,0.35)"
+        }
+      }
+    }
+  }
+}

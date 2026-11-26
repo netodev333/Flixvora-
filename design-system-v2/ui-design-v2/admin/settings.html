@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - System Settings</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { margin: 0; background: var(--bg-deep); font-family: var(--font-sans); height: 100vh; overflow: hidden; }
+    .admin-layout { display: flex; height: 100vh; }
+    .admin-sidebar {
+      width: 280px;
+      background: #0F0F11;
+      border-right: 1px solid var(--border-subtle);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-6);
+    }
+    .admin-logo {
+      margin-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: var(--space-4);
+    }
+    .admin-logo-text {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--flix-purple);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .admin-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      flex: 1;
+    }
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      color: var(--text-gray-300);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-normal);
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+    .admin-nav-item.active {
+      background: linear-gradient(135deg, var(--flix-purple), var(--flix-purple-dark));
+      color: white;
+    }
+    .admin-nav-item:hover:not(.active) {
+      background: var(--bg-card);
+      color: var(--text-white);
+    }
+    .admin-main {
+      flex: 1;
+      padding: var(--space-8);
+      overflow-y: auto;
+    }
+    .admin-header {
+      margin-bottom: var(--space-8);
+    }
+    .admin-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+    .admin-subtitle {
+      color: var(--text-gray-500);
+      font-size: var(--text-base);
+    }
+    .admin-settings-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-8);
+      overflow: hidden;
+    }
+    .admin-section-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-dark);
+    }
+    .admin-section-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      color: var(--text-white);
+    }
+    .admin-settings-form {
+      padding: var(--space-6);
+    }
+    .admin-setting-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: var(--space-4) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-setting-row:last-child {
+      border-bottom: none;
+    }
+    .admin-setting-label {
+      font-size: var(--text-sm);
+      font-weight: 600;
+      color: var(--text-gray-300);
+      flex: 1;
+    }
+    .admin-setting-desc {
+      font-size: var(--text-xs);
+      color: var(--text-gray-500);
+      margin-top: var(--space-1);
+    }
+    .admin-setting-control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+    }
+    .save-btn {
+      background: linear-gradient(135deg, var(--flix-purple), var(--flix-purple-dark));
+      color: white;
+      border: none;
+      padding: var(--space-3) var(--space-8);
+      border-radius: var(--radius-md);
+      font-size: var(--text-base);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+      box-shadow: var(--shadow-glow);
+    }
+    .save-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(139, 92, 246, 0.4);
+    }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-text">🛡️ FLIXVORA ADMIN</div>
+      </div>
+      <nav class="admin-nav">
+        <a href="dashboard.html" class="admin-nav-item">📊 Dashboard</a>
+        <a href="content.html" class="admin-nav-item">🎬 Content Management</a>
+        <a href="users.html" class="admin-nav-item">👥 User Management</a>
+        <a href="analytics.html" class="admin-nav-item">📈 Analytics</a>
+        <a href="#" class="admin-nav-item active">⚙️ System Settings</a>
+      </nav>
+      <div style="margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+        <a href="#" class="admin-nav-item" style="color: var(--flix-red);">🚪 Logout</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header animate-fade-in-down">
+        <div>
+          <div class="admin-title">System Settings</div>
+          <div class="admin-subtitle">Configure platform settings and integrations</div>
+        </div>
+      </header>
+
+      <!-- General Settings -->
+      <div class="admin-settings-section animate-fade-in-down">
+        <div class="admin-section-header">
+          <div class="admin-section-title">General Settings</div>
+        </div>
+        <div class="admin-settings-form">
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Site Name</div>
+              <div class="admin-setting-desc">Display name for the platform</div>
+            </div>
+            <div class="admin-setting-control">
+              <input type="text" class="input-field" value="Flixvora" style="max-width: 300px;">
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Site URL</div>
+              <div class="admin-setting-desc">Public URL of the platform</div>
+            </div>
+            <div class="admin-setting-control">
+              <input type="text" class="input-field" value="https://flixvora.com" style="max-width: 300px;">
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Support Email</div>
+              <div class="admin-setting-desc">Contact email for users</div>
+            </div>
+            <div class="admin-setting-control">
+              <input type="email" class="input-field" value="support@flixvora.com" style="max-width: 300px;">
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Maintenance Mode</div>
+              <div class="admin-setting-desc">Disable access for all users</div>
+            </div>
+            <div class="admin-setting-control">
+              <div class="toggle-switch">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Settings -->
+      <div class="admin-settings-section animate-slide-up" style="animation-delay: 0.1s;">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Content Settings</div>
+        </div>
+        <div class="admin-settings-form">
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Adult Content Default</div>
+              <div class="admin-setting-desc">Default filter for new users</div>
+            </div>
+            <div class="admin-setting-control">
+              <div class="toggle-switch active">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Max Download Quality</div>
+              <div class="admin-setting-desc">Maximum quality for downloads</div>
+            </div>
+            <div class="admin-setting-control">
+              <select class="input-field" style="max-width: 200px;">
+                <option>1080p</option>
+                <option>720p</option>
+                <option>480p</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Auto Transcode</div>
+              <div class="admin-setting-desc">Auto convert uploaded videos</div>
+            </div>
+            <div class="admin-setting-control">
+              <div class="toggle-switch active">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Enable Subtitles</div>
+              <div class="admin-setting-desc">Support subtitle files</div>
+            </div>
+            <div class="admin-setting-control">
+              <div class="toggle-switch active">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update Settings -->
+      <div class="admin-settings-section animate-zoom-in" style="animation-delay: 0.2s;">
+        <div class="admin-section-header">
+          <div class="admin-section-title">Update Settings</div>
+        </div>
+        <div class="admin-settings-form">
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Auto Check Updates</div>
+              <div class="admin-setting-desc">Check GitHub Releases API automatically</div>
+            </div>
+            <div class="admin-setting-control">
+              <div class="toggle-switch active">
+                <div class="toggle-thumb"></div>
+              </div>
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Update Channel</div>
+              <div class="admin-setting-desc">Release channel for updates</div>
+            </div>
+            <div class="admin-setting-control">
+              <select class="input-field" style="max-width: 200px;">
+                <option>Stable</option>
+                <option>Beta</option>
+                <option>Alpha</option>
+              </select>
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">GitHub Repository</div>
+              <div class="admin-setting-desc">Repo for release assets</div>
+            </div>
+            <div class="admin-setting-control">
+              <input type="text" class="input-field" value="netodev333/Flixvora-" style="max-width: 400px;">
+            </div>
+          </div>
+          <div class="admin-setting-row">
+            <div>
+              <div class="admin-setting-label">Last Check</div>
+              <div class="admin-setting-desc">Last update check time</div>
+            </div>
+            <div class="admin-setting-control">
+              <span class="text-xs text-gray-500 font-mono">2 hours ago</span>
+            </div>
+          </div>
+          <div style="margin-top: var(--space-8);">
+            <button class="btn btn-primary" style="padding: var(--space-3) var(--space-6); font-size: var(--text-sm);">🔄 Check Now</button>
+            <button class="btn btn-secondary" style="padding: var(--space-3) var(--space-6); font-size: var(--text-sm); margin-left: var(--space-4);">⬇ Force Update All</button>
+          </div>
+        </div>
+      </div>
+
+      <button class="save-btn" style="margin-top: var(--space-8);">
+        💾 Save All Changes
+      </button>
+
+    </main>
+  </div>
+
+</body>
+</html>

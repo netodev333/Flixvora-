@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Movie Detail</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">🎬 Movie Detail</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-4) var(--space-4) var(--space-100);">
+
+      <!-- Poster & Info -->
+      <div style="margin-bottom: var(--space-6);">
+        <div style="position: relative; width: 100%; aspect-ratio: 2/3; border-radius: var(--radius-lg); overflow: hidden; margin-bottom: var(--space-4);">
+          <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=400&h=600&fit=crop" alt="Poster" style="width: 100%; height: 100%; object-fit: cover;">
+          <div class="content-badge badge-anime" style="top: var(--space-3); left: var(--space-3);">Sub/Dub</div>
+          <div class="content-badge badge-18" style="top: var(--space-3); right: var(--space-3); left: auto;">18+</div>
+        </div>
+
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: var(--space-4);">
+          <div>
+            <h1 class="text-2xl font-bold mb-2">The Midnight Heist</h1>
+            <div class="flex gap-2 text-sm text-gray-400 mb-2">
+              <span>Action</span>
+              <span>•</span>
+              <span>Thriller</span>
+              <span>•</span>
+              <span>2024</span>
+              <span>•</span>
+              <span>120 min</span>
+            </div>
+          </div>
+          <div class="flex gap-2">
+            <button class="btn btn-icon" style="padding: var(--space-2);">⭐</button>
+            <button class="btn btn-icon" style="padding: var(--space-2);">📥</button>
+          </div>
+        </div>
+
+        <div class="text-gray-300 text-sm leading-relaxed mb-6">
+          A group of professional thieves plan the ultimate heist - stealing $100 million from the most secure vault in the city. But things go wrong when they discover the vault contains more than just money.
+        </div>
+
+        <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-6);">
+          <button class="btn btn-primary btn-lg btn-full">
+            ▶ Play Now
+          </button>
+          <button class="btn btn-secondary btn-lg btn-full">
+            📥 Download (2.4 GB)
+          </button>
+        </div>
+      </div>
+
+      <!-- Cast & Crew -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header">
+          <div class="section-title">
+            <div class="section-icon">👥</div>
+            <span>Cast & Crew</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: var(--space-4); overflow-x: auto; padding-bottom: var(--space-4);">
+          <div style="flex: 0 0 auto; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #1A1A1A; border-radius: var(--radius-full); margin-bottom: var(--space-2);">A</div>
+            <div class="text-xs text-gray-300">John Actor</div>
+          </div>
+          <div style="flex: 0 0 auto; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #1A1A1A; border-radius: var(--radius-full); margin-bottom: var(--space-2);">S</div>
+            <div class="text-xs text-gray-300">Sarah Star</div>
+          </div>
+          <div style="flex: 0 0 auto; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #1A1A1A; border-radius: var(--radius-full); margin-bottom: var(--space-2);">M</div>
+            <div class="text-xs text-gray-300">Mike Director</div>
+          </div>
+          <div style="flex: 0 0 auto; text-align: center;">
+            <div style="width: 60px; height: 60px; background: #1A1A1A; border-radius: var(--radius-full); margin-bottom: var(--space-2);">E</div>
+            <div class="text-xs text-gray-300">Emma Writer</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Seasons -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header">
+          <div class="section-title">
+            <div class="section-icon">📅</div>
+            <span>Seasons</span>
+          </div>
+        </div>
+        <div style="display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-4);">
+          <button class="btn btn-primary btn-sm">Season 1</button>
+          <button class="btn btn-secondary btn-sm">Season 2</button>
+          <button class="btn btn-secondary btn-sm">Season 3</button>
+          <button class="btn btn-secondary btn-sm">Season 4</button>
+        </div>
+      </div>
+
+      <!-- Similar Movies -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">🎯</div>
+          <span>Similar Movies</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=150&h=225&fit=crop" alt="Similar" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Ocean's Eleven</div>
+              <div class="content-meta">★ 8.2 • 2001</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=150&h=225&fit=crop" alt="Similar" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Inception</div>
+              <div class="content-meta">★ 8.8 • 2010</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=150&h=225&fit=crop" alt="Similar" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">The Dark Knight</div>
+              <div class="content-meta">★ 9.0 • 2008</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

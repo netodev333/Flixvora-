@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Live TV</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">📡 Live TV</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Header -->
+      <div style="margin-bottom: var(--space-8);">
+        <h1 class="text-2xl font-bold mb-2">Live TV Channels</h1>
+        <p class="text-gray-500">200+ channels • EPG Guide • Live sports</p>
+      </div>
+
+      <!-- Category Filter -->
+      <div style="display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <button class="btn btn-primary btn-sm">All</button>
+        <button class="btn btn-secondary btn-sm">News</button>
+        <button class="btn btn-secondary btn-sm">Sports</button>
+        <button class="btn btn-secondary btn-sm">Movies</button>
+        <button class="btn btn-secondary btn-sm">Kids</button>
+        <button class="btn btn-secondary btn-sm">Music</button>
+        <button class="btn btn-secondary btn-sm">Documentary</button>
+      </div>
+
+      <!-- Now Playing Bar -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); margin-bottom: var(--space-8); display: flex; align-items: center; gap: var(--space-4); cursor: pointer;">
+        <div style="width: 48px; height: 48px; background: #1A1A1A; border-radius: var(--radius-md);">📺</div>
+        <div style="flex: 1;">
+          <div class="text-base font-semibold">CNN - Breaking News</div>
+          <div class="text-xs text-gray-500">LIVE • 8:45 PM</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-icon" style="padding: var(--space-2);">⏯</button>
+          <button class="btn btn-icon" style="padding: var(--space-2);">🔊</button>
+        </div>
+      </div>
+
+      <!-- Channel Grid -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">📡</div>
+          <span>All Channels</span>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--space-4);">
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-purple); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">HBO</div>
+          <div class="text-base font-semibold">HBO</div>
+          <div class="text-xs text-gray-500">Movies</div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="live-dot"></span>
+            <span class="text-xs text-green font-bold">LIVE</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-red); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">CNN</div>
+          <div class="text-base font-semibold">CNN</div>
+          <div class="text-xs text-gray-500">News</div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="live-dot"></span>
+            <span class="text-xs text-green font-bold">LIVE</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-neon-blue); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">ESPN</div>
+          <div class="text-base font-semibold">ESPN</div>
+          <div class="text-xs text-gray-500">Sports</div>
+          <div class="mt-3">
+            <span class="badge badge-gray" style="font-size: var(--text-xs);">Off Air</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-neon-green); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">BBC</div>
+          <div class="text-base font-semibold">BBC</div>
+          <div class="text-xs text-gray-500">News</div>
+          <div class="flex items-center gap-1 mt-3">
+            <span class="live-dot"></span>
+            <span class="text-xs text-green font-bold">LIVE</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-orange); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">Disney</div>
+          <div class="text-base font-semibold">Disney+</div>
+          <div class="text-xs text-gray-500">Kids</div>
+          <div class="mt-3">
+            <span class="badge badge-gray" style="font-size: var(--text-xs);">Off Air</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-4); cursor: pointer; transition: all var(--transition-normal);">
+          <div style="width: 60px; height: 60px; background: var(--flix-neon-pink); border-radius: var(--radius-md); margin-bottom: var(--space-3); display: flex; align-items: center; justify-content: center; font-size: var(--text-xl);">MTV</div>
+          <div class="text-base font-semibold">MTV</div>
+          <div class="text-xs text-gray-500">Music</div>
+          <div class="mt-3">
+            <span class="badge badge-gray" style="font-size: var(--text-xs);">Off Air</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- EPG Guide -->
+      <div style="margin-top: var(--space-8);">
+        <div class="section-header">
+          <div class="section-title">
+            <div class="section-icon">📅</div>
+            <span>EPG Guide - Tonight</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); overflow: hidden;">
+          <div style="padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div class="text-xs font-bold text-gray-500 uppercase">8:00 PM</div>
+            <div class="text-base font-semibold">Movie: The Midnight Heist</div>
+            <div class="text-xs text-gray-500 mt-1">Action • 18+ • 24 min remaining</div>
+          </div>
+          <div style="padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div class="text-xs font-bold text-gray-500 uppercase">9:00 PM</div>
+            <div class="text-base font-semibold">News: World News Hour</div>
+            <div class="text-xs text-gray-500 mt-1">News • LIVE • 60 min</div>
+          </div>
+          <div style="padding: var(--space-4) var(--space-6);">
+            <div class="text-xs font-bold text-gray-500 uppercase">10:00 PM</div>
+            <div class="text-base font-semibold">Sports: Live Football</div>
+            <div class="text-xs text-gray-500 mt-1">Sports • LIVE • 90 min</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item active">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

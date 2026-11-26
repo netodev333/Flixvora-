@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Profile</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">👤 Profile</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Profile Header -->
+      <div style="text-align: center; margin-bottom: var(--space-8);">
+        <div class="avatar" style="width: 120px; height: 120px; font-size: var(text-3xl); margin: 0 auto var(--space-4);">JD</div>
+        <div class="text-2xl font-bold">John Doe</div>
+        <div class="text-sm text-gray-500 mt-2">john@example.com</div>
+        
+        <div style="background: rgba(16, 185, 129, 0.1); color: var(--flix-neon-green); padding: var(--space-2) var(--space-6); border-radius: var(--radius-full); font-size: var(--text-sm); font-weight: 600; margin-top: var(--space-4); display: inline-block;">
+          💎 Premium Member
+        </div>
+        
+        <div class="text-xs text-gray-500 mt-4">Membership expires: Dec 15, 2026</div>
+      </div>
+
+      <!-- Watch History -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">🕒</div>
+          <span>Watch History</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=150&h=225&fit=crop" alt="History" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">The Midnight Heist</div>
+              <div class="content-meta">Watched 2 days ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=150&h=225&fit=crop" alt="History" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Demon Slayer</div>
+              <div class="content-meta">Watched 5 days ago</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=150&h=225&fit=crop" alt="History" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Stranger Things</div>
+              <div class="content-meta">Watched 1 week ago</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Watching -->
+      <div class="section-header mb-6 mt-8">
+        <div class="section-title">
+          <div class="section-icon">▶️</div>
+          <span>Continue Watching</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=150&h=225&fit=crop" alt="Continue" class="content-card-image">
+            <div class="content-badge badge-anime" style="font-size: var(--text-xs);">65%</div>
+            <div class="content-info">
+              <div class="content-title">Jujutsu Kaisen</div>
+              <div class="content-meta">Episode 4 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1591757987807-27228827f039?w=150&h=225&fit=crop" alt="Continue" class="content-card-image">
+            <div class="content-badge badge-movie" style="font-size: var(--text-xs);">40%</div>
+            <div class="content-info">
+              <div class="content-title">The Witcher</div>
+              <div class="content-meta">Episode 2 • 60 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Watchlist -->
+      <div class="section-header mb-6 mt-8">
+        <div class="section-title">
+          <div class="section-icon">❤️</div>
+          <span>Watchlist</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=150&h=225&fit=crop" alt="Watchlist" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Ocean's Eleven</div>
+              <div class="content-meta">★ 8.2 • 2001</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=150&h=225&fit=crop" alt="Watchlist" class="content-card-image">
+            <div class="content-info">
+              <div class="content-title">Inception</div>
+              <div class="content-meta">★ 8.8 • 2010</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item active">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

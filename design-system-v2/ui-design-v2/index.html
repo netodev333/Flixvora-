@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora v10.0 - UI Design System</title>
+  <link rel="stylesheet" href="styles/design-system.css">
+  <link rel="stylesheet" href="styles/animations.css">
+  <style>
+    /* Showcase specific styles */
+    .showcase-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 300px;
+      height: 100vh;
+      background: var(--bg-dark);
+      border-right: 1px solid var(--border-subtle);
+      z-index: 100;
+      padding: var(--space-6);
+      overflow-y: auto;
+    }
+
+    .showcase-main {
+      margin-left: 300px;
+      padding: var(--space-8);
+      min-height: 100vh;
+    }
+
+    .nav-group {
+      margin-bottom: var(--space-8);
+    }
+
+    .nav-group-title {
+      font-size: var(--text-xs);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-gray-500);
+      margin-bottom: var(--space-4);
+    }
+
+    .nav-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      color: var(--text-gray-300);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-normal);
+      font-size: var(--text-sm);
+    }
+
+    .nav-link:hover {
+      background: var(--bg-card);
+      color: var(--text-white);
+    }
+
+    .nav-link.active {
+      background: linear-gradient(135deg, var(--flix-purple), var(--flix-purple-dark));
+      color: white;
+    }
+
+    .preview-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-xl);
+      padding: var(--space-6);
+      margin-bottom: var(--space-8);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .preview-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--flix-purple), var(--flix-neon-pink), var(--flix-neon-blue));
+    }
+
+    .preview-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: var(--space-6);
+    }
+
+    .preview-title {
+      font-family: var(--font-display);
+      font-size: var(text-2xl);
+      font-weight: 800;
+      color: var(--text-white);
+    }
+
+    .preview-subtitle {
+      color: var(--text-gray-500);
+      font-size: var(--text-sm);
+    }
+
+    .open-btn {
+      background: var(--flix-purple);
+      color: white;
+      border: none;
+      padding: var(--space-2) var(--space-4);
+      border-radius: var(--radius-md);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      cursor: pointer;
+      transition: all var(--transition-normal);
+    }
+
+    .open-btn:hover {
+      background: var(--flix-purple-dark);
+      transform: scale(1.05);
+    }
+
+    .device-frame {
+      background: #000;
+      border-radius: var(--radius-xl);
+      padding: var(--space-4);
+      box-shadow: var(--shadow-lg);
+      display: inline-block;
+      margin-bottom: var(--space-6);
+    }
+
+    .mobile-frame {
+      width: 390px;
+      height: 844px;
+      overflow: hidden;
+    }
+
+    .tv-frame {
+      width: 720px;
+      height: 405px;
+      overflow: hidden;
+    }
+
+    .desktop-frame {
+      width: 1024px;
+      height: 768px;
+      overflow: hidden;
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .feature-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+      transition: all var(--transition-normal);
+    }
+
+    .feature-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--flix-purple);
+    }
+
+    .feature-icon {
+      width: 48px;
+      height: 48px;
+      background: rgba(139, 92, 246, 0.1);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: var(--text-xl);
+      margin-bottom: var(--space-4);
+    }
+
+    .feature-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-2);
+    }
+
+    .feature-desc {
+      color: var(--text-gray-500);
+      font-size: var(--text-sm);
+      line-height: 1.5;
+    }
+
+    .stats-row {
+      display: flex;
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 800;
+      color: var(--flix-purple);
+    }
+
+    .stat-label {
+      font-size: var(--text-sm);
+      color: var(--text-gray-500);
+    }
+
+    @media (max-width: 1024px) {
+      .showcase-nav {
+        width: 250px;
+      }
+      .showcase-main {
+        margin-left: 250px;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .showcase-nav {
+        position: relative;
+        width: 100%;
+        height: auto;
+        border-right: none;
+        border-bottom: 1px solid var(--border-subtle);
+      }
+      .showcase-main {
+        margin-left: 0;
+      }
+      .tv-frame, .desktop-frame {
+        width: 100%;
+        height: auto;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SHOWCASE NAVIGATION -->
+  <nav class="showcase-nav">
+    <div style="margin-bottom: var(--space-8);">
+      <div class="nav-brand" style="font-size: var(--text-lg); font-weight: 800; color: var(--flix-purple); display: flex; align-items: center; gap: var(--space-2);">
+        🎬 FLIXVORA
+      </div>
+      <div class="text-caption text-gray-500 mt-4">UI Design System v10.0</div>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Mobile Screens</div>
+      <a href="screens/mobile-home.html" class="nav-link active">🏠 Home Screen</a>
+      <a href="screens/mobile-anime.html" class="nav-link">📺 Anime Section</a>
+      <a href="screens/mobile-webseries.html" class="nav-link">🎬 Web Series</a>
+      <a href="screens/movie-detail.html" class="nav-link">🎭 Movie Detail</a>
+      <a href="screens/tv-channels.html" class="nav-link">📡 Live TV Channels</a>
+      <a href="screens/settings.html" class="nav-link">⚙️ Settings</a>
+      <a href="screens/downloads.html" class="nav-link">📥 Downloads</a>
+      <a href="screens/profile.html" class="nav-link">👤 Profile</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">TV Screens (1920x1080)</div>
+      <a href="screens/tv-home.html" class="nav-link">📺 TV Home</a>
+      <a href="screens/tv-detail.html" class="nav-link">🎭 TV Detail</a>
+      <a href="screens/tv-live.html" class="nav-link">📡 TV Live</a>
+      <a href="screens/tv-settings.html" class="nav-link">⚙️ TV Settings</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">Backend Admin</div>
+      <a href="admin/dashboard.html" class="nav-link">🛡️ Admin Dashboard</a>
+      <a href="admin/content.html" class="nav-link">🎬 Content Management</a>
+      <a href="admin/users.html" class="nav-link">👥 User Management</a>
+      <a href="admin/analytics.html" class="nav-link">📈 Analytics</a>
+      <a href="admin/settings.html" class="nav-link">⚙️ System Settings</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-group-title">System States</div>
+      <a href="screens/force-update.html" class="nav-link">🔄 Force Update</a>
+      <a href="screens/update-dialog.html" class="nav-link">⬇ Update Dialog</a>
+      <a href="screens/loading.html" class="nav-link">⏳ Loading States</a>
+      <a href="screens/empty-state.html" class="nav-link">📭 Empty States</a>
+    </div>
+  </nav>
+
+  <!-- MAIN CONTENT -->
+  <main class="showcase-main">
+    <header class="mb-8 animate-fade-in-down">
+      <div class="flex justify-between items-center">
+        <div>
+          <h1 class="text-5xl font-bold text-display mb-2 gradient-text">Flixvora v10.0</h1>
+          <p class="text-xl text-gray-300 mb-4">Premium Streaming UI Design System</p>
+          <p class="text-gray-500 text-sm">
+            Movies • Anime • Web Series • Live TV • 4K Streaming • Adult Content Filter • GitHub Updates
+          </p>
+        </div>
+        <div class="flex gap-4">
+          <a href="#" class="btn btn-primary btn-lg">
+            📥 Download Figma File
+          </a>
+          <a href="#" class="btn btn-secondary btn-lg">
+            📋 View Documentation
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="stats-row animate-slide-up">
+      <div class="stat-item">
+        <div class="stat-number">15+</div>
+        <div class="stat-label">Screens Designed</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Platforms (Mobile, TV, Web)</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">4</div>
+        <div class="stat-label">Content Categories</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">60fps</div>
+        <div class="stat-label">Smooth Animations</div>
+      </div>
+    </div>
+
+    <!-- Features -->
+    <div class="feature-grid animate-fade-in-down" style="animation-delay: 0.1s;">
+      <div class="feature-card">
+        <div class="feature-icon">🎬</div>
+        <div class="feature-title">Movies</div>
+        <div class="feature-desc">Latest Hollywood & Bollywood movies with 4K HDR support</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📺</div>
+        <div class="feature-title">Anime</div>
+        <div class="feature-desc">Dedicated anime section with sub/dub options</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📚</div>
+        <div class="feature-title">Web Series</div>
+        <div class="feature-desc">Binge-worthy original series & shows</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📡</div>
+        <div class="feature-title">Live TV</div>
+        <div class="feature-desc">200+ live channels with EPG guide</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔞</div>
+        <div class="feature-title">Adult Filter</div>
+        <div class="feature-desc">Toggle adult content ON/OFF with PIN protection</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">⬇</div>
+        <div class="feature-title">Smart Updates</div>
+        <div class="feature-desc">GitHub Releases API with persistent install button</div>
+      </div>
+    </div>
+
+    <!-- Preview Cards -->
+    <div class="preview-card animate-slide-up" style="animation-delay: 0.2s;">
+      <div class="preview-header">
+        <div>
+          <div class="preview-title">Mobile Home Screen</div>
+          <div class="preview-subtitle">Hero banner • Content shelves • Adult toggle • Bottom nav</div>
+        </div>
+        <button class="open-btn" onclick="window.location.href='screens/mobile-home.html'">Open Preview →</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+        <div class="glass-card p-4" style="height: 200px;">
+          <div class="text-gray-500 text-xs mb-2">Hero Section</div>
+          <div class="skeleton-title mb-4"></div>
+          <div class="skeleton-text" style="width: 60%;"></div>
+          <div class="skeleton-text" style="width: 40%;"></div>
+        </div>
+        <div class="glass-card p-4" style="height: 200px;">
+          <div class="text-gray-500 text-xs mb-2">Trending Shelf</div>
+          <div class="content-card" style="width: 120px;">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" class="content-card-image">
+          </div>
+          <div class="content-card" style="width: 120px;">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" class="content-card-image">
+          </div>
+          <div class="content-card" style="width: 120px;">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=200&h=300&fit=crop" class="content-card-image">
+          </div>
+        </div>
+        <div class="glass-card p-4" style="height: 200px;">
+          <div class="text-gray-500 text-xs mb-2">Adult Toggle</div>
+          <div class="adult-control">
+            <div>
+              <div class="adult-label">🔞 Adult Content</div>
+              <div class="adult-desc">Filter enabled</div>
+            </div>
+            <div class="toggle-switch active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="preview-card animate-slide-up" style="animation-delay: 0.3s;">
+      <div class="preview-header">
+        <div>
+          <div class="preview-title">Backend Admin Panel</div>
+          <div class="preview-subtitle">Content management • User analytics • System settings</div>
+        </div>
+        <button class="open-btn" onclick="window.location.href='admin/dashboard.html'">Open Preview →</button>
+      </div>
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: var(--space-4);">
+        <div class="stat-card">
+          <div class="stat-value">12.4K</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-change change-up">▲ 12%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">$4.5K</div>
+          <div class="stat-label">Daily Revenue</div>
+          <div class="stat-change change-up">▲ 8%</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value">1,240</div>
+          <div class="stat-label">Content Items</div>
+          <div class="stat-change change-up">▲ 3%</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Animations Showcase -->
+    <div class="preview-card animate-slide-up" style="animation-delay: 0.4s;">
+      <div class="preview-header">
+        <div>
+          <div class="preview-title">Animation Effects</div>
+          <div class="preview-subtitle">Smooth transitions, hover effects, loading states</div>
+        </div>
+      </div>
+      <div class="flex gap-6 flex-wrap">
+        <div class="glass-card p-6" style="min-width: 150px;">
+          <div class="loading-spinner mb-4"></div>
+          <div class="text-center text-gray-300 text-xs">Loading Spinner</div>
+        </div>
+        <div class="glass-card p-6" style="min-width: 150px;">
+          <div class="live-dot"></div>
+          <div class="text-center text-gray-300 text-xs">Live Indicator</div>
+        </div>
+        <div class="glass-card p-6" style="min-width: 150px;">
+          <div class="btn btn-primary glow-effect mb-2">Glow Button</div>
+          <div class="text-center text-gray-300 text-xs">Glow Effect</div>
+        </div>
+        <div class="glass-card p-6" style="min-width: 150px;">
+          <div class="toast" style="position: relative; bottom: auto; right: auto;">
+            ✅ Update ready to install
+          </div>
+          <div class="text-center text-gray-300 text-xs">Toast Notification</div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Navigation active state
+    document.querySelectorAll('.nav-link').forEach(link => {
+      link.addEventListener('click', function() {
+        document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Toast demo
+    setTimeout(() => {
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `
+        <div style="font-size: var(--text-sm); font-weight: 600;">New Design Added</div>
+        <div style="font-size: var(--text-xs); color: var(--text-gray-300);">Flixvora v10.0 UI System</div>
+      `;
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        toast.classList.add('toast-exit');
+        setTimeout(() => toast.remove(), 300);
+      }, 4000);
+    }, 1000);
+  </script>
+</body>
+</html>

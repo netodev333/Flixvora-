@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Empty States</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+    .empty-state { text-align: center; padding: var(--space-12) var(--space-6); }
+    .empty-icon { font-size: 80px; margin-bottom: var(--space-8); opacity: 0.5; }
+    .empty-title { font-size: var(--text-2xl); font-weight: 700; margin-bottom: var(--space-4); }
+    .empty-desc { color: var(--text-gray-500); margin-bottom: var(--space-8); max-width: 300px; margin-left: auto; margin-right: auto; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">📭 Empty States</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- No Search Results -->
+      <div style="margin-bottom: var(--space-12);">
+        <div class="empty-state animate-bounce-in">
+          <div class="empty-icon">🔍</div>
+          <div class="empty-title">No Results Found</div>
+          <div class="empty-desc">We couldn't find any movies or shows matching your search. Try different keywords.</div>
+          <button class="btn btn-primary">Clear Search</button>
+        </div>
+      </div>
+
+      <!-- No Downloads -->
+      <div style="margin-bottom: var(--space-12);">
+        <div class="empty-state animate-slide-up">
+          <div class="empty-icon">📥</div>
+          <div class="empty-title">No Downloads Yet</div>
+          <div class="empty-desc">Start downloading your favorite movies and shows to watch offline.</div>
+          <button class="btn btn-primary">Browse Content</button>
+        </div>
+      </div>
+
+      <!-- Empty Watchlist -->
+      <div style="margin-bottom: var(--space-12);">
+        <div class="empty-state animate-fade-in-down">
+          <div class="empty-icon">❤️</div>
+          <div class="empty-title">Your Watchlist is Empty</div>
+          <div class="empty-desc">Add movies and shows to your watchlist to keep track of what you want to watch.</div>
+          <button class="btn btn-primary">Explore Movies</button>
+        </div>
+      </div>
+
+      <!-- No Internet -->
+      <div style="margin-bottom: var(--space-12);">
+        <div class="empty-state animate-zoom-in">
+          <div class="empty-icon">📵</div>
+          <div class="empty-title">No Internet Connection</div>
+          <div class="empty-desc">Please check your connection and try again.</div>
+          <button class="btn btn-primary">Retry</button>
+        </div>
+      </div>
+
+      <!-- Adult Content Blocked -->
+      <div style="margin-bottom: var(--space-12);">
+        <div class="empty-state animate-rotate-in">
+          <div class="empty-icon">🔞</div>
+          <div class="empty-title">Adult Content Filtered</div>
+          <div class="empty-desc">Adult content is currently filtered. Go to Settings to enable it.</div>
+          <button class="btn btn-primary">Go to Settings</button>
+        </div>
+      </div>
+
+      <!-- Error State -->
+      <div>
+        <div class="empty-state animate-shake">
+          <div class="empty-icon">⚠️</div>
+          <div class="empty-title">Something Went Wrong</div>
+          <div class="empty-desc">We encountered an error while loading content. Please try again later.</div>
+          <button class="btn btn-primary">Try Again</button>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

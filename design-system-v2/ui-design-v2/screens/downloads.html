@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Downloads</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">📥 Downloads</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">✏️</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Storage Info -->
+      <div style="background: linear-gradient(135deg, var(--flix-purple), var(--flix-purple-dark)); border-radius: var(--radius-lg); padding: var(--space-6); margin-bottom: var(--space-8); color: white;">
+        <div class="flex justify-between">
+          <div>
+            <div class="text-lg font-bold">3.2 GB Used</div>
+            <div class="text-sm text-purple-200">Of 32 GB available</div>
+          </div>
+          <div class="text-right">
+            <div class="text-lg font-bold">85%</div>
+            <div class="text-sm text-purple-200">Storage used</div>
+          </div>
+        </div>
+        <div style="height: 6px; background: rgba(255,255,255,0.2); border-radius: var(--radius-full); margin-top: var(--space-4); overflow: hidden;">
+          <div style="height: 100%; background: white; width: 85%; border-radius: var(--radius-full);"></div>
+        </div>
+      </div>
+
+      <!-- Downloads List -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">📥</div>
+          <span>Your Downloads</span>
+        </div>
+      </div>
+
+      <!-- Completed Download -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); margin-bottom: var(--space-4); padding: var(--space-4); display: flex; gap: var(--space-4); align-items: center;">
+        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=80&h=120&fit=crop" alt="Poster" style="width: 80px; height: 120px; object-fit: cover; border-radius: var(--radius-md);">
+        <div style="flex: 1;">
+          <div class="text-base font-semibold">The Midnight Heist</div>
+          <div class="text-xs text-gray-500">Action • 2024 • 120 min</div>
+          <div class="text-xs text-green mt-2">✓ Download Complete</div>
+          <div class="text-xs text-gray-500">2.4 GB • 1080p</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-primary btn-sm" style="padding: var(--space-2) var(--space-4);">▶ Play</button>
+          <button class="btn btn-icon" style="padding: var(--space-2);">🗑</button>
+        </div>
+      </div>
+
+      <!-- Downloading -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); margin-bottom: var(--space-4); padding: var(--space-4); display: flex; gap: var(--space-4); align-items: center;">
+        <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=80&h=120&fit=crop" alt="Poster" style="width: 80px; height: 120px; object-fit: cover; border-radius: var(--radius-md);">
+        <div style="flex: 1;">
+          <div class="text-base font-semibold">Demon Slayer S4</div>
+          <div class="text-xs text-gray-500">Anime • 2024 • 24 min</div>
+          <div style="margin: var(--space-2) 0;">
+            <div style="height: 6px; background: var(--border-subtle); border-radius: var(--radius-full); overflow: hidden;">
+              <div style="height: 100%; background: var(--flix-neon-pink); width: 65%; border-radius: var(--radius-full);"></div>
+            </div>
+          </div>
+          <div class="text-xs text-orange">↓ Downloading 65%</div>
+          <div class="text-xs text-gray-500">1.2 GB • 1080p</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-secondary btn-sm" style="padding: var(--space-2) var(--space-4);">⏸ Pause</button>
+          <button class="btn btn-icon" style="padding: var(--space-2);">🗑</button>
+        </div>
+      </div>
+
+      <!-- Failed Download -->
+      <div style="background: var(--bg-card); border: 1px solid var(--flix-red); border-radius: var(--radius-lg); margin-bottom: var(--space-4); padding: var(--space-4); display: flex; gap: var(--space-4); align-items: center;">
+        <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=80&h=120&fit=crop" alt="Poster" style="width: 80px; height: 120px; object-fit: cover; border-radius: var(--radius-md);">
+        <div style="flex: 1;">
+          <div class="text-base font-semibold">Stranger Things</div>
+          <div class="text-xs text-gray-500">Web Series • 2023 • 50 min</div>
+          <div class="text-xs text-red mt-2">⚠ Download Failed</div>
+          <div class="text-xs text-gray-500">Network error</div>
+        </div>
+        <div class="flex gap-2">
+          <button class="btn btn-primary btn-sm" style="padding: var(--space-2) var(--space-4);">🔄 Retry</button>
+          <button class="btn btn-icon" style="padding: var(--space-2);">🗑</button>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item active">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

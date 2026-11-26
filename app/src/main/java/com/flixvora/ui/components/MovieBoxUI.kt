@@ -103,13 +103,13 @@ fun MbPosterCard(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .padding(5.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(BrandBlue)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(com.flixvora.ui.theme.FlixNeonPink)
                         .padding(horizontal = 4.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "S${movie.totalSeasons}",
-                        fontSize = 6.5.sp,
+                        fontSize = 7.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
@@ -121,15 +121,15 @@ fun MbPosterCard(
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .padding(5.dp)
-                        .clip(RoundedCornerShape(3.dp))
-                        .background(Color.Black.copy(alpha = 0.7f))
-                        .padding(horizontal = 4.5.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color.Black.copy(alpha = 0.75f))
+                        .padding(horizontal = 5.dp, vertical = 2.dp)
                 ) {
                     Text(
-                        text = "\u2605 $rating",
-                        fontSize = 7.5.sp,
+                        text = "★ $rating",
+                        fontSize = 8.sp,
                         fontWeight = FontWeight.ExtraBold,
-                        color = BrandGreen
+                        color = com.flixvora.ui.theme.FlixOrange
                     )
                 }
             }

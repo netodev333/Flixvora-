@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Force Update</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="force-update-screen">
+    <div class="update-icon">🔄</div>
+    <div class="update-title animate-bounce-in">Update Required</div>
+    <div class="update-desc animate-fade-in-down">
+      A new version of Flixvora is required to continue using the app. Please update to v10.0.
+    </div>
+    <div class="update-versions animate-fade-in-down">
+      Current: v9.7 &nbsp;|&nbsp; Latest: v10.0
+    </div>
+    <button class="btn btn-primary btn-lg btn-full" disabled style="max-width: 400px; margin: 0 var(--space-4);">
+      Install Now - 6.7 MB
+    </button>
+    <div class="update-progress animate-zoom-in">
+      <div class="update-progress-bar loaded"></div>
+    </div>
+    <div class="text-caption text-gray-500 animate-fade-in-down" style="margin-top: var(--space-4);">
+      Downloading... 78%
+    </div>
+    <div class="text-caption text-gray-600 mt-6 animate-fade-in-down">
+      Install button appears after download completes
+    </div>
+  </div>
+
+</body>
+</html>

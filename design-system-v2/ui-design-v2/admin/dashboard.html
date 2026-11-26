@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Admin Dashboard</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { margin: 0; background: var(--bg-deep); font-family: var(--font-sans); height: 100vh; overflow: hidden; }
+    .admin-layout {
+      display: flex;
+      height: 100vh;
+    }
+    .admin-sidebar {
+      width: 280px;
+      background: #0F0F11;
+      border-right: 1px solid var(--border-subtle);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      padding: var(--space-6);
+    }
+    .admin-logo {
+      margin-bottom: var(--space-8);
+      border-bottom: 1px solid var(--border-subtle);
+      padding-bottom: var(--space-4);
+    }
+    .admin-logo-text {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 800;
+      color: var(--flix-purple);
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+    }
+    .admin-nav {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      flex: 1;
+    }
+    .admin-nav-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-3);
+      padding: var(--space-3) var(--space-4);
+      color: var(--text-gray-300);
+      text-decoration: none;
+      border-radius: var(--radius-md);
+      transition: all var(--transition-normal);
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+    .admin-nav-item.active {
+      background: linear-gradient(135deg, var(--flix-purple), var(--flix-purple-dark));
+      color: white;
+    }
+    .admin-nav-item:hover:not(.active) {
+      background: var(--bg-card);
+      color: var(--text-white);
+    }
+    .admin-nav-item svg {
+      width: 20px;
+      height: 20px;
+    }
+    .admin-main {
+      flex: 1;
+      padding: var(--space-8);
+      overflow-y: auto;
+    }
+    .admin-header {
+      margin-bottom: var(--space-8);
+    }
+    .admin-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: 800;
+      margin-bottom: var(--space-2);
+    }
+    .admin-subtitle {
+      color: var(--text-gray-500);
+      font-size: var(--text-base);
+    }
+    .admin-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+    .admin-content-table {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      margin-bottom: var(--space-8);
+    }
+    .admin-table-header {
+      background: var(--bg-dark);
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-table-header h3 {
+      font-size: var(--text-lg);
+      font-weight: 700;
+    }
+    .table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .table th {
+      text-align: left;
+      padding: var(--space-4) var(--space-6);
+      font-size: var(--text-xs);
+      font-weight: 600;
+      color: var(--text-gray-500);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-subtle);
+      background: var(--bg-dark);
+    }
+    .table td {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: var(--text-sm);
+      color: var(--text-gray-300);
+    }
+    .table tr:hover {
+      background: var(--bg-card-hover);
+    }
+    .admin-charts {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-6);
+      margin-bottom: var(--space-8);
+    }
+    .admin-chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: var(--space-6);
+    }
+    .admin-chart-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+      margin-bottom: var(--space-4);
+    }
+    .admin-activity {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+    }
+    .admin-activity-header {
+      padding: var(--space-4) var(--space-6);
+      border-bottom: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .admin-activity-title {
+      font-size: var(--text-lg);
+      font-weight: 700;
+    }
+    .admin-activity-list {
+      padding: var(--space-4);
+    }
+    .admin-activity-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-4);
+      padding: var(--space-3) 0;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .admin-activity-item:last-child {
+      border-bottom: none;
+    }
+    .admin-activity-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-full);
+      background: var(--flix-purple);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: var(--text-xs);
+      color: white;
+    }
+    .admin-activity-text {
+      flex: 1;
+      font-size: var(--text-sm);
+      color: var(--text-gray-300);
+    }
+    .admin-activity-time {
+      font-size: var(--text-xs);
+      color: var(--text-gray-500);
+      font-family: var(--font-mono);
+    }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="admin-layout">
+    <!-- Sidebar -->
+    <aside class="admin-sidebar">
+      <div class="admin-logo">
+        <div class="admin-logo-text">🛡️ FLIXVORA ADMIN</div>
+      </div>
+      <nav class="admin-nav">
+        <a href="#" class="admin-nav-item active">📊 Dashboard</a>
+        <a href="content.html" class="admin-nav-item">🎬 Content Management</a>
+        <a href="users.html" class="admin-nav-item">👥 User Management</a>
+        <a href="analytics.html" class="admin-nav-item">📈 Analytics</a>
+        <a href="settings.html" class="admin-nav-item">⚙️ System Settings</a>
+      </nav>
+      <div style="margin-top: auto; padding-top: var(--space-4); border-top: 1px solid var(--border-subtle);">
+        <a href="#" class="admin-nav-item" style="color: var(--flix-red);">🚪 Logout</a>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+      <header class="admin-header animate-fade-in-down">
+        <div class="admin-title">Dashboard</div>
+        <div class="admin-subtitle">Overview of your streaming platform</div>
+      </header>
+
+      <!-- Stats -->
+      <div class="admin-stats animate-slide-up">
+        <div class="stat-card animate-fade-in-down" style="animation-delay: 0.1s;">
+          <div class="stat-value">12,450</div>
+          <div class="stat-label">Total Users</div>
+          <div class="stat-change change-up">▲ 12% this month</div>
+        </div>
+        <div class="stat-card animate-fade-in-down" style="animation-delay: 0.2s;">
+          <div class="stat-value">3,200</div>
+          <div class="stat-label">Active Users</div>
+          <div class="stat-change change-up">▲ 5% this month</div>
+        </div>
+        <div class="stat-card animate-fade-in-down" style="animation-delay: 0.3s;">
+          <div class="stat-value">$4,550</div>
+          <div class="stat-label">Revenue (Today)</div>
+          <div class="stat-change change-up">▲ 8% this month</div>
+        </div>
+        <div class="stat-card animate-fade-in-down" style="animation-delay: 0.4s;">
+          <div class="stat-value">1,240</div>
+          <div class="stat-label">Content Items</div>
+          <div class="stat-change change-up">▲ 3% this month</div>
+        </div>
+      </div>
+
+      <!-- Charts -->
+      <div class="admin-charts animate-fade-in-down" style="animation-delay: 0.5s;">
+        <div class="admin-chart-card">
+          <div class="admin-chart-title">User Growth (30 Days)</div>
+          <div style="height: 200px; background: #1A1A1A; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--text-gray-500);">
+            Line Chart Placeholder
+          </div>
+        </div>
+        <div class="admin-chart-card">
+          <div class="admin-chart-title">Content by Genre</div>
+          <div style="height: 200px; background: #1A1A1A; border-radius: var(--radius-lg); display: flex; align-items: center; justify-content: center; color: var(--text-gray-500);">
+            Donut Chart Placeholder
+          </div>
+        </div>
+      </div>
+
+      <!-- Recent Content Table -->
+      <div class="admin-content-table animate-slide-up" style="animation-delay: 0.6s;">
+        <div class="admin-table-header">
+          <h3>Recent Content</h3>
+          <button class="btn btn-primary" style="padding: var(--space-2) var(--space-4); font-size: var(--text-sm);">+ Add Content</button>
+        </div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Poster</th>
+              <th>Title</th>
+              <th>Genre</th>
+              <th>Rating</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=50&h=75&fit=crop" style="width: 40px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);"></td>
+              <td class="text-headline-medium">The Midnight Heist</td>
+              <td><span class="badge badge-category">Action</span></td>
+              <td>★ 8.2</td>
+              <td><span class="badge badge-safe">Live</span></td>
+              <td>
+                <button class="btn btn-icon" style="padding: 4px;">✏️</button>
+                <button class="btn btn-icon" style="padding: 4px;">🗑</button>
+              </td>
+            </tr>
+            <tr>
+              <td><img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=50&h=75&fit=crop" style="width: 40px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);"></td>
+              <td class="text-headline-medium">Demon Slayer S4</td>
+              <td><span class="badge badge-category">Anime</span></td>
+              <td>★ 8.7</td>
+              <td><span class="badge badge-safe">Live</span></td>
+              <td>
+                <button class="btn btn-icon" style="padding: 4px;">✏️</button>
+                <button class="btn btn-icon" style="padding: 4px;">🗑</button>
+              </td>
+            </tr>
+            <tr>
+              <td><img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=50&h=75&fit=crop" style="width: 40px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);"></td>
+              <td class="text-headline-medium">Stranger Things</td>
+              <td><span class="badge badge-category">Web Series</span></td>
+              <td>★ 8.7</td>
+              <td><span class="badge badge-safe">Live</span></td>
+              <td>
+                <button class="btn btn-icon" style="padding: 4px;">✏️</button>
+                <button class="btn btn-icon" style="padding: 4px;">🗑</button>
+              </td>
+            </tr>
+            <tr>
+              <td><img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=50&h=75&fit=crop" style="width: 40px; height: 60px; object-fit: cover; border-radius: var(--radius-sm);"></td>
+              <td class="text-headline-medium">Adult Drama</td>
+              <td><span class="badge badge-category">Drama</span></td>
+              <td>★ 7.5</td>
+              <td><span class="badge badge-red">Draft</span></td>
+              <td>
+                <button class="btn btn-icon" style="padding: 4px;">✏️</button>
+                <button class="btn btn-icon" style="padding: 4px;">🗑</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Recent Activity -->
+      <div class="admin-activity animate-slide-up" style="animation-delay: 0.7s;">
+        <div class="admin-activity-header">
+          <div class="admin-activity-title">Recent Activity</div>
+        </div>
+        <div class="admin-activity-list">
+          <div class="admin-activity-item">
+            <div class="admin-activity-avatar">JD</div>
+            <div class="admin-activity-text">John Doe subscribed to Premium plan</div>
+            <div class="admin-activity-time">2 hours ago</div>
+          </div>
+          <div class="admin-activity-item">
+            <div class="admin-activity-avatar">MS</div>
+            <div class="admin-activity-text">Movie "Action Film" uploaded</div>
+            <div class="admin-activity-time">5 hours ago</div>
+          </div>
+          <div class="admin-activity-item">
+            <div class="admin-activity-avatar">SW</div>
+            <div class="admin-activity-text">Sarah Wilson cancelled subscription</div>
+            <div class="admin-activity-time">1 day ago</div>
+          </div>
+          <div class="admin-activity-item">
+            <div class="admin-activity-avatar">MR</div>
+            <div class="admin-activity-text">Mike Ross updated profile</div>
+            <div class="admin-activity-time">2 days ago</div>
+          </div>
+          <div class="admin-activity-item">
+            <div class="admin-activity-avatar">ES</div>
+            <div class="admin-activity-text">Emma Smith rated 5 stars</div>
+            <div class="admin-activity-time">3 days ago</div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+</body>
+</html>

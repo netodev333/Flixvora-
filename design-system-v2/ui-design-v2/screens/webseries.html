@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Web Series</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">🎬 Web Series</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Header -->
+      <div style="margin-bottom: var(--space-8);">
+        <h1 class="text-2xl font-bold mb-2">Web Series</h1>
+        <p class="text-gray-500">Binge-worthy original series & shows</p>
+      </div>
+
+      <!-- Filter Chips -->
+      <div style="display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-4); margin-bottom: var(--space-6);">
+        <button class="btn btn-primary btn-sm">All Series</button>
+        <button class="btn btn-secondary btn-sm">Drama</button>
+        <button class="btn btn-secondary btn-sm">Thriller</button>
+        <button class="btn btn-secondary btn-sm">Crime</button>
+        <button class="btn btn-secondary btn-sm">Comedy</button>
+        <button class="btn btn-secondary btn-sm">Sci-Fi</button>
+        <button class="btn btn-secondary btn-sm">Horror</button>
+        <button class="btn btn-secondary btn-sm">Original</button>
+      </div>
+
+      <!-- Trending Series -->
+      <div class="section-header mb-6">
+        <div class="section-title">
+          <div class="section-icon">🔥</div>
+          <span>Trending Series</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-webseries">Original</span>
+            <div class="content-info">
+              <div class="content-title">Money Heist</div>
+              <div class="content-meta">★ 8.2 • 2017 • 45 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-webseries">Original</span>
+            <div class="content-info">
+              <div class="content-title">Stranger Things</div>
+              <div class="content-meta">★ 8.7 • 2016 • 50 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-webseries">Original</span>
+            <div class="content-info">
+              <div class="content-title">The Crown</div>
+              <div class="content-meta">★ 8.7 • 2016 • 60 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-18">18+</span>
+            <div class="content-info">
+              <div class="content-title">Narcos</div>
+              <div class="content-meta">★ 8.8 • 2015 • 50 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1591757987807-27228827f039?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Dark Shadows</div>
+              <div class="content-meta">★ 8.8 • 2024 • 45 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- New Releases -->
+      <div class="section-header mb-6 mt-8">
+        <div class="section-title">
+          <div class="section-icon">🆕</div>
+          <span>New This Week</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">The Diplomat S2</div>
+              <div class="content-meta">★ 8.5 • 2024 • 45 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Bridgerton S3</div>
+              <div class="content-meta">★ 8.1 • 2024 • 50 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Wednesday S2</div>
+              <div class="content-meta">★ 8.6 • 2024 • 45 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Continue Watching -->
+      <div class="section-header mb-6 mt-8">
+        <div class="section-title">
+          <div class="section-icon">▶️</div>
+          <span>Continue Watching</span>
+        </div>
+      </div>
+
+      <div class="content-shelf animate-slide-left">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-anime" style="font-size: var(--text-xs);">65%</div>
+            <div class="content-info">
+              <div class="content-title">Money Heist</div>
+              <div class="content-meta">Season 4 • Episode 8</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" alt="Series" class="content-card-image">
+            <div class="content-badge badge-anime" style="font-size: var(--text-xs);">40%</div>
+            <div class="content-info">
+              <div class="content-title">Stranger Things</div>
+              <div class="content-meta">Season 3 • Episode 5</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

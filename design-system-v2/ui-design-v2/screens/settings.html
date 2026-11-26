@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Settings</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen { max-width: 390px; margin: 0 auto; min-height: 100vh; background: var(--bg-deep); }
+    .back-link { display: flex; align-items: center; gap: var(--space-2); color: var(--text-gray-300); text-decoration: none; font-size: var(--text-sm); font-weight: 500; }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <a href="../index.html" style="position: absolute; top: var(--space-4); left: var(--space-4); z-index: 100;">
+      <div class="back-link">← Back</div>
+    </a>
+
+    <nav class="nav-top">
+      <a href="#" class="nav-brand">⚙️ Settings</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔔</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Profile -->
+      <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); padding: var(--space-6); margin-bottom: var(--space-8);">
+        <div style="display: flex; align-items: center; gap: var(--space-4); margin-bottom: var(--space-4);">
+          <div class="avatar" style="width: 80px; height: 80px; font-size: var(--text-lg);">JD</div>
+          <div>
+            <div class="text-lg font-bold">John Doe</div>
+            <div class="text-sm text-gray-500">john@example.com</div>
+          </div>
+          <button class="btn btn-secondary btn-sm">Edit</button>
+        </div>
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-base font-semibold">Premium Member</div>
+            <div class="text-xs text-green">Expires: Dec 2026</div>
+          </div>
+          <button class="btn btn-primary btn-sm">Manage Plan</button>
+        </div>
+      </div>
+
+      <!-- Account Section -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header mb-6">
+          <div class="section-title">
+            <div class="section-icon">👤</div>
+            <span>Account</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <div class="text-base font-semibold">Change Password</div>
+              <div class="text-xs text-gray-500">Update your account password</div>
+            </div>
+            <span style="color: var(--text-gray-500);">›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6);">
+            <div>
+              <div class="text-base font-semibold">Email Notifications</div>
+              <div class="text-xs text-gray-500">Get updates about new content</div>
+            </div>
+            <div class="toggle-switch active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6);">
+            <div>
+              <div class="text-base font-semibold">Push Notifications</div>
+              <div class="text-xs text-gray-500">Receive alerts on your device</div>
+            </div>
+            <div class="toggle-switch active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Content Section -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header mb-6">
+          <div class="section-title">
+            <div class="section-icon">🔞</div>
+            <span>Content</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+          <div class="adult-control">
+            <div>
+              <div class="adult-label">🔞 Adult Content Filter</div>
+              <div class="adult-desc">When ON, 18+ movies and shows appear in results</div>
+            </div>
+            <div class="toggle-switch active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div style="padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-subtle);">
+            <div class="text-xs text-gray-500">Requires PIN to change this setting</div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-top: 1px solid var(--border-subtle);">
+            <div>
+              <div class="text-base font-semibold">Download Quality</div>
+              <div class="text-xs text-gray-500">Wi-Fi and mobile data</div>
+            </div>
+            <span style="color: var(--text-gray-500);">1080p ▼</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6);">
+            <div>
+              <div class="text-base font-semibold">Auto Play Next Episode</div>
+              <div class="text-xs text-gray-500">Continue watching automatically</div>
+            </div>
+            <div class="toggle-switch active">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- App Section -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header mb-6">
+          <div class="section-title">
+            <div class="section-icon">📱</div>
+            <span>App</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <div class="text-base font-semibold">Theme</div>
+              <div class="text-xs text-gray-500">Dark or Light mode</div>
+            </div>
+            <div class="toggle-switch">
+              <div class="toggle-thumb"></div>
+            </div>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <div class="text-base font-semibold">Language</div>
+              <div class="text-xs text-gray-500">App interface language</div>
+            </div>
+            <span style="color: var(--text-gray-500);">English ▼</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle);">
+            <div>
+              <div class="text-base font-semibold">Check for Updates</div>
+              <div class="text-xs text-gray-500">v9.7 → v10.0 available</div>
+            </div>
+            <button class="btn btn-primary btn-sm">Install</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Support Section -->
+      <div style="margin-bottom: var(--space-8);">
+        <div class="section-header mb-6">
+          <div class="section-title">
+            <div class="section-icon">💬</div>
+            <span>Support</span>
+          </div>
+        </div>
+        <div style="background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg);">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle); cursor: pointer;">
+            <span>Contact Support</span>
+            <span style="color: var(--text-gray-500);">›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle); cursor: pointer;">
+            <span>Privacy Policy</span>
+            <span style="color: var(--text-gray-500);">›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); border-bottom: 1px solid var(--border-subtle); cursor: pointer;">
+            <span>Terms of Service</span>
+            <span style="color: var(--text-gray-500);">›</span>
+          </div>
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: var(--space-4) var(--space-6); color: var(--flix-red); cursor: pointer;">
+            <span>Logout</span>
+            <span>🚪</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <nav class="nav-mobile">
+      <a href="#" class="nav-item">🏠</span>Home</a>
+      <a href="#" class="nav-item">🔍</span>Search</a>
+      <a href="#" class="nav-item">📺</span>TV</a>
+      <a href="#" class="nav-item">📥</span>Downloads</a>
+      <a href="#" class="nav-item active">⚙️</span>Settings</a>
+    </nav>
+  </div>
+
+</body>
+</html>

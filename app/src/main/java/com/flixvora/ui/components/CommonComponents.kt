@@ -63,20 +63,19 @@ import com.flixvora.ui.theme.TextPrimary
 import com.flixvora.ui.theme.TextSecondary
 import com.flixvora.ui.theme.TextTertiary
 
-/** Brand accent ramp (plasma red → ember → gold) used for CTAs, progress and highlights. */
-// The demo uses flat fills, so the "gradient" tokens resolve to solid green.
+/** Brand accent ramp (purple → neon pink) used for CTAs, progress and highlights in UI v2. */
 val BrandGradient: Brush = Brush.horizontalGradient(
-    listOf(BrandGreen, BrandGreen)
+    listOf(com.flixvora.ui.theme.FlixPurple, com.flixvora.ui.theme.FlixNeonPink)
 )
 
 /** Diagonal variant for badges and hero flourishes. */
 val BrandGradientDiagonal: Brush = Brush.linearGradient(
-    listOf(BrandGreen, BrandGreen)
+    listOf(com.flixvora.ui.theme.FlixPurple, com.flixvora.ui.theme.FlixNeonPink)
 )
 
 /** Violet → cyan counter-gradient used for secondary highlights. */
 val CoolGradient: Brush = Brush.horizontalGradient(
-    listOf(BrandBlue, BrandBlue)
+    listOf(com.flixvora.ui.theme.FlixNeonBlue, com.flixvora.ui.theme.FlixPurpleLight)
 )
 
 /** The BOUNCE spring: a touch of overshoot so surfaces feel alive. */

@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flixvora - Mobile Home</title>
+  <link rel="stylesheet" href="../styles/design-system.css">
+  <link rel="stylesheet" href="../styles/animations.css">
+  <style>
+    body { padding-bottom: 80px; }
+    .mobile-screen {
+      max-width: 390px;
+      margin: 0 auto;
+      min-height: 100vh;
+      background: var(--bg-deep);
+    }
+    .back-btn {
+      position: absolute;
+      top: var(--space-4);
+      left: var(--space-4);
+      z-index: 100;
+    }
+    .back-link {
+      display: flex;
+      align-items: center;
+      gap: var(--space-2);
+      color: var(--text-gray-300);
+      text-decoration: none;
+      font-size: var(--text-sm);
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body class="page-transition animate-fade-in">
+
+  <div class="mobile-screen">
+    <!-- Back Button -->
+    <a href="../index.html" class="back-btn">
+      <div class="back-link">← Back to Showcase</div>
+    </a>
+
+    <!-- Top Nav -->
+    <nav class="nav-top animate-slide-down">
+      <a href="#" class="nav-brand">🎬 FLIXVORA</a>
+      <div class="nav-actions">
+        <button class="nav-icon-btn">🔍</button>
+        <button class="nav-icon-btn">📢</button>
+        <div class="avatar">JD</div>
+      </div>
+    </nav>
+
+    <!-- Content -->
+    <div style="padding: var(--space-6) var(--space-4) var(--space-100);">
+
+      <!-- Hero Section -->
+      <div class="hero-section animate-slide-up">
+        <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=800&h=450&fit=crop" alt="Hero" class="hero-image">
+        <div class="hero-gradient"></div>
+        <div class="hero-content">
+          <div class="hero-badges">
+            <span class="badge badge-anime">Anime</span>
+            <span class="badge badge-new">NEW</span>
+            <span class="badge badge-18">18+</span>
+          </div>
+          <h1 class="hero-title">Demon Slayer: Kimetsu no Yaiba</h1>
+          <div class="hero-meta">
+            Action • Adventure • Supernatural • 2019 • 24 min • ★ 8.7
+          </div>
+          <div class="hero-actions animate-bounce-in">
+            <button class="btn btn-primary btn-lg">
+              ▶ Play
+            </button>
+            <button class="btn btn-secondary btn-lg">
+              📥 Download
+            </button>
+            <button class="btn btn-ghost btn-lg">
+              ℹ Info
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Adult Content Toggle -->
+      <div class="adult-control animate-fade-in-down" style="animation-delay: 0.1s;">
+        <div>
+          <div class="adult-label">🔞 Adult Content Filter</div>
+          <div class="adult-desc">When ON, 18+ content appears in search & recommendations</div>
+        </div>
+        <div class="toggle-switch active">
+          <div class="toggle-thumb"></div>
+        </div>
+      </div>
+
+      <!-- Trending Movies -->
+      <div class="section-header animate-fade-in-down" style="animation-delay: 0.2s;">
+        <div class="section-title">
+          <div class="section-icon">🔥</div>
+          <span>Trending Movies</span>
+        </div>
+        <a href="#" class="see-all">See All ▶</a>
+      </div>
+
+      <div class="content-shelf animate-slide-left" style="animation-delay: 0.3s;">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" alt="Movie 1" class="content-card-image">
+            <div class="content-badge badge-movie">Movie</span>
+            <div class="content-info">
+              <div class="content-title">The Midnight Heist</div>
+              <div class="content-meta">★ 8.2 • 2024 • 120 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" alt="Movie 2" class="content-card-image">
+            <div class="content-badge badge-anime">Anime</span>
+            <div class="content-info">
+              <div class="content-title">Demon Slayer S4</div>
+              <div class="content-meta">★ 8.7 • 2024 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1542744173-8e7e53315517?w=200&h=300&fit=crop" alt="Movie 3" class="content-card-image">
+            <div class="content-badge badge-webseries">Web Series</span>
+            <div class="content-info">
+              <div class="content-title">Stranger Things</div>
+              <div class="content-meta">★ 8.7 • 2023 • 50 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517604931442-47096817991d?w=200&h=300&fit=crop" alt="Movie 4" class="content-card-image">
+            <div class="content-badge badge-18">18+</span>
+            <div class="content-info">
+              <div class="content-title">Adult Drama</div>
+              <div class="content-meta">★ 7.5 • 2024 • 90 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1591757987807-27228827f039?w=200&h=300&fit=crop" alt="Movie 5" class="content-card-image">
+            <div class="content-badge badge-new">NEW</span>
+            <div class="content-info">
+              <div class="content-title">Dark Shadows</div>
+              <div class="content-meta">★ 8.8 • 2024 • 45 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Anime Section -->
+      <div class="section-header animate-fade-in-down" style="animation-delay: 0.4s;">
+        <div class="section-title">
+          <div class="section-icon">📺</div>
+          <span>Anime Collection</span>
+        </div>
+        <a href="#" class="see-all">See All ▶</a>
+      </div>
+
+      <div class="content-shelf animate-slide-left" style="animation-delay: 0.5s;">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1575818682772-d84744687217?w=200&h=300&fit=crop" alt="Anime 1" class="content-card-image">
+            <div class="content-badge badge-anime">Sub/Dub</span>
+            <div class="content-info">
+              <div class="content-title">Attack on Titan</div>
+              <div class="content-meta">★ 9.0 • 2013 • 24 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1517883801712-9e1a54930d4b?w=200&h=300&fit=crop" alt="Anime 2" class="content-card-image">
+            <div class="content-badge badge-anime">Movie</span>
+            <div class="content-info">
+              <div class="content-title">Your Name</div>
+              <div class="content-meta">★ 8.4 • 2016 • 112 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1518399992413-c5f549a3e6d8?w=200&h=300&fit=crop" alt="Anime 3" class="content-card-image">
+            <div class="content-badge badge-anime">Series</span>
+            <div class="content-info">
+              <div class="content-title">Jujutsu Kaisen</div>
+              <div class="content-meta">★ 8.6 • 2020 • 24 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Web Series Section -->
+      <div class="section-header animate-fade-in-down" style="animation-delay: 0.6s;">
+        <div class="section-title">
+          <div class="section-icon">🎬</div>
+          <span>Web Series</span>
+        </div>
+        <a href="#" class="see-all">See All ▶</a>
+      </div>
+
+      <div class="content-shelf animate-slide-left" style="animation-delay: 0.7s;">
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=200&h=300&fit=crop" alt="Series 1" class="content-card-image">
+            <div class="content-badge badge-webseries">Original</span>
+            <div class="content-info">
+              <div class="content-title">Money Heist</div>
+              <div class="content-meta">★ 8.2 • 2017 • 45 min</div>
+            </div>
+          </div>
+        </div>
+        <div class="shelf-item">
+          <div class="content-card card-hover">
+            <img src="https://images.unsplash.com/photo-1533158883124-746742b9548c?w=200&h=300&fit=crop" alt="Series 2" class="content-card-image">
+            <div class="content-badge badge-webseries">Original</span>
+            <div class="content-info">
+              <div class="content-title">The Crown</div>
+              <div class="content-meta">★ 8.7 • 2016 • 60 min</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Live TV Section -->
+      <div class="section-header animate-fade-in-down" style="animation-delay: 0.8s;">
+        <div class="section-title">
+          <div class="section-icon">📡</div>
+          <span>Live TV Channels</span>
+        </div>
+        <a href="#" class="see-all">See All ▶</a>
+      </div>
+
+      <div style="display: flex; gap: var(--space-3); overflow-x: auto; padding-bottom: var(--space-4); animation-delay: 0.9s;" class="animate-slide-left">
+        <div style="flex: 0 0 auto; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; min-width: 70px;">
+          <div style="width: 50px; height: 50px; background: #1A1A1A; border-radius: 50%; margin: 0 auto var(--space-2); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">📺</div>
+          <div class="text-caption text-gray-300">HBO</div>
+          <span class="badge badge-green" style="font-size: var(--text-xs);">LIVE</span>
+        </div>
+        <div style="flex: 0 0 auto; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; min-width: 70px;">
+          <div style="width: 50px; height: 50px; background: #1A1A1A; border-radius: 50%; margin: 0 auto var(--space-2); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">📺</div>
+          <div class="text-caption text-gray-300">CNN</div>
+          <span class="badge badge-red" style="font-size: var(--text-xs);">LIVE</span>
+        </div>
+        <div style="flex: 0 0 auto; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; min-width: 70px;">
+          <div style="width: 50px; height: 50px; background: #1A1A1A; border-radius: 50%; margin: 0 auto var(--space-2); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">📺</div>
+          <div class="text-caption text-gray-300">ESPN</div>
+        </div>
+        <div style="flex: 0 0 auto; background: var(--bg-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: var(--space-3); text-align: center; min-width: 70px;">
+          <div style="width: 50px; height: 50px; background: #1A1A1A; border-radius: 50%; margin: 0 auto var(--space-2); display: flex; align-items: center; justify-content: center; font-size: var(--text-lg);">📺</div>
+          <div class="text-caption text-gray-300">BBC</div>
+          <span class="badge badge-green" style="font-size: var(--text-xs);">LIVE</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="nav-mobile animate-fade-in-down" style="animation-delay: 1s;">
+      <a href="#" class="nav-item active">
+        <span>🏠</span>
+        <span>Home</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span>🔍</span>
+        <span>Search</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span>📺</span>
+        <span>TV</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span>📥</span>
+        <span>Downloads</span>
+      </a>
+      <a href="#" class="nav-item">
+        <span>⚙️</span>
+        <span>Settings</span>
+      </a>
+    </nav>
+  </div>
+
+</body>
+</html>
