@@ -123,7 +123,6 @@ val BgCard = Color(0xFF101218)
 val BgCardHover = Color(0xFF171A23)
 val BgOverlay = Color(0xE607080B)
 
-val BorderSubtle = Color(0xFF252834)
 val BorderBrand = Color(0xFF1DD171)
 val BorderGlass = Color(0x14FFFFFF)
 

@@ -35,8 +35,8 @@ android {
     applicationId = "com.flixvora.app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 59
-    versionName = "11.0"
+    versionCode = 60
+    versionName = "11.1"
 
     buildConfigField("String", "TMDB_API_KEY_1", "\"$tmdbApiKey1\"")
     buildConfigField("String", "TMDB_API_KEY_2", "\"$tmdbApiKey2\"")

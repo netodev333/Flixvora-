@@ -510,3 +510,44 @@ fun SeriesEpisodeAccordion(
         }
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Compatibility Helpers & Insets for legacy components
+// ─────────────────────────────────────────────────────────────────────────────
+val BrandGradient: Brush = Brush.horizontalGradient(
+    listOf(Color(0xFF1DD171), Color(0xFF38E586))
+)
+
+val BrandGradientDiagonal: Brush = Brush.linearGradient(
+    listOf(Color(0xFF1DD171), Color(0xFF38E586))
+)
+
+@Composable
+fun safeTopInset(): androidx.compose.ui.unit.Dp {
+    val cutout = WindowInsets.displayCutout.asPaddingValues().calculateTopPadding()
+    val status = WindowInsets.statusBars.asPaddingValues().calculateTopPadding()
+    val notch = if (cutout > status) cutout else status
+    return if (notch > 12.dp) notch else 12.dp
+}
+
+@Composable
+fun safeBottomInset(): androidx.compose.ui.unit.Dp {
+    val nav = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
+    val gesture = WindowInsets.systemGestures.asPaddingValues().calculateBottomPadding()
+    val bar = if (nav > gesture) nav else gesture
+    return if (bar > 8.dp) bar else 8.dp
+}
+
+fun setSystemBarsVisible(activity: android.app.Activity, visible: Boolean) {
+    val controller = androidx.core.view.WindowInsetsControllerCompat(
+        activity.window,
+        activity.window.decorView
+    )
+    if (visible) {
+        controller.show(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+    } else {
+        controller.hide(androidx.core.view.WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+    }
+}
