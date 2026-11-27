@@ -63,19 +63,19 @@ import com.flixvora.ui.theme.TextPrimary
 import com.flixvora.ui.theme.TextSecondary
 import com.flixvora.ui.theme.TextTertiary
 
-/** Brand accent ramp (purple → neon pink) used for CTAs, progress and highlights in UI v2. */
+/** Brand accent ramp (emerald → bright emerald) matching flixvora-ui.zip design tokens. */
 val BrandGradient: Brush = Brush.horizontalGradient(
-    listOf(com.flixvora.ui.theme.FlixPurple, com.flixvora.ui.theme.FlixNeonPink)
+    listOf(Color(0xFF1DD171), Color(0xFF38E586))
 )
 
 /** Diagonal variant for badges and hero flourishes. */
 val BrandGradientDiagonal: Brush = Brush.linearGradient(
-    listOf(com.flixvora.ui.theme.FlixPurple, com.flixvora.ui.theme.FlixNeonPink)
+    listOf(Color(0xFF1DD171), Color(0xFF38E586))
 )
 
 /** Violet → cyan counter-gradient used for secondary highlights. */
 val CoolGradient: Brush = Brush.horizontalGradient(
-    listOf(com.flixvora.ui.theme.FlixNeonBlue, com.flixvora.ui.theme.FlixPurpleLight)
+    listOf(Color(0xFF06B6D4), Color(0xFF38E586))
 )
 
 /** The BOUNCE spring: a touch of overshoot so surfaces feel alive. */
@@ -125,8 +125,8 @@ fun BrandMark(size: Dp = 32.dp, cornerRadius: Dp = size * 0.3f) {
 }
 
 /**
- * Ambient aurora mesh: soft plasma blooms drifting behind the whole UI. Drawn
- * as radial gradients (no blur pass) so it stays cheap on low-end devices.
+ * Solid canvas background using the deep dark surface (#07080B).
+ * No ambient glow blooms — the emerald theme uses clean darkness.
  */
 @Composable
 fun AuroraBackground(
@@ -136,25 +136,8 @@ fun AuroraBackground(
     Box(
         modifier = modifier
             .fillMaxSize()
-            .background(SurfaceBase)
+            .background(com.flixvora.ui.theme.BgDeep)
     ) {
-        // Ultra-premium subtle ambient cyber lighting (Purple & Cyan cinematic glow)
-        Canvas(modifier = Modifier.fillMaxSize()) {
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(com.flixvora.ui.theme.FlixPurpleDark.copy(alpha = 0.16f), Color.Transparent),
-                    center = Offset(size.width * 0.85f, size.height * 0.08f),
-                    radius = size.width * 0.75f
-                )
-            )
-            drawCircle(
-                brush = Brush.radialGradient(
-                    colors = listOf(com.flixvora.ui.theme.FlixNeonPink.copy(alpha = 0.10f), Color.Transparent),
-                    center = Offset(size.width * 0.15f, size.height * 0.45f),
-                    radius = size.width * 0.65f
-                )
-            )
-        }
         content()
     }
 }

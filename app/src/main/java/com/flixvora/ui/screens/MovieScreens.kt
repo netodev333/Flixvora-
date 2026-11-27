@@ -907,20 +907,12 @@ private fun androidx.compose.foundation.layout.RowScope.MbTabItem(
     tag: String,
     onClick: () -> Unit
 ) {
+    // Reference: flat bar, active = BrandGreen (#1DD171), inactive = TextTertiary (#6B7280)
+    // Icon 18dp, label 10sp SemiBold, NO glass pill, NO indicator dot
     val tint by androidx.compose.animation.animateColorAsState(
-        targetValue = if (selected) FlixPurple else TextTertiary,
+        targetValue = if (selected) BrandGreen else TextTertiary,
         animationSpec = androidx.compose.animation.core.tween(200),
         label = "tab_tint"
-    )
-    val bgAlpha by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (selected) 1f else 0f,
-        animationSpec = androidx.compose.animation.core.tween(200),
-        label = "tab_bg"
-    )
-    val scale by androidx.compose.animation.core.animateFloatAsState(
-        targetValue = if (selected) 1.1f else 1f,
-        animationSpec = androidx.compose.animation.core.spring(dampingRatio = 0.5f, stiffness = 800f),
-        label = "tab_scale"
     )
 
     Column(
@@ -928,44 +920,23 @@ private fun androidx.compose.foundation.layout.RowScope.MbTabItem(
         verticalArrangement = Arrangement.Center,
         modifier = Modifier
             .weight(1f)
-            .clip(RoundedCornerShape(20.dp))
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp, horizontal = 4.dp)
+            .padding(vertical = 10.dp, horizontal = 4.dp)
             .testTag(tag)
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(if (selected) 40.dp else 36.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(
-                    if (selected) FlixPurple.copy(alpha = 0.18f * bgAlpha)
-                    else Color.Transparent
-                )
-                .graphicsLayer { scaleX = scale; scaleY = scale }
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = label,
-                tint = tint,
-                modifier = Modifier.size(20.dp)
-            )
-        }
-        Spacer(modifier = Modifier.height(3.dp))
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = tint,
+            modifier = Modifier.size(18.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
         Text(
             text = label,
-            fontSize = 9.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.SemiBold,
             color = tint,
             maxLines = 1
-        )
-        // Active indicator dot
-        Box(
-            modifier = Modifier
-                .padding(top = 2.dp)
-                .size(4.dp)
-                .clip(RoundedCornerShape(2.dp))
-                .background(if (selected) FlixPurple else Color.Transparent)
         )
     }
 }
@@ -1029,47 +1000,34 @@ fun MainContent(viewModel: MovieViewModel) {
             containerColor = Color.Transparent,
             bottomBar = {
                 if (viewModel.playInfo == null && viewModel.playingDownloadedFile == null && !viewModel.isLiveTvPlaying) {
-                    // Premium glass morphism bottom navigation bar
+                    // Flat bottom navigation bar: h-16, BgDeep/95%, border-top BorderGlass
+                    // Matching flixvora-ui.zip reference: no glass pill, flat bar
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
                             .navigationBarsPadding()
+                            .background(Color(0xF20A0B0F)) // ~95% BgDeep
                     ) {
-                        // Background blur surface
+                        // Top hairline border
                         Box(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .background(
-                                    Brush.verticalGradient(
-                                        listOf(
-                                            Color.Transparent,
-                                            BgDeep.copy(alpha = 0.95f)
-                                        )
-                                    )
-                                )
+                                .height(1.dp)
+                                .align(Alignment.TopCenter)
+                                .background(BorderGlass)
                         )
-                        // Glass pill container
-                        Box(
+                        Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(horizontal = 16.dp, vertical = 8.dp)
-                                .clip(RoundedCornerShape(28.dp))
-                                .background(BgCard.copy(alpha = 0.85f))
-                                .border(1.dp, BorderGlass, RoundedCornerShape(28.dp))
+                                .height(64.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 4.dp, vertical = 2.dp),
-                                horizontalArrangement = Arrangement.SpaceEvenly,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                MbTabItem("Home", Icons.Filled.Home, activeTab == "home", "nav_home") { activeTab = "home" }
-                                MbTabItem("Search", Icons.Filled.Search, activeTab == "search", "nav_search") { activeTab = "search" }
-                                MbTabItem("Live TV", Icons.Filled.LiveTv, activeTab == "livetv", "nav_livetv") { activeTab = "livetv" }
-                                MbTabItem("Downloads", Icons.Filled.Download, activeTab == "download", "nav_download") { activeTab = "download" }
-                                MbTabItem("Me", Icons.Filled.Person, activeTab == "settings", "nav_me") { activeTab = "settings" }
-                            }
+                            MbTabItem("Home", Icons.Filled.Home, activeTab == "home", "nav_home") { activeTab = "home" }
+                            MbTabItem("Search", Icons.Filled.Search, activeTab == "search", "nav_search") { activeTab = "search" }
+                            MbTabItem("Live TV", Icons.Filled.LiveTv, activeTab == "livetv", "nav_livetv") { activeTab = "livetv" }
+                            MbTabItem("Downloads", Icons.Filled.Download, activeTab == "download", "nav_download") { activeTab = "download" }
+                            MbTabItem("Me", Icons.Filled.Person, activeTab == "settings", "nav_me") { activeTab = "settings" }
                         }
                     }
                 }

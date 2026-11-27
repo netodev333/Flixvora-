@@ -37,16 +37,17 @@ import com.flixvora.ui.theme.TextTertiary
 import com.flixvora.util.ImageOptimizer
 
 /**
- * Poster card matching the MovieBox demo: 104x152 artwork window with a
- * hairline inset ring, a quality chip top-left, a green rating chip
- * bottom-right and an optional season badge top-right. Title and a
- * year-genre line sit underneath.
+ * Poster card matching flixvora-ui.zip:
+ * aspect-[3/4] rounded-xl bg-[#14161D] border border-white/[0.08]
+ * Rating badge: top-right bg-black/75 text-[#FBBF24] 10sp bold
+ * Title: 11sp font-medium text-white truncate
+ * Width 110dp, corner 12dp, bounce animation.
  */
 @Composable
 fun MbPosterCard(
     movie: MovieSubject,
     modifier: Modifier = Modifier,
-    width: androidx.compose.ui.unit.Dp = 122.dp,
+    width: androidx.compose.ui.unit.Dp = 110.dp,
     showSeasonBadge: Boolean = movie.isTvShow,
     onClick: () -> Unit
 ) {
@@ -58,10 +59,10 @@ fun MbPosterCard(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(width * 1.462f)
-                .clip(RoundedCornerShape(14.dp))
+                .aspectRatio(3f / 4f)
+                .clip(RoundedCornerShape(12.dp))
                 .background(com.flixvora.ui.theme.BgCard)
-                .border(1.dp, com.flixvora.ui.theme.BorderGlass, RoundedCornerShape(14.dp))
+                .border(1.dp, com.flixvora.ui.theme.BorderGlass, RoundedCornerShape(12.dp))
         ) {
             val url = androidx.compose.runtime.remember(movie.poster) {
                 ImageOptimizer.getOptimalUrl(movie.poster, 360)
@@ -83,6 +84,7 @@ fun MbPosterCard(
                 modifier = Modifier.fillMaxSize()
             )
 
+            // Bottom gradient scrim
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -94,52 +96,50 @@ fun MbPosterCard(
                         )
                     )
             )
-            QualityChip(
-                label = if (movie.isTvShow) "HD" else "4K",
-                modifier = Modifier.align(Alignment.TopStart).padding(5.dp)
-            )
-            if (showSeasonBadge && movie.totalSeasons > 0) {
+            val rating = movie.rating
+            if (!rating.isNullOrBlank() && rating != "Not available") {
+                // Rating badge: top-right, bg-black/75, text-[#FBBF24]
                 Box(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(5.dp)
-                        .clip(RoundedCornerShape(4.dp))
-                        .background(com.flixvora.ui.theme.FlixNeonPink)
-                        .padding(horizontal = 4.dp, vertical = 2.dp)
-                ) {
-                    Text(
-                        text = "S${movie.totalSeasons}",
-                        fontSize = 7.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
-                }
-            }
-            val rating = movie.rating
-            if (!rating.isNullOrBlank() && rating != "Not available") {
-                Box(
-                    modifier = Modifier
-                        .align(Alignment.BottomEnd)
-                        .padding(5.dp)
+                        .padding(top = 6.dp, end = 6.dp)
                         .clip(RoundedCornerShape(4.dp))
                         .background(Color.Black.copy(alpha = 0.75f))
                         .padding(horizontal = 5.dp, vertical = 2.dp)
                 ) {
                     Text(
                         text = "★ $rating",
-                        fontSize = 8.sp,
-                        fontWeight = FontWeight.ExtraBold,
-                        color = com.flixvora.ui.theme.FlixOrange
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFBBF24)
+                    )
+                }
+            }
+            if (showSeasonBadge && movie.totalSeasons > 0) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 6.dp, start = 6.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(BrandGreen.copy(alpha = 0.90f))
+                        .padding(horizontal = 4.dp, vertical = 2.dp)
+                ) {
+                    Text(
+                        text = "S${movie.totalSeasons}",
+                        fontSize = 7.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = com.flixvora.ui.theme.BrandGreenInk
                     )
                 }
             }
         }
-        Spacer(Modifier.height(6.dp))
+        Spacer(Modifier.height(5.dp))
+        // Title below: 11sp font-medium text-white truncate
         Text(
             text = movie.name,
-            fontSize = 10.5.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = TextPrimary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            color = Color.White,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             letterSpacing = (-0.1).sp
@@ -319,9 +319,8 @@ fun MbTop10Card(
 }
 
 /**
- * Section header: a short accent rule anchors the title, and an optional
- * "More" affordance sits flush right. The rule replaces the boxed badge the
- * design used to carry - it marks hierarchy without adding another surface.
+ * Section header: brand-colored accent bar + bold title (font-display text-sm font-bold)
+ * matching the flixvora-ui.zip reference. Subtitle renders in brand monospace 10sp.
  */
 @Composable
 fun MbSectionHeader(
@@ -336,27 +335,28 @@ fun MbSectionHeader(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
+            // 3dp × 20dp brand-colored accent bar
             Box(
                 modifier = Modifier
-                    .width(4.dp)
+                    .width(3.dp)
                     .height(20.dp)
                     .clip(RoundedCornerShape(2.dp))
-                    .background(BrandGradient)
+                    .background(BrandGreen)
             )
             Spacer(Modifier.width(10.dp))
             Column {
                 Text(
                     text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.ExtraBold,
+                    fontSize = 14.sp,          // font-display text-sm
+                    fontWeight = FontWeight.Bold,
                     color = TextPrimary,
-                    letterSpacing = (-0.3).sp
+                    letterSpacing = (-0.2).sp
                 )
                 if (!subtitle.isNullOrBlank()) {
                     Text(
                         text = subtitle,
                         fontSize = 10.sp,
-                        color = TextTertiary,
+                        color = BrandGreen,    // brand monospace accent
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )

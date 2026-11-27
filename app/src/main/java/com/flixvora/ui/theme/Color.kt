@@ -69,7 +69,7 @@ val AccentAmber = FlixOrange
 // Text ramp (flixvora-ui.zip)
 val TextPrimary = Color(0xFFF8FAFC)
 val TextSecondary = Color(0xFF94A3B8)
-val TextTertiary = Color(0xFF64748B)
+val TextTertiary = Color(0xFF6B7280)
 val TextDisabled = Color(0xFF334155)
 val TextOnAccent = Color(0xFF051A0D)
 

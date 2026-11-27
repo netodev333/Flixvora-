@@ -175,7 +175,7 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(450.dp)
+                            .height(288.dp)   // h-72 ≈ 288dp per reference design
                     ) {
                         androidx.compose.foundation.pager.HorizontalPager(
                             state = pagerState,
@@ -185,6 +185,8 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
+                                    .clip(RoundedCornerShape(16.dp))
+                                    .border(1.dp, BorderGlass, RoundedCornerShape(16.dp))
                                     .clickable { viewModel.selectSubject(heroMovie) }
                             ) {
                                 val optimalHeroUrl = androidx.compose.runtime.remember(heroMovie.backdrop, heroMovie.poster) {
@@ -217,17 +219,46 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                                         .background(
                                             Brush.verticalGradient(
                                                 colors = listOf(
-                                                    ObsidianDark.copy(alpha = 0.55f),
+                                                    Color(0xD90A0B0F),  // from-[#0A0B0F]/85
                                                     Color.Transparent,
-                                                    ObsidianDark.copy(alpha = 0.30f),
-                                                    ObsidianDark.copy(alpha = 0.80f),
-                                                    ObsidianDark
+                                                    Color(0x4D000000)   // to-black/30
                                                 ),
                                                 startY = 0f,
-                                                endY = 1400f
+                                                endY = Float.POSITIVE_INFINITY
                                             )
                                         )
                                 )
+                                // TOP progress indicator bars (reference: absolute top-2.5 inset-x-3 flex gap-1)
+                                if (bannerMovies.size > 1) {
+                                    Row(
+                                        modifier = Modifier
+                                            .align(Alignment.TopStart)
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 10.dp, vertical = 10.dp),
+                                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                                    ) {
+                                        repeat(bannerMovies.size) { i ->
+                                            val isPast = i < page
+                                            val isCurrent = i == page
+                                            Box(
+                                                modifier = Modifier
+                                                    .weight(1f)
+                                                    .height(3.dp)
+                                                    .clip(RoundedCornerShape(2.dp))
+                                                    .background(Color.White.copy(alpha = 0.25f))
+                                            ) {
+                                                if (isPast || isCurrent) {
+                                                    Box(
+                                                        modifier = Modifier
+                                                            .fillMaxWidth()
+                                                            .fillMaxHeight()
+                                                            .background(BrandGreen)
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
                                 Column(
                                     modifier = Modifier
                                         .align(Alignment.BottomStart)
@@ -247,19 +278,19 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                                             letterSpacing = 1.sp
                                         )
                                     }
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(6.dp))
                                     Text(
                                         text = heroMovie.name,
                                         fontFamily = androidx.compose.ui.text.font.FontFamily.SansSerif,
-                                        fontSize = 31.sp,
+                                        fontSize = 20.sp,
                                         fontWeight = FontWeight.Black,
                                         color = TextPrimary,
                                         maxLines = 2,
                                         overflow = TextOverflow.Ellipsis,
-                                        letterSpacing = (-1.0).sp,
-                                        lineHeight = 34.sp
+                                        letterSpacing = (-0.5).sp,
+                                        lineHeight = 24.sp
                                     )
-                                    Spacer(modifier = Modifier.height(7.dp))
+                                    Spacer(modifier = Modifier.height(5.dp))
                                     Row(verticalAlignment = Alignment.CenterVertically) {
                                         if (!heroMovie.rating.isNullOrBlank() && heroMovie.rating != "Not available") {
                                             com.flixvora.ui.components.RatingBadge(rating = heroMovie.rating.orEmpty())
@@ -267,84 +298,67 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                                         }
                                         val heroMeta = listOfNotNull(
                                             heroMovie.year?.takeIf { it.isNotBlank() && it != "Not available" },
-                                            heroMovie.duration?.takeIf { it.isNotBlank() },
                                             heroMovie.genres.take(2).joinToString(", ")
                                                 .takeIf { it.isNotBlank() }
                                         )
                                         Text(
                                             text = heroMeta.joinToString("  •  "),
-                                            fontSize = 12.sp,
+                                            fontSize = 11.sp,
                                             fontWeight = FontWeight.Medium,
                                             color = TextSecondary,
                                             maxLines = 1,
                                             overflow = TextOverflow.Ellipsis
                                         )
                                     }
-                                    if (heroMovie.description.isNotBlank()) {
-                                        Spacer(modifier = Modifier.height(7.dp))
-                                        Text(
-                                            text = heroMovie.description,
-                                            fontSize = 11.5.sp,
-                                            color = TextSecondary.copy(alpha = 0.82f),
-                                            maxLines = 2,
-                                            overflow = TextOverflow.Ellipsis,
-                                            lineHeight = 16.sp,
-                                            modifier = Modifier.padding(end = 24.dp)
-                                        )
-                                    }
-                                    Spacer(modifier = Modifier.height(14.dp))
-                                    Row(verticalAlignment = Alignment.CenterVertically) {
+                                    Spacer(modifier = Modifier.height(10.dp))
+                                    Row(
+                                        verticalAlignment = Alignment.CenterVertically,
+                                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                                    ) {
+                                        // Play button: BrandGreen bg, TextOnAccent text
                                         Button(
                                             onClick = { viewModel.playDirect(heroMovie) },
-                                            colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
-                                            contentPadding = PaddingValues(),
-                                            shape = RoundedCornerShape(14.dp),
-                                            modifier = Modifier
-                                                .height(46.dp)
-                                                .clip(RoundedCornerShape(14.dp))
-                                                .background(com.flixvora.ui.components.BrandGradient)
+                                            colors = ButtonDefaults.buttonColors(containerColor = BrandGreen),
+                                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 0.dp),
+                                            shape = RoundedCornerShape(10.dp),
+                                            modifier = Modifier.height(30.dp)
                                         ) {
-                                            Row(
-                                                modifier = Modifier.padding(horizontal = 20.dp, vertical = 10.dp),
-                                                verticalAlignment = Alignment.CenterVertically
-                                            ) {
-                                                Icon(
-                                                    Icons.Filled.PlayArrow,
-                                                    contentDescription = null,
-                                                    tint = Color.White,
-                                                    modifier = Modifier.size(20.dp)
-                                                )
-                                                Spacer(modifier = Modifier.width(8.dp))
-                                                Text(
-                                                    "Play Now",
-                                                    fontWeight = FontWeight.Bold,
-                                                    fontSize = 14.sp,
-                                                    color = Color.White
-                                                )
-                                            }
+                                            Icon(
+                                                Icons.Filled.PlayArrow,
+                                                contentDescription = null,
+                                                tint = TextOnAccent,
+                                                modifier = Modifier.size(14.dp)
+                                            )
+                                            Spacer(modifier = Modifier.width(4.dp))
+                                            Text(
+                                                "Play",
+                                                fontWeight = FontWeight.Bold,
+                                                fontSize = 12.sp,
+                                                color = TextOnAccent
+                                            )
                                         }
-                                        Spacer(modifier = Modifier.width(10.dp))
+                                        // Info button: white/12% fill
                                         OutlinedButton(
                                             onClick = { viewModel.selectSubject(heroMovie) },
-                                            shape = RoundedCornerShape(14.dp),
+                                            shape = RoundedCornerShape(10.dp),
                                             border = BorderStroke(1.dp, Color.White.copy(alpha = 0.35f)),
                                             colors = ButtonDefaults.outlinedButtonColors(
-                                                containerColor = Color.White.copy(alpha = 0.10f),
+                                                containerColor = Color.White.copy(alpha = 0.12f),
                                                 contentColor = Color.White
                                             ),
-                                            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 10.dp),
-                                            modifier = Modifier.height(46.dp)
+                                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 0.dp),
+                                            modifier = Modifier.height(30.dp)
                                         ) {
                                             Icon(
                                                 Icons.Filled.Info,
                                                 contentDescription = null,
-                                                modifier = Modifier.size(18.dp)
+                                                modifier = Modifier.size(13.dp)
                                             )
-                                            Spacer(modifier = Modifier.width(6.dp))
+                                            Spacer(modifier = Modifier.width(4.dp))
                                             Text(
-                                                "Details",
+                                                "Info",
                                                 fontWeight = FontWeight.SemiBold,
-                                                fontSize = 14.sp
+                                                fontSize = 12.sp
                                             )
                                         }
                                     }
@@ -352,28 +366,52 @@ fun HomeScreen(viewModel: MovieViewModel, onSearchClick: () -> Unit = {}, onNavi
                             }
                         }
 
-                        // Page indicators for the hero carousel
-                        if (bannerMovies.size > 1) {
-                            Row(
+                        // Top progress indicator bars inside each pager page (see inner Box below)
+                        // No external bottom dots needed — reference design uses bars INSIDE hero
+                    }
+                }
+            }
+
+            // 1b. Genre Filter Dock (reference: rounded-xl bg-white/[0.04] border border-white/[0.08])
+            item {
+                var selectedGenreFilter by remember { mutableStateOf("All") }
+                val genres = listOf("All", "Action", "Comedy", "Romance", "Thriller", "Sci-Fi", "Horror", "Anime", "Drama", "Adventure")
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 10.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.04f))
+                        .border(1.dp, BorderGlass, RoundedCornerShape(12.dp))
+                        .padding(8.dp)
+                ) {
+                    // Genre pill row
+                    LazyRow(
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        items(genres) { genre ->
+                            val active = selectedGenreFilter == genre
+                            Box(
                                 modifier = Modifier
-                                    .align(Alignment.BottomCenter)
-                                    .padding(bottom = 12.dp),
-                                horizontalArrangement = Arrangement.spacedBy(6.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                repeat(bannerMovies.size) { i ->
-                                    val selected = pagerState.currentPage == i
-                                    Box(
-                                        modifier = Modifier
-                                            .height(4.dp)
-                                            .width(if (selected) 20.dp else 6.dp)
-                                            .clip(RoundedCornerShape(2.dp))
-                                            .background(
-                                                if (selected) com.flixvora.ui.components.BrandGradient
-                                                else androidx.compose.ui.graphics.SolidColor(Color.White.copy(alpha = 0.35f))
-                                            )
+                                    .clip(RoundedCornerShape(999.dp))
+                                    .background(
+                                        if (active) BrandGreen
+                                        else Color(0xFF14161D).copy(alpha = 0.8f)
                                     )
-                                }
+                                    .border(
+                                        1.dp,
+                                        if (active) Color.Transparent else BorderGlass,
+                                        RoundedCornerShape(999.dp)
+                                    )
+                                    .clickable { selectedGenreFilter = genre }
+                                    .padding(horizontal = 12.dp, vertical = 6.dp)
+                            ) {
+                                Text(
+                                    text = genre,
+                                    fontSize = 11.sp,
+                                    fontWeight = if (active) FontWeight.Bold else FontWeight.Medium,
+                                    color = if (active) TextOnAccent else Color(0xFFD1D5DB)
+                                )
                             }
                         }
                     }
@@ -838,8 +876,10 @@ fun AllCatalogScreen(
 
 
 /**
- * Compact 16:9 "resume" tile used by the Continue Watching rail. Shows the
- * poster with a progress bar and the remaining watch time.
+ * Continue-watching tile. Reference flixvora-ui.zip:
+ * w-44 (176dp) shrink-0 text-left rounded-xl overflow-hidden bg-[#14161D] border border-white/[0.08]
+ * 16:9 backdrop + play circle overlay (black/65%, brand icon) + 4dp progress bar at bottom
+ * Below: title 11sp bold white + "X% left" 10sp BrandGreen in a row
  */
 @Composable
 private fun ContinueWatchingCard(
@@ -849,20 +889,21 @@ private fun ContinueWatchingCard(
     val fraction = if (entry.totalTime > 0) {
         (entry.seeTime.toFloat() / entry.totalTime.toFloat()).coerceIn(0f, 1f)
     } else 0f
-    val remainingMs = (entry.totalTime - entry.seeTime).coerceAtLeast(0L)
+    val pct = (fraction * 100).toInt()
 
     Column(
         modifier = Modifier
-            .width(148.dp)
+            .width(176.dp)
+            .clip(RoundedCornerShape(12.dp))
+            .background(Color(0xFF14161D))
+            .border(1.dp, BorderGlass, RoundedCornerShape(12.dp))
             .clickable(onClick = onClick)
     ) {
+        // 16:9 image area
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(84.dp)
-                .clip(RoundedCornerShape(8.dp))
-                .background(SurfaceRaised)
-                .border(1.dp, Color.White.copy(alpha = 0.06f), RoundedCornerShape(8.dp))
+                .aspectRatio(16f / 9f)
         ) {
             AsyncImage(
                 model = entry.poster,
@@ -870,57 +911,72 @@ private fun ContinueWatchingCard(
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxSize()
             )
+            // Dark scrim overlay
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(Color.Black.copy(alpha = 0.25f))
+            )
+            // Play circle (black/65% bg, BrandGreen icon border)
             Box(
                 modifier = Modifier
                     .align(Alignment.Center)
                     .size(28.dp)
-                    .clip(RoundedCornerShape(50))
-                    .background(Color.Black.copy(alpha = 0.5f)),
+                    .clip(androidx.compose.foundation.shape.CircleShape)
+                    .background(Color.Black.copy(alpha = 0.65f))
+                    .border(1.dp, Color.White.copy(alpha = 0.25f), androidx.compose.foundation.shape.CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     imageVector = Icons.Filled.PlayArrow,
                     contentDescription = "Resume",
-                    tint = Color.White,
-                    modifier = Modifier.size(15.dp)
+                    tint = BrandGreen,
+                    modifier = Modifier.size(14.dp)
                 )
             }
+            // Bottom progress bar: white/15% bg, BrandGreen fill, 4dp height
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
                     .fillMaxWidth()
-                    .height(3.dp)
-                    .background(Color.White.copy(alpha = 0.25f))
+                    .height(4.dp)
+                    .background(Color.White.copy(alpha = 0.15f))
             ) {
                 Box(
                     modifier = Modifier
                         .fillMaxWidth(fraction)
                         .fillMaxHeight()
-                        .background(com.flixvora.ui.components.BrandGradient)
+                        .background(BrandGreen)
                 )
             }
         }
-        Spacer(Modifier.height(5.dp))
-        Text(
-            text = entry.name,
-            color = TextPrimary,
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-        Text(
-            text = if (remainingMs > 0) "${formatContinueTime(remainingMs)} left" else "Resume",
-            color = TextTertiary,
-            fontSize = 8.5.sp,
-            maxLines = 1
-        )
+        // Bottom info row: title + percentage
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp, vertical = 6.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = entry.name,
+                color = Color.White,
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                modifier = Modifier.weight(1f)
+            )
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "$pct%",
+                color = BrandGreen,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1
+            )
+        }
     }
 }
 
-private fun formatContinueTime(ms: Long): String {
-    val totalMinutes = ms / 60000L
-    val hours = totalMinutes / 60
-    val minutes = totalMinutes % 60
-    return if (hours > 0) "${hours}h ${minutes}m" else "${minutes}m"
-}
+// formatContinueTime removed — ContinueWatchingCard now shows percentage
