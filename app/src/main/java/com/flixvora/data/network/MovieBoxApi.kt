@@ -206,15 +206,9 @@ class MovieBoxSignatureInterceptor(private val prefs: PreferencesManager) : Inte
                 val categoryId = Regex("\"categoryId\"\\s*:\\s*(\\d+)").find(requestBodyString)?.groupValues?.get(1)?.toIntOrNull() ?: 2
                 val page = Regex("\"page\"\\s*:\\s*(\\d+)").find(requestBodyString)?.groupValues?.get(1)?.toIntOrNull() ?: 1
                 
-                val endpoint = when (categoryId) {
-                    2 -> "movies"
-                    8 -> "anime"
-                    18 -> "asian"
-                    5 -> "western"
-                    else -> "category/$categoryId"
-                }
-                
-                newUrlBuilder.encodedPath("/$endpoint")
+                // Address the tab by its real id: the old name map disagreed with the
+                // catalogue (5 is Series, not Western), so TV Shows/Anime loaded wrong tabs.
+                newUrlBuilder.encodedPath("/category/$categoryId")
                     .setQueryParameter("page", page.toString())
                 
                 isPostToGet = true
@@ -246,37 +240,48 @@ class MovieBoxSignatureInterceptor(private val prefs: PreferencesManager) : Inte
                 builder.method("GET", null)
             }
 
-            val response = chain.proceed(builder.build())
-            if (response.isSuccessful) {
-                val responseBody = response.body
-                if (responseBody != null) {
-                    val rawJson = responseBody.string()
-                    val rewrittenJson = try {
-                        val path = newUrl.encodedPath
-                        if (path.contains("movies") || path.contains("anime") || path.contains("asian") || path.contains("western") || path.contains("category/")) {
-                            flattenCategoryJson(rawJson)
-                        } else if (path.contains("trending")) {
-                            rewriteTrendingJson(rawJson)
-                        } else if (path.contains("stream")) {
-                            rewriteStreamJson(rawJson)
-                        } else if (path.endsWith("search") || path.contains("/search")) {
-                            rewriteSearchJson(rawJson)
-                        } else if (path.contains("/detail/")) {
-                            val subjectId = path.substringAfter("/detail/").substringBefore("?").substringBefore("/")
-                            rewriteDetailJson(rawJson, subjectId, mockHost)
-                        } else {
+            try {
+                val response = chain.proceed(builder.build())
+                if (response.isSuccessful) {
+                    val responseBody = response.body
+                    if (responseBody != null) {
+                        val rawJson = responseBody.string()
+                        val rewrittenJson = try {
+                            val path = newUrl.encodedPath
+                            if (path.contains("movies") || path.contains("anime") || path.contains("asian") || path.contains("western") || path.contains("category/")) {
+                                flattenCategoryJson(rawJson)
+                            } else if (path.contains("trending")) {
+                                rewriteTrendingJson(rawJson)
+                            } else if (path.contains("stream")) {
+                                rewriteStreamJson(rawJson)
+                            } else if (path.endsWith("search") || path.contains("/search")) {
+                                rewriteSearchJson(rawJson)
+                            } else if (path.contains("/detail/")) {
+                                val subjectId = path.substringAfter("/detail/").substringBefore("?").substringBefore("/")
+                                rewriteDetailJson(rawJson, subjectId, mockHost)
+                            } else {
+                                rawJson
+                            }
+                        } catch (e: Exception) {
                             rawJson
                         }
-                    } catch (e: Exception) {
-                        rawJson
+
+                        val contentType = responseBody.contentType()
+                        val newBody = okhttp3.ResponseBody.create(contentType, rewrittenJson)
+                        return response.newBuilder().body(newBody).build()
                     }
-                    
-                    val contentType = responseBody.contentType()
-                    val newBody = okhttp3.ResponseBody.create(contentType, rewrittenJson)
-                    return response.newBuilder().body(newBody).build()
+                    return response
                 }
+                // The on-device proxy can be down (port busy, service killed,
+                // stale build). Falling through to the signed official request
+                // keeps the catalogue working instead of dropping to demo data.
+                response.close()
+            } catch (e: Exception) {
+                android.util.Log.w(
+                    "MovieBoxApi",
+                    "Local proxy request failed, retrying official endpoint: ${e.message}"
+                )
             }
-            return response
         }
 
         val timestamp = System.currentTimeMillis().toString()

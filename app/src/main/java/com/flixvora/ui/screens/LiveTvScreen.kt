@@ -26,18 +26,34 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.flixvora.data.LiveChannel
-import com.flixvora.data.SampleCatalog
 import com.flixvora.ui.theme.*
 
 @Composable
 fun LiveTvScreen(
-    channels: List<LiveChannel> = SampleCatalog.liveChannels,
+    channels: List<LiveChannel> = emptyList(),
     backgroundAudioEnabled: Boolean,
     onWatchChannel: (LiveChannel) -> Unit,
     onPlayAudioCommentary: (LiveChannel) -> Unit
 ) {
     val accent = LocalAccentTheme.current
-    val liveList = channels.ifEmpty { SampleCatalog.liveChannels }
+    val liveList = channels
+
+    if (liveList.isEmpty()) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                "No live channels loaded yet. Open Home and pull to refresh.",
+                color = TextSecondary,
+                fontSize = 13.sp
+            )
+        }
+        return
+    }
+
     var selectedChannel by remember(liveList) { mutableStateOf(liveList.first()) }
 
     LazyColumn(

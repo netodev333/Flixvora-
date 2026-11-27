@@ -38,6 +38,7 @@ import com.flixvora.ui.theme.*
 @Composable
 fun HomeScreen(
     uiState: FlixvoraUiState,
+    onRefresh: () -> Unit = {},
     onSearchChange: (String) -> Unit,
     onSelectCategory: (String) -> Unit,
     onSelectGenre: (String) -> Unit,
@@ -53,23 +54,33 @@ fun HomeScreen(
     val accent = LocalAccentTheme.current
     val safeCatalog = uiState.safeCatalog
 
-    val categories = remember { listOf("Trending", "Movies", "TV Shows", "Anime") }
-    val genres = remember { listOf("Trending", "Action", "Sci-Fi", "Anime", "Thriller", "Drama") }
-    val otts = remember { listOf("All", "MovieBox Hot", "Netflix", "Apple TV+", "Crunchyroll") }
+    val categories = remember { listOf("Trending", "Movies", "TV Shows", "Anime", "Asian") }
+    val displayCatalog = if (uiState.searchQuery.isNotBlank()) uiState.searchResults else safeCatalog
+    val genres = remember(displayCatalog) {
+        listOf("Trending") + displayCatalog.flatMap { it.genres }
+            .filter { it.isNotBlank() }
+            .distinct()
+            .take(12)
+    }
+    val otts = remember(displayCatalog) {
+        listOf("All") + displayCatalog.map { it.ottProvider }
+            .filter { it.isNotBlank() }
+            .distinct()
+    }
 
     val activeMood = remember(uiState.selectedMoodId) {
         SampleCatalog.moods.firstOrNull { it.id == uiState.selectedMoodId }
     }
 
     val filteredCatalog = remember(
-        safeCatalog,
+        displayCatalog,
         uiState.selectedCategory,
         uiState.selectedGenre,
         uiState.selectedOtt,
         uiState.selectedMoodId,
         uiState.searchQuery
     ) {
-        safeCatalog.filter { item ->
+        displayCatalog.filter { item ->
             val catOk = when (uiState.selectedCategory) {
                 "Movies" -> item.category == MediaCategory.MOVIE
                 "TV Shows" -> item.category == MediaCategory.SERIES
@@ -111,6 +122,44 @@ fun HomeScreen(
         contentPadding = PaddingValues(start = 16.dp, end = 16.dp, top = 12.dp, bottom = 110.dp),
         verticalArrangement = Arrangement.spacedBy(18.dp)
     ) {
+        if (uiState.isLoading) {
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
+                    Text("Loading live catalogue…", color = TextSecondary, fontSize = 12.sp)
+                }
+            }
+        }
+
+        if (!uiState.loadError.isNullOrBlank() && !uiState.isLoading) {
+            item {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(14.dp))
+                        .background(accent.surface)
+                        .border(1.dp, LiveCrimson.copy(alpha = 0.5f), RoundedCornerShape(14.dp))
+                        .padding(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(10.dp)
+                ) {
+                    Text(
+                        uiState.loadError ?: "",
+                        color = TextSecondary,
+                        fontSize = 12.sp,
+                        modifier = Modifier.weight(1f)
+                    )
+                    TextButton(onClick = onRefresh) {
+                        Text("Retry", color = accent.primary, fontWeight = FontWeight.Bold, fontSize = 12.sp)
+                    }
+                }
+            }
+        }
+
         // MovieBox Top Search Bar
         item {
             OutlinedTextField(
@@ -202,6 +251,13 @@ fun HomeScreen(
                         }
                     }
                 }
+            }
+        }
+
+        // Real, titled catalogue rails straight from the API
+        if (uiState.searchQuery.isBlank() && uiState.rails.isNotEmpty()) {
+            items(uiState.rails, key = { it.id }) { rail ->
+                CatalogRailRow(rail = rail, onOpenDetail = onOpenDetail)
             }
         }
 
@@ -490,4 +546,70 @@ fun HomeScreen(
             if (match != null) viewModel.selectSubject(match)
         }
     )
+}
+
+
+@Composable
+private fun CatalogRailRow(
+    rail: com.flixvora.data.CatalogRail,
+    onOpenDetail: (MediaTitle) -> Unit
+) {
+    val accent = LocalAccentTheme.current
+    Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(rail.title, color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
+            Text("${rail.items.size} titles", color = TextSecondary, fontSize = 11.sp)
+        }
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+            items(rail.items, key = { it.id }) { item ->
+                Column(
+                    modifier = Modifier
+                        .width(116.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(accent.surface)
+                        .border(1.dp, BorderHairline, RoundedCornerShape(12.dp))
+                        .clickable { onOpenDetail(item) }
+                ) {
+                    Box(modifier = Modifier.fillMaxWidth().aspectRatio(3f / 4f)) {
+                        AsyncImage(
+                            model = item.posterUrl,
+                            contentDescription = item.title,
+                            contentScale = ContentScale.Crop,
+                            modifier = Modifier.fillMaxSize()
+                        )
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Brush.verticalGradient(listOf(Color.Transparent, Color.Black.copy(alpha = 0.8f))))
+                        )
+                        Text(
+                            text = "★ ${item.rating}",
+                            color = RatingGold,
+                            fontSize = 9.sp,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier
+                                .align(Alignment.TopEnd)
+                                .padding(6.dp)
+                                .clip(RoundedCornerShape(6.dp))
+                                .background(Color.Black.copy(alpha = 0.72f))
+                                .padding(horizontal = 5.dp, vertical = 2.dp)
+                        )
+                    }
+                    Text(
+                        item.title,
+                        color = Color.White,
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(6.dp)
+                    )
+                }
+            }
+        }
+    }
 }

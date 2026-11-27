@@ -6,23 +6,27 @@ on:
   workflow_dispatch:
     inputs:
       version_name:
-        description: 'Version name (e.g., 9.7)'
-        required: true
-        default: '9.7'
+        description: 'Version name override (blank = version.properties)'
+        required: false
+        default: ''
       version_code:
-        description: 'Version code (integer)'
-        required: true
-        default: '46'
+        description: 'Version code override (blank = version.properties)'
+        required: false
+        default: ''
 
 permissions:
   contents: write
+
+concurrency:
+  group: release-build
+  cancel-in-progress: false
 
 jobs:
   build:
     name: Build Release APK
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -36,11 +40,8 @@ jobs:
 
       - name: Setup Android SDK
         run: |
-          # Install Android SDK using sdkmanager
           ANDROID_SDK_ROOT="${ANDROID_SDK_ROOT:-$HOME/android-sdk}"
           mkdir -p "$ANDROID_SDK_ROOT"
-          
-          # Download cmdline-tools if not present
           if [ ! -d "$ANDROID_SDK_ROOT/cmdline-tools/latest" ]; then
             cd "$ANDROID_SDK_ROOT"
             wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip -O cmdline-tools.zip
@@ -49,8 +50,6 @@ jobs:
             mv cmdline-tools cmdline-tools/latest
             rm cmdline-tools.zip
           fi
-          
-          # Accept licenses and install platforms
           yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses > /dev/null 2>&1 || true
           "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" "platforms;android-36" "build-tools;35.0.0" "platform-tools"
 
@@ -64,59 +63,77 @@ jobs:
           storeFile=release-key.jks
           EOP
 
+      - name: Resolve version
+        id: version
+        run: |
+          FILE_NAME=$(grep -E '^versionName=' version.properties | head -1 | cut -d= -f2 | tr -d '[:space:]')
+          FILE_CODE=$(grep -E '^versionCode=' version.properties | head -1 | cut -d= -f2 | tr -d '[:space:]')
+          NAME="${{ github.event.inputs.version_name }}"
+          CODE="${{ github.event.inputs.version_code }}"
+          [ -z "$NAME" ] && NAME="$FILE_NAME"
+          [ -z "$CODE" ] && CODE="$FILE_CODE"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$CODE" >> "$GITHUB_OUTPUT"
+          echo "Building Flixvora $NAME ($CODE)"
+
       - name: Make gradlew executable
         run: chmod +x gradlew
 
       - name: Build Release APK
         run: |
           ./gradlew :app:assembleRelease \
-            -PversionName="${{ github.event.inputs.version_name || '9.7' }}" \
-            -PversionCode="${{ github.event.inputs.version_code || '46' }}" \
+            -PversionName="${{ steps.version.outputs.name }}" \
+            -PversionCode="${{ steps.version.outputs.code }}" \
             --no-daemon \
             -Dorg.gradle.jvmargs="-Xmx4g"
-        env:
-          ORG_GRADLE_PROJECT_versionName: ${{ github.event.inputs.version_name || '9.7' }}
-          ORG_GRADLE_PROJECT_versionCode: ${{ github.event.inputs.version_code || '46' }}
 
       - name: Get APK path
         id: apk
         run: |
           APK_PATH=$(find . -name "app-release.apk" -type f | head -1)
-          echo "path=$APK_PATH" >> $GITHUB_OUTPUT
+          if [ -z "$APK_PATH" ]; then
+            echo "No signed app-release.apk produced" >&2
+            exit 1
+          fi
+          cp "$APK_PATH" Flixvora.apk
+          echo "path=Flixvora.apk" >> "$GITHUB_OUTPUT"
 
       - name: Get APK info
         id: apk_info
         run: |
           SHA256=$(sha256sum "${{ steps.apk.outputs.path }}" | cut -d' ' -f1)
           SIZE=$(stat -c%s "${{ steps.apk.outputs.path }}")
-          echo "sha256=$SHA256" >> $GITHUB_OUTPUT
-          echo "size=$SIZE" >> $GITHUB_OUTPUT
+          echo "sha256=$SHA256" >> "$GITHUB_OUTPUT"
+          echo "size=$SIZE" >> "$GITHUB_OUTPUT"
 
       - name: Create version.json
         run: |
           cat > version.json << EOV
           {
-            "versionName": "${{ github.event.inputs.version_name || '9.7' }}",
-            "versionCode": ${{ github.event.inputs.version_code || '46' }},
+            "versionName": "${{ steps.version.outputs.name }}",
+            "versionCode": ${{ steps.version.outputs.code }},
             "sha256": "${{ steps.apk_info.outputs.sha256 }}",
             "size": ${{ steps.apk_info.outputs.size }},
-            "url": "https://github.com/${{ github.repository }}/releases/download/v${{ github.event.inputs.version_name || '9.7' }}/Flixvora.apk",
-            "releaseNotes": "Flixvora v${{ github.event.inputs.version_name || '9.7' }} - Built via GitHub Actions"
+            "url": "https://github.com/${{ github.repository }}/releases/download/v${{ steps.version.outputs.name }}/Flixvora.apk",
+            "releaseNotes": "Flixvora v${{ steps.version.outputs.name }} - built from ${{ github.sha }}"
           }
           EOV
           cat version.json
 
-      - name: Create Release
-        uses: softprops/action-gh-release@v1
+      - name: Create or update Release
+        uses: softprops/action-gh-release@v2
         with:
-          tag_name: v${{ github.event.inputs.version_name || '9.7' }}
-          name: Flixvora v${{ github.event.inputs.version_name || '9.7' }}
+          tag_name: v${{ steps.version.outputs.name }}
+          name: Flixvora v${{ steps.version.outputs.name }}
+          make_latest: true
           body: |
-            ## Flixvora v${{ github.event.inputs.version_name || '9.7' }}
-            
-            Built via GitHub Actions on ${{ github.run_id }}
-            
-            **SHA256:** ${{ steps.apk_info.outputs.sha256 }}
+            ## Flixvora v${{ steps.version.outputs.name }}
+
+            - Version code: `${{ steps.version.outputs.code }}`
+            - Commit: `${{ github.sha }}`
+            - Built by GitHub Actions (run ${{ github.run_id }})
+
+            **SHA256:** `${{ steps.apk_info.outputs.sha256 }}`
             **Size:** ${{ steps.apk_info.outputs.size }} bytes
           files: |
             ${{ steps.apk.outputs.path }}
@@ -127,6 +144,6 @@ jobs:
       - name: Upload APK as artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Flixvora-APK
+          name: Flixvora-${{ steps.version.outputs.name }}-APK
           path: ${{ steps.apk.outputs.path }}
           retention-days: 30

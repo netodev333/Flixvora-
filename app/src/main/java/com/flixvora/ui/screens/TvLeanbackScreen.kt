@@ -31,12 +31,12 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.flixvora.data.LiveChannel
 import com.flixvora.data.MediaTitle
-import com.flixvora.data.SampleCatalog
 import com.flixvora.ui.theme.*
 
 @Composable
 fun TvLeanbackScreen(
     catalog: List<MediaTitle>,
+    channels: List<LiveChannel> = emptyList(),
     onPlayTitle: (MediaTitle) -> Unit,
     onWatchChannel: (LiveChannel) -> Unit,
     onExitTvMode: () -> Unit
@@ -44,8 +44,25 @@ fun TvLeanbackScreen(
     val accent = LocalAccentTheme.current
     var focusedIndex by remember { mutableIntStateOf(0) }
     var activeChannelIdx by remember { mutableIntStateOf(0) }
-    val hero = catalog.getOrElse(focusedIndex) { catalog.first() }
-    val currentChannel = SampleCatalog.liveChannels[activeChannelIdx % SampleCatalog.liveChannels.size]
+    val hero = catalog.getOrElse(focusedIndex) { catalog.firstOrNull() } ?: return
+    val liveChannels = channels.ifEmpty {
+        listOf(
+            LiveChannel(
+                id = "",
+                number = "--",
+                name = "No live channels",
+                category = "Live TV",
+                currentProgram = "Open Home and refresh to load channels",
+                nextProgram = "",
+                timeWindow = "",
+                streamFormat = "LIVE",
+                progressPercent = 0,
+                previewUrl = "",
+                epgSlots = emptyList()
+            )
+        )
+    }
+    val currentChannel = liveChannels[activeChannelIdx % liveChannels.size]
 
     LazyColumn(
         modifier = Modifier
@@ -63,11 +80,11 @@ fun TvLeanbackScreen(
                             true
                         }
                         Key.ChannelUp -> {
-                            activeChannelIdx = (activeChannelIdx + 1) % SampleCatalog.liveChannels.size
+                            activeChannelIdx = (activeChannelIdx + 1) % liveChannels.size
                             true
                         }
                         Key.ChannelDown -> {
-                            activeChannelIdx = (activeChannelIdx - 1 + SampleCatalog.liveChannels.size) % SampleCatalog.liveChannels.size
+                            activeChannelIdx = (activeChannelIdx - 1 + liveChannels.size) % liveChannels.size
                             true
                         }
                         Key.DirectionCenter, Key.Enter -> {
@@ -168,10 +185,10 @@ fun TvLeanbackScreen(
                 }
                 Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                     OutlinedButton(onClick = {
-                        activeChannelIdx = (activeChannelIdx - 1 + SampleCatalog.liveChannels.size) % SampleCatalog.liveChannels.size
+                        activeChannelIdx = (activeChannelIdx - 1 + liveChannels.size) % liveChannels.size
                     }) { Text("CH -", color = Color.White) }
                     OutlinedButton(onClick = {
-                        activeChannelIdx = (activeChannelIdx + 1) % SampleCatalog.liveChannels.size
+                        activeChannelIdx = (activeChannelIdx + 1) % liveChannels.size
                     }) { Text("CH +", color = Color.White) }
                     Button(
                         onClick = { onWatchChannel(currentChannel) },
