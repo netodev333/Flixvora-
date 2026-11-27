@@ -35,8 +35,8 @@ android {
     applicationId = "com.flixvora.app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 60
-    versionName = "11.1"
+    versionCode = 61
+    versionName = "11.2"
 
     buildConfigField("String", "TMDB_API_KEY_1", "\"$tmdbApiKey1\"")
     buildConfigField("String", "TMDB_API_KEY_2", "\"$tmdbApiKey2\"")
@@ -129,6 +129,8 @@ dependencies {
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
   implementation(libs.androidx.media3.exoplayer)
+  implementation("androidx.media3:media3-session:1.4.1")
+  implementation("androidx.work:work-runtime-ktx:2.10.0")
   implementation(libs.androidx.media3.ui)
   implementation(libs.androidx.media3.exoplayer.dash)
   implementation(libs.androidx.media3.exoplayer.hls)

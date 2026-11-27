@@ -551,3 +551,110 @@ fun setSystemBarsVisible(activity: android.app.Activity, visible: Boolean) {
             androidx.core.view.WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     }
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Legacy Interaction & UI Modifiers
+// ─────────────────────────────────────────────────────────────────────────────
+fun AuroraBackground(
+    modifier: Modifier = Modifier,
+    content: @Composable BoxScope.() -> Unit
+) {
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(com.flixvora.ui.theme.BgDeep)
+    ) {
+        content()
+    }
+}
+
+fun Modifier.glassSurface(
+    shape: androidx.compose.ui.graphics.Shape = RoundedCornerShape(16.dp),
+    tint: Float = 1f
+): Modifier = this
+    .clip(shape)
+    .background(
+        Brush.verticalGradient(
+            listOf(
+                Color.White.copy(alpha = 0.06f * tint),
+                Color.White.copy(alpha = 0.03f * tint)
+            )
+        )
+    )
+    .border(1.dp, Color.White.copy(alpha = 0.09f * tint), shape)
+
+fun Modifier.bounceClick(onClick: () -> Unit): Modifier = this.clickable { onClick() }
+
+@Composable
+fun PillChip(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val shape = RoundedCornerShape(999.dp)
+    Box(
+        modifier = Modifier
+            .then(if (selected) Modifier.background(BrandGradient, shape) else Modifier.glassSurface(shape))
+            .bounceClick(onClick)
+            .padding(horizontal = 17.dp, vertical = 9.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = text,
+            fontSize = 13.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.SemiBold,
+            color = if (selected) TextOnAccent else TextSecondary,
+            maxLines = 1
+        )
+    }
+}
+
+@Composable
+fun SectionHeader(title: String, modifier: Modifier = Modifier) {
+    Text(
+        text = title,
+        color = Color.White,
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+    )
+}
+
+@Composable
+fun MovieGridItem(
+    movie: com.flixvora.data.model.MovieSubject,
+    modifier: Modifier = Modifier.width(110.dp),
+    showRating: Boolean = false,
+    onClick: () -> Unit
+) {
+    Column(
+        modifier = modifier
+            .clip(RoundedCornerShape(10.dp))
+            .clickable { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(2f / 3f)
+                .clip(RoundedCornerShape(12.dp))
+                .background(Color(0xFF14161D))
+                .border(1.dp, Color.White.copy(alpha = 0.07f), RoundedCornerShape(12.dp))
+        ) {
+            AsyncImage(
+                model = movie.poster,
+                contentDescription = movie.name,
+                contentScale = ContentScale.Crop,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+        Spacer(Modifier.height(4.dp))
+        Text(
+            text = movie.name,
+            color = Color.White,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
+    }
+}
