@@ -488,7 +488,7 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { current ->
             current.copy(
                 activeSourceId = source.id,
-                toastMessage = "Switched to ${source.label} (${source.resolution})"
+                toastMessage = "Switched to ${source.name} (${source.quality})"
             )
         }
     }
@@ -499,7 +499,7 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
         _uiState.update {
             it.copy(
                 activeSourceId = next.id,
-                toastMessage = "Failover: Auto-routed to ${next.label} (${next.latencyMs}ms)"
+                toastMessage = "Failover: Auto-routed to ${next.name} (${next.pingMs}ms)"
             )
         }
     }
@@ -512,10 +512,10 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
         val newComment = CommentItem(
             id = "c_${System.currentTimeMillis()}",
             author = "You",
-            timeAgo = "Just now",
+            timestamp = "Just now",
             body = body,
             hasSpoiler = hasSpoiler,
-            upvotes = 1
+            likes = 1
         )
         _uiState.update { current ->
             val list = current.commentsByTitle[titleId].orEmpty()

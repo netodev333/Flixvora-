@@ -14,8 +14,8 @@ object DataBridge {
         val yr = movie.year?.filter { it.isDigit() }?.toIntOrNull() ?: 2024
         val dur = movie.duration.orEmpty().ifBlank { if (movie.isTvShow) "${movie.totalSeasons.coerceAtLeast(1)} Seasons" else "120 min" }
         val rating = movie.rating.orEmpty().ifBlank { "8.5" }
-        val age = if (movie.isAdult || movie.restrictKid == 1) "18+" else "PG-13"
-        val quality = if (movie.quality.isNotBlank()) movie.quality else "4K UHD"
+        val age = if (movie.isAdult) "18+" else "PG-13"
+        val quality = "4K UHD"
         val genres = if (movie.genres.isNotEmpty()) movie.genres else listOf("Action", "Drama")
         val ott = if (category == MediaCategory.ANIME) "Crunchyroll" else "MovieBox Hot"
         val poster = if (movie.poster.isNotBlank()) movie.poster else "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=600&q=80"
@@ -41,7 +41,7 @@ object DataBridge {
             continueEpisode = null,
             rank = null,
             introEndSeconds = 85,
-            isRestricted = movie.isAdult || movie.restrictKid == 1,
+            isRestricted = movie.isAdult,
             cast = emptyList(),
             seasons = emptyList(),
             audioTracks = if (category == MediaCategory.ANIME) SampleCatalog.defaultAnimeTracks else SampleCatalog.defaultMovieTracks
@@ -82,7 +82,7 @@ object DataBridge {
             title = movie.name.ifBlank { "Upcoming Premiere" },
             categoryLabel = if (movie.isTvShow) "SERIES PREMIERE" else "BLOCKBUSTER PREMIERE",
             releaseEpochMs = System.currentTimeMillis() + (daysLater * 24 * 60 * 60 * 1000L),
-            quality = if (movie.quality.isNotBlank()) movie.quality else "4K HDR · IMAX",
+            quality = "4K HDR · IMAX",
             tagline = movie.description.take(100).ifBlank { "Exclusive premiere coming soon to Flixvora." },
             backdropUrl = backdrop,
             genres = if (movie.genres.isNotEmpty()) movie.genres else listOf("Action", "Thriller")
