@@ -117,8 +117,33 @@ object DataBridge {
             isRestricted = movie.isAdult,
             cast = movie.cast.map { CastMember(it.name, it.role) },
             seasons = seasons,
-            audioTracks = audioTracksOf(movie, category)
+            audioTracks = audioTracksOf(movie, category),
+            releaseEpochMs = parseReleaseEpoch(movie.releaseDate)
         )
+    }
+
+    private fun parseReleaseEpoch(raw: String?): Long? {
+        val value = raw?.trim()?.takeIf { it.isNotEmpty() && !it.equals("null", true) } ?: return null
+        value.toLongOrNull()?.let { return if (it > 100_000_000_000L) it else null }
+        val patterns = listOf(
+            "yyyy-MM-dd'T'HH:mm:ss",
+            "yyyy-MM-dd HH:mm:ss",
+            "yyyy-MM-dd",
+            "yyyy/MM/dd",
+            "MMM d, yyyy",
+            "dd MMM yyyy",
+            "yyyy"
+        )
+        for (pattern in patterns) {
+            try {
+                val parsed = java.text.SimpleDateFormat(pattern, java.util.Locale.US)
+                    .apply { isLenient = false }
+                    .parse(value)
+                if (parsed != null) return parsed.time
+            } catch (_: Exception) {
+            }
+        }
+        return null
     }
 
     fun tvChannelToLiveChannel(tv: TvChannel, index: Int): LiveChannel {
@@ -140,20 +165,6 @@ object DataBridge {
                 EpgSlot("Now", nowTitle, isNow = true),
                 EpgSlot("Next", nextTitle, isNow = false)
             )
-        )
-    }
-
-    fun movieSubjectToComingSoon(movie: MovieSubject, index: Int): ComingSoonRelease {
-        val title = movie.name.ifBlank { "Upcoming Premiere" }
-        return ComingSoonRelease(
-            id = "cs_${movie.id}",
-            title = title,
-            categoryLabel = if (movie.isTvShow) "SERIES" else "MOVIE",
-            releaseEpochMs = System.currentTimeMillis() + ((index + 1) * 24 * 60 * 60 * 1000L),
-            quality = "Coming Soon",
-            tagline = movie.description.take(100).ifBlank { "Coming soon to Flixvora." },
-            backdropUrl = movie.backdrop?.takeIf { it.isNotBlank() } ?: movie.poster,
-            genres = movie.genres
         )
     }
 }

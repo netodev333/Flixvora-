@@ -47,6 +47,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import org.json.JSONArray
@@ -180,17 +181,32 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
                 if (!homeLoaded) delay(600)
                 if (force) repository.clearFeedCaches()
                 val payload = coroutineScope {
-                    val tabIds = listOf(2, 5, 8, 18)
+                    // AniFam has one catalogue; its rows already come from
+                    // getAnimeRails(), so asking every MovieBox tab would add
+                    // the same sections four times.
+                    val tabIds = if (repository.isAniFam) emptyList() else listOf(2, 5, 8, 18)
                     val tabDeferred = tabIds.map { id ->
                         id to async {
-                            runCatching { repository.getTabOperatingModules(id) }.getOrDefault(emptyList())
+                            try {
+                                withTimeoutOrNull(12_000) { repository.getTabOperatingModules(id) } ?: emptyList()
+                            } catch (_: Exception) {
+                                emptyList()
+                            }
                         }
                     }
                     val trendingDeferred = async {
-                        runCatching { repository.getTrending(1, 30) }.getOrDefault(emptyList())
+                        try {
+                            withTimeoutOrNull(12_000) { repository.getTrending(1, 30) } ?: emptyList()
+                        } catch (_: Exception) {
+                            emptyList()
+                        }
                     }
                     val animeDeferred = async {
-                        runCatching { repository.getAnimeRails() }.getOrDefault(emptyList())
+                        try {
+                            withTimeoutOrNull(15_000) { repository.getAnimeRails() } ?: emptyList()
+                        } catch (_: Exception) {
+                            emptyList()
+                        }
                     }
                     val rails = mutableListOf<CatalogRail>()
                     val seenRailKeys = mutableSetOf<String>()
@@ -245,18 +261,22 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
                 }
 
                 val catalog = payload.rails.flatMap { it.items }.distinctBy { it.id }
-                val comingSoon = payload.trending.take(6).mapIndexed { idx, subject ->
-                    ComingSoonRelease(
-                        id = "cs_${subject.id}",
-                        title = subject.title,
-                        categoryLabel = if (subject.category == MediaCategory.SERIES) "SERIES" else "MOVIE",
-                        releaseEpochMs = System.currentTimeMillis() + ((idx + 1) * 3L * 24 * 60 * 60 * 1000),
-                        quality = "Coming Soon",
-                        tagline = subject.editorialTagline.ifBlank { "Coming soon to Flixvora." },
-                        backdropUrl = subject.backdropUrl,
-                        genres = subject.genres
-                    )
-                }
+                val comingSoon = payload.trending
+                    .filter { it.releaseEpochMs != null && it.releaseEpochMs > System.currentTimeMillis() }
+                    .sortedBy { it.releaseEpochMs }
+                    .take(6)
+                    .map { subject ->
+                        ComingSoonRelease(
+                            id = "cs_${subject.id}",
+                            title = subject.title,
+                            categoryLabel = if (subject.category == MediaCategory.SERIES) "SERIES" else "MOVIE",
+                            releaseEpochMs = subject.releaseEpochMs!!,
+                            quality = subject.quality,
+                            tagline = subject.editorialTagline.ifBlank { "Upcoming on Flixvora." },
+                            backdropUrl = subject.backdropUrl,
+                            genres = subject.genres
+                        )
+                    }
 
                 withContext(Dispatchers.Main) {
                     _uiState.update { current ->
@@ -290,8 +310,13 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
         val channels = runCatching {
             val india = repository.getAllTvChannels("IN", maxPages = 6)
             if (india.isNotEmpty()) india else repository.getAllTvChannels("US", maxPages = 6)
-        }.getOrDefault(emptyList())
+        }.getOrDefault(emptyList()).ifEmpty {
+            runCatching { repository.getFallbackTvChannels("in") }.getOrDefault(emptyList())
+        }
         if (channels.isEmpty()) return
+        channels.forEach { channel ->
+            channel.playUrl?.takeIf { it.isNotBlank() }?.let { channelStreamUrls[channel.channelId] = it }
+        }
         val mapped = channels.mapIndexed { idx, tv -> DataBridge.tvChannelToLiveChannel(tv, idx) }
         withContext(Dispatchers.Main) {
             _uiState.update { it.copy(liveTvChannels = mapped) }
@@ -673,7 +698,7 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
     private fun buildHeaders(cookie: String, item: MediaTitle): Map<String, String> {
         val headers = mutableMapOf<String, String>()
         if (cookie.isNotBlank()) {
-            if (cookie.contains("=") && (cookie.contains("Referer=") || cookie.contains("Origin="))) {
+            if (cookie.contains("=") && (cookie.contains("Referer=", true) || cookie.contains("Origin=", true))) {
                 cookie.split(";").forEach { pair ->
                     val parts = pair.split("=", limit = 2)
                     if (parts.size == 2) headers[parts[0].trim()] = parts[1].trim()
@@ -682,13 +707,15 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
                 headers["Cookie"] = cookie
             }
         }
+        // The catalogue's own media headers win: AniFam and MovieBox CDNs do not
+        // all accept the same referer, and overwriting a working one breaks playback.
+        fun hasHeader(name: String) = headers.keys.any { it.equals(name, ignoreCase = true) }
         if (item.id.startsWith("anifam_") || item.category == MediaCategory.ANIME) {
-            headers["Referer"] = "https://zokoanime.video/"
-            headers["Origin"] = "https://zokoanime.video"
+            if (!hasHeader("Referer")) headers["Referer"] = "https://zokoanime.video/"
+            if (!hasHeader("Origin")) headers["Origin"] = "https://zokoanime.video"
         } else {
-            // MovieBox CDN only serves DASH/HLS manifests to this referer.
-            headers["Referer"] = "https://sportslive.wine"
-            headers["Origin"] = "https://sportslive.wine"
+            if (!hasHeader("Referer")) headers["Referer"] = "https://sportslive.wine"
+            if (!hasHeader("Origin")) headers["Origin"] = "https://sportslive.wine"
         }
         return headers
     }
