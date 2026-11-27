@@ -1749,15 +1749,39 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                         if (finalResourceId != null) params["resourceId"] = finalResourceId
 
-                        val rawResponse = makeOfficialRequest("GET", "/wefeed-mobile-bff/subject-api/play-info/v2", params)
+                        var rawResponse = makeOfficialRequest("GET", "/wefeed-mobile-bff/subject-api/play-info/v2", params)
 
-                        val responseMap = parseJsonToMap(rawResponse)
+                        var responseMap = parseJsonToMap(rawResponse)
 
-                        val data = responseMap["data"] as? Map<String, Any?> ?: emptyMap<String, Any?>()
+                        var data = responseMap["data"] as? Map<String, Any?> ?: emptyMap<String, Any?>()
 
                         var streams = data["streamList"] as? List<Map<String, Any?>> ?: data["streams"] as? List<Map<String, Any?>> ?: emptyList()
 
-                        val globalCookie = responseMap["signCookie"] ?: data["signCookie"] ?: ""
+                        var globalCookie = responseMap["signCookie"] ?: data["signCookie"] ?: ""
+
+                        // Some regions/accounts only answer on the legacy endpoint;
+                        // v2 returning an empty list must not end playback.
+                        if (streams.isEmpty()) {
+                            try {
+                                val legacyParams = mutableMapOf(
+                                    "subjectId" to finalSubjectId,
+                                    "host" to "api6.aoneroom.com"
+                                )
+                                if (resSe != null) legacyParams["se"] = resSe
+                                if (resEp != null) legacyParams["ep"] = resEp
+                                if (finalResourceId != null) legacyParams["resourceId"] = finalResourceId
+                                legacyParams["quality"] = quality
+                                rawResponse = makeOfficialRequest("GET", "/wefeed-mobile-bff/subject-api/play-info", legacyParams)
+                                responseMap = parseJsonToMap(rawResponse)
+                                data = responseMap["data"] as? Map<String, Any?> ?: emptyMap<String, Any?>()
+                                val legacyStreams = data["streamList"] as? List<Map<String, Any?>> ?: data["streams"] as? List<Map<String, Any?>> ?: emptyList()
+                                if (legacyStreams.isNotEmpty()) {
+                                    streams = legacyStreams
+                                    val legacyCookie = (responseMap["signCookie"] ?: data["signCookie"])?.toString().orEmpty()
+                                    if (legacyCookie.isNotEmpty()) globalCookie = legacyCookie
+                                }
+                            } catch (_: Exception) {}
+                        }
 
                         // Mirror resources the play-info body omits. The endpoint
                         // gates these behind a member check, so the flag is set to
@@ -2145,6 +2169,14 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                         val prioritizedStreams = streams.map { it }
 
+                        fun isHevcStream(stream: Map<String, Any?>): Boolean {
+                            val u = (stream["url"] ?: "").toString().lowercase()
+                            return u.contains("h265") || u.contains("x265") || u.contains("hev1") || u.contains("h.265")
+                        }
+                        // Prefer a codec the device can decode: H.264/AVC first,
+                        // HEVC only when the catalogue has nothing else.
+                        val decodablePool = prioritizedStreams.filterNot { isHevcStream(it) }.ifEmpty { prioritizedStreams }
+
                         var workingUrl = ""
 
                         var workingCookie = globalCookie.toString()
@@ -2173,7 +2205,7 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                             }
 
-                            val bestStream = prioritizedStreams.maxWithOrNull { s1, s2 ->
+                            val bestStream = decodablePool.maxWithOrNull { s1, s2 ->
                                 val r1 = (s1["resolutions"] ?: s1["resolution"] ?: s1["quality"] ?: "").toString().filter { it.isDigit() }.toIntOrNull() ?: 0
                                 val r2 = (s2["resolutions"] ?: s2["resolution"] ?: s2["quality"] ?: "").toString().filter { it.isDigit() }.toIntOrNull() ?: 0
                                 if (r1 != r2) {
@@ -2246,7 +2278,7 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                         if (workingUrl.isEmpty() && prioritizedStreams.isNotEmpty()) {
                             // Try to find any fallback stream that isn't a dummy
 
-                            for (st in prioritizedStreams) {
+                            for (st in decodablePool) {
                                 val fallbackUrl = st["url"]?.toString() ?: ""
 
                                 val fallbackIsDummy = fallbackUrl.contains("macdn.aoneroom.com") || fallbackUrl.contains("please_update") || fallbackUrl.contains("update_app")

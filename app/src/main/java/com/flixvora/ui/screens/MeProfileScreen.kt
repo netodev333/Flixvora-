@@ -30,10 +30,7 @@ fun MeProfileScreen(
     uiState: FlixvoraUiState,
     onSwitchProfile: (ProfileType) -> Unit,
     onSelectTheme: (FlixvoraAccentTheme) -> Unit,
-    onToggleTvMode: () -> Unit,
     onToggleBackgroundAudio: () -> Unit,
-    onOpenStreamResolver: () -> Unit,
-    onSyncTrakt: () -> Unit,
     onToggleWifiOnly: (Boolean) -> Unit,
     onToggleAutoDelete: (Boolean) -> Unit,
     onClearTempCache: () -> Unit,
@@ -150,7 +147,7 @@ fun MeProfileScreen(
             }
         }
 
-        // Settings Toggles: Android TV 10-Foot Mode + Background Audio Service + Stream Resolver + Trakt Sync
+        // Settings: Background Audio Service
         item {
             Column(
                 modifier = Modifier
@@ -165,18 +162,6 @@ fun MeProfileScreen(
 
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
-                        Icon(Icons.Default.Tv, contentDescription = null, tint = accent.primary, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text("Android TV 10-Foot Mode", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text("D-Pad focus & quick channel zapping", color = TextSecondary, fontSize = 11.sp)
-                        }
-                    }
-                    Switch(checked = uiState.isTvMode, onCheckedChange = { onToggleTvMode() })
-                }
-
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
-                    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
                         Icon(Icons.Default.Headphones, contentDescription = null, tint = accent.primary, modifier = Modifier.size(20.dp))
                         Spacer(Modifier.width(10.dp))
                         Column {
@@ -188,38 +173,6 @@ fun MeProfileScreen(
                 }
 
                 HorizontalDivider(color = BorderHairline)
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable { onOpenStreamResolver() }.padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Dns, contentDescription = null, tint = accent.primary, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text("Backup Stream Resolvers", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text("Auto-failover HLS, DASH & ClearKey mirrors", color = TextSecondary, fontSize = 11.sp)
-                        }
-                    }
-                    Icon(Icons.Default.ChevronRight, contentDescription = null, tint = TextSecondary)
-                }
-
-                Row(
-                    modifier = Modifier.fillMaxWidth().clickable { onSyncTrakt() }.padding(vertical = 4.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Default.Sync, contentDescription = null, tint = accent.primary, modifier = Modifier.size(20.dp))
-                        Spacer(Modifier.width(10.dp))
-                        Column {
-                            Text("Trakt.tv Scrobble Sync", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text(if (uiState.traktConnected) "Synced (${uiState.traktLastSync})" else "Tap to sync history & watchlist", color = TextSecondary, fontSize = 11.sp)
-                        }
-                    }
-                    Text(if (uiState.traktConnected) "Connected" else "Connect", color = accent.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                }
 
                 Row(
                     modifier = Modifier

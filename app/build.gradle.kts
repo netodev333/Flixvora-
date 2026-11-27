@@ -39,10 +39,10 @@ android {
     if (file.exists()) file.inputStream().use { load(it) }
   }
   val appVersionName = (project.findProperty("versionName") as String?)
-    ?: versionProps.getProperty("versionName", "11.8")
+    ?: versionProps.getProperty("versionName", "11.9")
   val appVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull()
-    ?: versionProps.getProperty("versionCode", "67").toIntOrNull()
-    ?: 67
+    ?: versionProps.getProperty("versionCode", "68").toIntOrNull()
+    ?: 68
 
   defaultConfig {
     applicationId = "com.flixvora.app"

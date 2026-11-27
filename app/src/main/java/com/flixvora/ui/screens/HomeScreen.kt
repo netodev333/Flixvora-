@@ -44,7 +44,6 @@ fun HomeScreen(
     onSelectGenre: (String) -> Unit,
     onSelectOtt: (String) -> Unit,
     onToggleMood: (String?) -> Unit,
-    onSyncTrakt: () -> Unit,
     onToggleReminder: (ComingSoonRelease) -> Unit,
     onToggleWatchlist: (String) -> Unit,
     onPlayTitle: (MediaTitle) -> Unit,
@@ -366,8 +365,6 @@ fun HomeScreen(
             item {
                 PersonalizedForYouRow(
                     recommendations = personalizedRecs,
-                    traktConnected = uiState.traktConnected,
-                    onSyncTrakt = onSyncTrakt,
                     onSelectTitle = onOpenDetail
                 )
             }
@@ -535,7 +532,6 @@ fun HomeScreen(
         onSelectGenre = {},
         onSelectOtt = {},
         onToggleMood = {},
-        onSyncTrakt = {},
         onToggleReminder = {},
         onToggleWatchlist = {},
         onPlayTitle = { item ->
