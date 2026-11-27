@@ -181,7 +181,10 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
                 if (!homeLoaded) delay(600)
                 if (force) repository.clearFeedCaches()
                 val payload = coroutineScope {
-                    val tabIds = listOf(2, 5, 8, 18)
+                    // AniFam has one catalogue; its rows already come from
+                    // getAnimeRails(), so asking every MovieBox tab would add
+                    // the same sections four times.
+                    val tabIds = if (repository.isAniFam) emptyList() else listOf(2, 5, 8, 18)
                     val tabDeferred = tabIds.map { id ->
                         id to async {
                             try {
