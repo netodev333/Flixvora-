@@ -508,8 +508,9 @@ fun SettingsScreen(
                                     )
                                     val appVersion = remember {
                                         try {
-                                            context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "4.3"
-                                        } catch (e: Exception) { "4.3" }
+                                            context.packageManager.getPackageInfo(context.packageName, 0).versionName
+                                                ?: com.flixvora.BuildConfig.VERSION_NAME
+                                        } catch (e: Exception) { com.flixvora.BuildConfig.VERSION_NAME }
                                     }
                                     Text(
                                         text = if (viewModel.isCheckingUpdate) "Checking latest version..." else "Current: v$appVersion",

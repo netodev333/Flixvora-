@@ -1136,11 +1136,25 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                         val futures = (startSubPage..endSubPage).map { p ->
                             executor.submit(java.util.concurrent.Callable {
                                 try {
-                                    val payload = mapOf("keyword" to q, "page" to p, "pageSize" to 20)
-                                    val raw = makeOfficialRequest("POST", "/wefeed-mobile-bff/subject-api/search", emptyMap(), toJsonString(payload))
-                                    val respMap = parseJsonToMap(raw)
-                                    val dMap = respMap["data"] as? Map<String, Any?>
-                                    ((dMap?.get("items") ?: dMap?.get("list") ?: dMap?.get("subjects")) as? List<Map<String, Any?>>) ?: emptyList()
+                                    val payload = mapOf(
+                                        "keyword" to q,
+                                        "page" to p,
+                                        "perPage" to 20,
+                                        "pageSize" to 20,
+                                        "subjectType" to 0,
+                                        "type" to 0,
+                                        "q" to q
+                                    )
+                                    fun parseItems(raw: String): List<Map<String, Any?>> {
+                                        val dMap = parseJsonToMap(raw)["data"] as? Map<String, Any?>
+                                        return ((dMap?.get("items") ?: dMap?.get("list") ?: dMap?.get("subjects")) as? List<Map<String, Any?>>) ?: emptyList()
+                                    }
+                                    val v2 = runCatching {
+                                        parseItems(makeOfficialRequest("POST", "/wefeed-mobile-bff/subject-api/search/v2", emptyMap(), toJsonString(payload)))
+                                    }.getOrDefault(emptyList())
+                                    if (v2.isNotEmpty()) v2 else parseItems(
+                                        makeOfficialRequest("POST", "/wefeed-mobile-bff/subject-api/search", emptyMap(), toJsonString(payload))
+                                    )
                                 } catch (_: Exception) {
                                     emptyList<Map<String, Any?>>()
                                 }
@@ -1467,7 +1481,22 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                         val data = responseMap["data"] as? Map<String, Any?> ?: responseMap
 
-                        val rawSeasons = data["seasons"] as? List<Map<String, Any?>> ?: data["seasonList"] as? List<Map<String, Any?>> ?: data["list"] as? List<Map<String, Any?>> ?: emptyList()
+                        var rawSeasons = data["seasons"] as? List<Map<String, Any?>> ?: data["seasonList"] as? List<Map<String, Any?>> ?: data["list"] as? List<Map<String, Any?>> ?: emptyList()
+
+                        if (rawSeasons.isEmpty()) {
+                            // Some catalogue builds only expose the v1 season endpoint.
+                            val fallbackRaw = runCatching {
+                                makeOfficialRequest("GET", "/wefeed-mobile-bff/subject-api/season-info", mapOf("subjectId" to seriesId))
+                            }.getOrNull()
+                            if (!fallbackRaw.isNullOrBlank()) {
+                                val fallbackMap = parseJsonToMap(fallbackRaw)
+                                val fallbackData = fallbackMap["data"] as? Map<String, Any?> ?: fallbackMap
+                                rawSeasons = fallbackData["seasons"] as? List<Map<String, Any?>>
+                                    ?: fallbackData["seasonList"] as? List<Map<String, Any?>>
+                                    ?: fallbackData["list"] as? List<Map<String, Any?>>
+                                    ?: emptyList()
+                            }
+                        }
 
                         val mappedSeasons = mutableListOf<Map<String, Any?>>()
 
@@ -2283,6 +2312,10 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                                             "lanName" to lanName,
 
+                                            "language" to lanName.ifEmpty { lan },
+
+                                            "format" to "vtt",
+
                                             "url" to subUrl
 
                                         ))
@@ -2424,6 +2457,10 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
                                     "lanName" to lanName,
 
+                                    "language" to lanName.ifEmpty { lan },
+
+                                    "format" to "vtt",
+
                                     "url" to subUrl
 
                                 ))
@@ -2447,6 +2484,8 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                                     subtitlesMapped.add(mapOf(
                                         "lan" to openSub.language,
                                         "lanName" to openSub.languageName,
+                                        "language" to openSub.languageName.ifEmpty { openSub.language },
+                                        "format" to "vtt",
                                         "url" to openSub.url
                                     ))
                                 }
@@ -2588,6 +2627,7 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                             "cookie" to workingCookie,
                             "resolutions" to resolutionsStr,
                             "streamList" to finalStreamList,
+                            "subTitleList" to sortedSubtitles,
                             "subtitles" to sortedSubtitles
                         )
 

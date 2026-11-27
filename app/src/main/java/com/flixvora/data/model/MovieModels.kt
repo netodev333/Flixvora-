@@ -91,6 +91,7 @@ data class MovieSubject(
     val blurHash: String? = null,
     val averageHue: String? = null,
     val backdrop: String? = null,
+    val releaseDate: String? = null,
     val isAdult: Boolean = false
 )
 
@@ -503,6 +504,7 @@ class MovieSubjectAdapter {
             blurHash = blurHash,
             averageHue = averageHue,
             backdrop = backdropUrl,
+            releaseDate = releaseDateRaw,
             isAdult = AdultContentRules.isAdult(
                 genres = genresList,
                 restrictKid = (item["restrictKid"] ?: map["restrictKid"])?.toString()?.toIntOrNull(),
@@ -529,6 +531,8 @@ class MovieSubjectAdapter {
             "dubs" to subject.dubs,
             "blurHash" to subject.blurHash,
             "averageHue" to subject.averageHue,
+            "backdrop" to subject.backdrop,
+            "releaseDate" to subject.releaseDate,
             "isAdult" to subject.isAdult,
             "seasonList" to subject.seasonList.map { s ->
                 mapOf(

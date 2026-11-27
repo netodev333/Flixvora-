@@ -275,9 +275,9 @@ class MovieRepository(
     suspend fun getAnimeRails(): List<CategorySection> = withContext(Dispatchers.IO) {
         val cached = memoryAnimeRails
         if (cached.isNotEmpty()) return@withContext cached.filterAdultSections()
-        try {
-            val home = retryWithBackoff { aniFamApi.getHome() }
-            val rails = mutableListOf<CategorySection>()
+        val home = runCatching { retryWithBackoff { aniFamApi.getHome() } }.getOrNull()
+        val rails = mutableListOf<CategorySection>()
+        if (home != null) {
             if (home.trending.isNotEmpty()) {
                 rails.add(CategorySection("Trending Anime", "TRENDING", home.trending.map { it.toMovieSubject() }))
             }
@@ -296,14 +296,32 @@ class MovieRepository(
             if (home.new_releases.isNotEmpty()) {
                 rails.add(CategorySection("New Anime Releases", "NEW", home.new_releases.map { it.toMovieSubject() }))
             }
-            if (rails.isNotEmpty()) {
-                memoryAnimeRails.clear()
-                memoryAnimeRails.addAll(rails)
-            }
-            rails.filterAdultSections()
-        } catch (_: Exception) {
-            emptyList()
         }
+        if (rails.isEmpty()) {
+            rails.addAll(aniFamBrowseRails())
+        }
+        if (rails.isNotEmpty()) {
+            memoryAnimeRails.clear()
+            memoryAnimeRails.addAll(rails)
+        }
+        rails.filterAdultSections()
+    }
+
+    /** Real AniFam rows for when /app/home is unavailable or empty. */
+    private suspend fun aniFamBrowseRails(): List<CategorySection> {
+        val sections = mutableListOf<CategorySection>()
+        val popular = runCatching { aniFamApi.browse(sort = "popular", page = 1) }.getOrNull()
+            ?.data?.map { it.toMovieSubject() }.orEmpty()
+        if (popular.isNotEmpty()) {
+            sections.add(CategorySection("Popular Anime", "ANIFAM_POPULAR", popular))
+        }
+        val latest = runCatching { aniFamApi.browse(sort = "latest", page = 1) }.getOrNull()
+            ?.data?.map { it.toMovieSubject() }.orEmpty()
+        val fresh = latest.filter { item -> popular.none { it.id == item.id } }
+        if (fresh.isNotEmpty()) {
+            sections.add(CategorySection("New Anime", "ANIFAM_NEW", fresh))
+        }
+        return sections
     }
 
     suspend fun getTrending(page: Int = 1, pageSize: Int = 20): List<MovieSubject> = withContext(Dispatchers.IO) {
@@ -375,8 +393,9 @@ class MovieRepository(
         val cached = if (page == 1) getCachedCategorySections(categoryId) else (memorySectionsCache[categoryId] ?: emptyList())
         if (isAniFam) {
             try {
-                if (categoryId == 0 || categoryId == 2) {
-                    val home = retryWithBackoff { aniFamApi.getHome() }
+                if (categoryId == 0 || categoryId == 1 || categoryId == 2 || categoryId == 5 || categoryId == 8 || categoryId == 18) {
+                    val home = runCatching { retryWithBackoff { aniFamApi.getHome() } }
+                        .getOrDefault(AniFamHomeResponse())
                     val sections = mutableListOf<CategorySection>()
                     if (home.spotlight.isNotEmpty()) {
                         sections.add(CategorySection("Spotlight", "SPOTLIGHT", home.spotlight.map { it.toMovieSubject() }))
@@ -398,6 +417,9 @@ class MovieRepository(
                     }
                     if (home.top_movies.isNotEmpty()) {
                         sections.add(CategorySection("Top Anime Movies", "MOVIES", home.top_movies.map { it.toMovieSubject() }))
+                    }
+                    if (sections.isEmpty()) {
+                        sections.addAll(aniFamBrowseRails())
                     }
                     if (sections.isNotEmpty()) {
                         memorySectionsCache[categoryId] = sections
@@ -443,7 +465,10 @@ class MovieRepository(
         val cached = if (page == 1) getCachedCategoryList(categoryId) else (memoryCategoryCache[categoryId] ?: emptyList())
         if (isAniFam) {
             val sections = getCategorySections(categoryId, page, pageSize)
-            val allItems = sections.flatMap { it.items }
+            var allItems = sections.flatMap { it.items }
+            if (allItems.isEmpty()) {
+                allItems = getAnimeRails().flatMap { it.items }
+            }
             if (allItems.isNotEmpty()) {
                 memoryCategoryCache[categoryId] = allItems
                 if (page == 1) saveMoviesToDisk("${providerKey}_$categoryId", allItems)
@@ -679,14 +704,15 @@ class MovieRepository(
     ): PlayInfo = withContext(Dispatchers.IO) {
         if (isAniFamSubject(subjectId)) {
             val numId = parseAniFamId(subjectId) ?: return@withContext PlayInfo()
-            val epId = aniFamEpisodeMap["${numId}_${episode}"]
+            val episodeNumber = if (episode > 0) episode else 1
+            val epId = aniFamEpisodeMap["${numId}_$episodeNumber"]
                 ?: try {
                     val allEps = fetchAllAniFamEpisodes(numId)
                     allEps.forEach { ep ->
                         aniFamEpisodeMap["${numId}_${ep.episodeNumber}"] = ep.id
                         aniFamEpisodeItemMap[ep.id] = ep
                     }
-                    allEps.find { it.episodeNumber == episode }?.id
+                    allEps.find { it.episodeNumber == episodeNumber }?.id ?: allEps.firstOrNull()?.id
                 } catch (e: Exception) { null }
 
             if (epId == null) return@withContext PlayInfo()
@@ -763,6 +789,9 @@ class MovieRepository(
                     }
                 }
 
+                if (streams.isEmpty() && track == "sub") {
+                    return@withContext getPlayInfo(subjectId, season, episode, quality, "dub")
+                }
                 PlayInfo(streamList = streams, subTitleList = subtitles)
             } catch (e: Exception) {
                 PlayInfo()
@@ -774,19 +803,22 @@ class MovieRepository(
 
                 // Movies answer at se=0&ep=0 and series at their real
                 // season/episode, but a subject's isTvShow flag can disagree with
-                // how the catalogue addresses it. Only the first episode is
-                // retried with the other addressing: deeper seasons legitimately
-                // have no stream, and re-asking would surface unrelated content.
-                if (season > 1 || episode > 1) return@withContext primary
-
-                val altSeason = if (season == 0) 1 else 0
-                val altEpisode = if (season == 0) 1 else 0
-                try {
-                    val alt = api.playInfo(subjectId, altSeason, altEpisode, quality, resourceId)
-                    if (alt.streamList.isNotEmpty()) alt else primary
-                } catch (e: Exception) {
-                    primary
+                // how the catalogue addresses it. Try the equivalent first
+                // episode before giving up, and never invent deeper seasons.
+                val alternatives = when {
+                    season <= 0 && episode <= 0 -> listOf(1 to 1, 0 to 1, 1 to 0)
+                    season <= 0 -> listOf(1 to episode)
+                    episode <= 0 -> listOf(season to 1)
+                    else -> emptyList()
                 }
+                for ((altSeason, altEpisode) in alternatives) {
+                    try {
+                        val alt = api.playInfo(subjectId, altSeason, altEpisode, quality, resourceId)
+                        if (alt.streamList.isNotEmpty()) return@withContext alt
+                    } catch (_: Exception) {
+                    }
+                }
+                primary
             } catch (e: Exception) {
                 PlayInfo(emptyList(), emptyList())
             }
@@ -897,11 +929,22 @@ class MovieRepository(
     suspend fun getRankingList(type: String?, page: Int = 1): List<MovieSubject> =
         safeExt { it.getRankingList(type, page, 30).data?.subjects?.filterAdultMovies() } ?: emptyList()
 
-    suspend fun getGenreTop(genre: String, page: Int = 1): List<MovieSubject> =
-        safeExt {
-            it.getGenreTop(mapOf("type" to "0", "genre" to genre, "page" to page, "pageSize" to 30))
-                .data?.list?.filterAdultMovies()
-        } ?: emptyList()
+    suspend fun getGenreTop(genre: String, page: Int = 1): List<MovieSubject> = withContext(Dispatchers.IO) {
+        if (isAniFam) {
+            val slug = runCatching {
+                aniFamApi.getGenres().firstOrNull { it.name.equals(genre, true) }?.slug
+            }.getOrNull() ?: genre
+            runCatching {
+                aniFamApi.browse(genre = slug, sort = "popular", page = page)
+                    .data.map { it.toMovieSubject() }.filterAdultMovies()
+            }.getOrDefault(emptyList())
+        } else {
+            safeExt {
+                it.getGenreTop(mapOf("type" to "0", "genre" to genre, "page" to page, "pageSize" to 30))
+                    .data?.list?.filterAdultMovies()
+            } ?: emptyList()
+        }
+    }
 
     suspend fun getFilterOptions(categoryId: Int = 2): List<FilterOption> =
         safeExt { it.getFilterOptions(categoryId).data?.typeList?.firstOrNull()?.items } ?: emptyList()
@@ -1006,6 +1049,59 @@ class MovieRepository(
 
     suspend fun getTvChannelStream(channelId: String): String? =
         safeExt { it.getTvChannel(channelId).data?.streams?.firstOrNull { s -> s.url.isNotBlank() }?.url }
+
+    /**
+     * Public iptv-org playlist used when the catalogue's live-TV endpoints are
+     * unavailable (guest sessions, region blocks, or AniFam mode).
+     */
+    suspend fun getFallbackTvChannels(countryCode: String = "in"): List<TvChannel> =
+        withContext(Dispatchers.IO) {
+            val url = "https://iptv-org.github.io/iptv/countries/${countryCode.lowercase()}.m3u"
+            val body = try {
+                val request = okhttp3.Request.Builder()
+                    .url(url)
+                    .header("User-Agent", "Flixvora-Android")
+                    .build()
+                okhttp3.OkHttpClient.Builder()
+                    .connectTimeout(20, java.util.concurrent.TimeUnit.SECONDS)
+                    .readTimeout(25, java.util.concurrent.TimeUnit.SECONDS)
+                    .build()
+                    .newCall(request)
+                    .execute()
+                    .use { if (it.isSuccessful) it.body?.string() else null }
+            } catch (_: Exception) {
+                null
+            } ?: return@withContext emptyList()
+
+            val channels = mutableListOf<TvChannel>()
+            var pendingTitle: String? = null
+            var pendingGroup: String? = null
+            for (line in body.lineSequence()) {
+                val trimmed = line.trim()
+                when {
+                    trimmed.startsWith("#EXTINF") -> {
+                        pendingTitle = trimmed.substringAfterLast(',', "").trim().ifBlank { null }
+                        pendingGroup = Regex("""group-title="([^"]*)"""")
+                            .find(trimmed)?.groupValues?.get(1)?.ifBlank { null }
+                    }
+                    trimmed.isNotEmpty() && !trimmed.startsWith("#") && pendingTitle != null -> {
+                        val channelId = "iptv_${trimmed.hashCode().toUInt().toString(16)}"
+                        channels.add(
+                            TvChannel(
+                                channelId = channelId,
+                                title = pendingTitle.orEmpty(),
+                                countryCode = countryCode.uppercase(),
+                                countryName = pendingGroup ?: "Live",
+                                streams = listOf(TvStream(streamId = channelId, url = trimmed, urlType = "hls"))
+                            )
+                        )
+                        pendingTitle = null
+                        pendingGroup = null
+                    }
+                }
+            }
+            channels.distinctBy { it.channelId }
+        }
 
     suspend fun getComments(topicId: String, page: Int = 1): List<CommentItem> =
         safeExt { it.getComments(topicId, 1, page, 20).data?.all } ?: emptyList()

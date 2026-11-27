@@ -424,13 +424,15 @@ fun HomeScreen(
             }
         }
 
-        // Coming Soon with live countdowns
-        item {
-            ComingSoonRow(
-                releases = uiState.displayComingSoon,
-                remindedIds = uiState.remindedReleases,
-                onToggleReminder = onToggleReminder
-            )
+        // Coming Soon with live countdowns (only when the catalogue has a real future date)
+        if (uiState.displayComingSoon.isNotEmpty()) {
+            item {
+                ComingSoonRow(
+                    releases = uiState.displayComingSoon,
+                    remindedIds = uiState.remindedReleases,
+                    onToggleReminder = onToggleReminder
+                )
+            }
         }
     }
 }
@@ -516,7 +518,7 @@ fun HomeScreen(
                 posterUrl = movie.poster,
                 backdropUrl = movie.backdrop ?: movie.poster
             )
-        }.ifEmpty { com.flixvora.data.SampleCatalog.mediaCatalog }
+        }
     }
 
     val mockUiState = remember(mediaTitles) {

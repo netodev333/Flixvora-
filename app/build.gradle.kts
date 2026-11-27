@@ -39,9 +39,9 @@ android {
     if (file.exists()) file.inputStream().use { load(it) }
   }
   val appVersionName = (project.findProperty("versionName") as String?)
-    ?: versionProps.getProperty("versionName", "11.5")
+    ?: versionProps.getProperty("versionName", "11.6")
   val appVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull()
-    ?: versionProps.getProperty("versionCode", "64").toIntOrNull()
+    ?: versionProps.getProperty("versionCode", "65").toIntOrNull()
     ?: 64
 
   defaultConfig {
@@ -142,7 +142,7 @@ dependencies {
   "ksp"(libs.androidx.room.compiler)
   "ksp"(libs.moshi.kotlin.codegen)
   implementation(libs.androidx.media3.exoplayer)
-  implementation("androidx.media3:media3-session:1.4.1")
+  implementation(libs.androidx.media3.session)
   implementation("androidx.work:work-runtime-ktx:2.10.0")
   implementation(libs.androidx.media3.ui)
   implementation(libs.androidx.media3.exoplayer.dash)

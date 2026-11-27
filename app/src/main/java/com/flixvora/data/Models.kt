@@ -72,7 +72,8 @@ data class MediaTitle(
     val isRestricted: Boolean = false,
     val cast: List<CastMember> = emptyList(),
     val seasons: List<SeasonItem> = emptyList(),
-    val audioTracks: List<AudioTrackMetadata> = emptyList()
+    val audioTracks: List<AudioTrackMetadata> = emptyList(),
+    val releaseEpochMs: Long? = null
 )
 
 data class PersonalizedRecommendation(
