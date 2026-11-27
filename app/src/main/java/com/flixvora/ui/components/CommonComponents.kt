@@ -555,6 +555,7 @@ fun setSystemBarsVisible(activity: android.app.Activity, visible: Boolean) {
 // ─────────────────────────────────────────────────────────────────────────────
 // Legacy Interaction & UI Modifiers
 // ─────────────────────────────────────────────────────────────────────────────
+@Composable
 fun AuroraBackground(
     modifier: Modifier = Modifier,
     content: @Composable BoxScope.() -> Unit
