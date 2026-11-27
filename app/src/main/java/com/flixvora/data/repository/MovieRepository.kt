@@ -296,6 +296,12 @@ class MovieRepository(
             if (home.new_releases.isNotEmpty()) {
                 rails.add(CategorySection("New Anime Releases", "NEW", home.new_releases.map { it.toMovieSubject() }))
             }
+            if (home.top10.today.isNotEmpty()) {
+                rails.add(CategorySection("Top 10 Today", "TOP10", home.top10.today.map { it.toMovieSubject() }))
+            }
+            if (home.completed.isNotEmpty()) {
+                rails.add(CategorySection("Completed Anime", "COMPLETED", home.completed.map { it.toMovieSubject() }))
+            }
         }
         if (rails.isEmpty()) {
             rails.addAll(aniFamBrowseRails())
@@ -392,6 +398,12 @@ class MovieRepository(
         val providerKey = if (isAniFam) "anifam" else "moviebox"
         val cached = if (page == 1) getCachedCategorySections(categoryId) else (memorySectionsCache[categoryId] ?: emptyList())
         if (isAniFam) {
+            if (page > 1) {
+                val more = runCatching { aniFamApi.browse(sort = "popular", page = page) }
+                    .getOrNull()?.data?.map { it.toMovieSubject() }.orEmpty()
+                return@withContext if (more.isEmpty()) emptyList() else
+                    listOf(CategorySection("More Anime", "BROWSE", more))
+            }
             try {
                 if (categoryId == 0 || categoryId == 1 || categoryId == 2 || categoryId == 5 || categoryId == 8 || categoryId == 18) {
                     val home = runCatching { retryWithBackoff { aniFamApi.getHome() } }
@@ -414,6 +426,12 @@ class MovieRepository(
                     }
                     if (home.most_popular.isNotEmpty()) {
                         sections.add(CategorySection("Most Popular", "POPULAR", home.most_popular.map { it.toMovieSubject() }))
+                    }
+                    if (home.completed.isNotEmpty()) {
+                        sections.add(CategorySection("Completed Anime", "COMPLETED", home.completed.map { it.toMovieSubject() }))
+                    }
+                    if (home.top10.today.isNotEmpty()) {
+                        sections.add(CategorySection("Top 10 Today", "TOP10", home.top10.today.map { it.toMovieSubject() }))
                     }
                     if (home.top_movies.isNotEmpty()) {
                         sections.add(CategorySection("Top Anime Movies", "MOVIES", home.top_movies.map { it.toMovieSubject() }))

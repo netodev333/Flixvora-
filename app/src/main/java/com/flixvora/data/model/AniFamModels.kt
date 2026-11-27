@@ -76,7 +76,16 @@ data class AniFamHomeResponse(
     val new_releases: List<AniFamAnimeItem> = emptyList(),
     val top_airing: List<AniFamAnimeItem> = emptyList(),
     val most_popular: List<AniFamAnimeItem> = emptyList(),
-    val top_movies: List<AniFamAnimeItem> = emptyList()
+    val completed: List<AniFamAnimeItem> = emptyList(),
+    val top_movies: List<AniFamAnimeItem> = emptyList(),
+    val top10: AniFamTop10 = AniFamTop10()
+)
+
+@JsonClass(generateAdapter = true)
+data class AniFamTop10(
+    val today: List<AniFamAnimeItem> = emptyList(),
+    val week: List<AniFamAnimeItem> = emptyList(),
+    val month: List<AniFamAnimeItem> = emptyList()
 )
 
 @JsonClass(generateAdapter = true)

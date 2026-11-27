@@ -24,6 +24,8 @@ class AniFamParsingTest {
         assertTrue("spotlight should parse", home.spotlight.isNotEmpty())
         assertTrue("trending should parse", home.trending.isNotEmpty())
         assertTrue("top_airing should parse", home.top_airing.isNotEmpty())
+        assertTrue("completed should parse", home.completed.isNotEmpty())
+        assertTrue("top10 should parse", home.top10.today.isNotEmpty())
 
         val titles = home.trending.map { DataBridge.movieSubjectToMediaTitle(it.toMovieSubject()) }
         assertTrue(titles.isNotEmpty())
