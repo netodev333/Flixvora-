@@ -53,6 +53,7 @@ fun RealPlayerOverlay(
     onClose: () -> Unit,
     onEnterPip: () -> Unit,
     onNotify: (String) -> Unit,
+    onPlayerError: () -> Boolean = { false },
     onProgress: (Long, Long) -> Unit = { _, _ -> }
 ) {
     val context = LocalContext.current
@@ -97,8 +98,12 @@ fun RealPlayerOverlay(
     DisposableEffect(player) {
         val listener = object : Player.Listener {
             override fun onPlayerError(e: PlaybackException) {
-                error = e.message ?: "Playback failed"
-                buffering = false
+                // A dead mirror should not end the session: advance to the next
+                // resolved source and only surface the error when all are tried.
+                if (!onPlayerError()) {
+                    error = e.message ?: "Playback failed"
+                    buffering = false
+                }
             }
 
             override fun onPlaybackStateChanged(playbackState: Int) {

@@ -546,6 +546,42 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
         _uiState.update { it.copy(selectedDetail = null) }
     }
 
+    /**
+     * Pops one UI layer for the system back button. Returns false only at the
+     * Home root, which lets the caller show the double-tap-to-exit prompt.
+     */
+    fun handleBack(): Boolean {
+        val state = _uiState.value
+        when {
+            state.showPinDialogFor != null -> { dismissPinDialog(); return true }
+            state.showWatchPartyFor != null -> { openWatchParty(null); return true }
+            state.showStreamResolver -> { setStreamResolverOpen(false); return true }
+            state.activePlayerSession != null -> { closePlayer(); return true }
+            state.selectedDetail != null -> { closeDetail(); return true }
+            state.isTvMode -> { toggleTvMode(); return true }
+            state.activeTab != MainNavTab.HOME -> { selectTab(MainNavTab.HOME); return true }
+            state.searchQuery.isNotBlank() -> { resetHomeFilters(); return true }
+            state.selectedCategory != "Trending" ||
+                state.selectedGenre != "Trending" ||
+                state.selectedOtt != "All" ||
+                state.selectedMoodId != null -> { resetHomeFilters(); return true }
+        }
+        return false
+    }
+
+    fun resetHomeFilters() {
+        _uiState.update {
+            it.copy(
+                searchQuery = "",
+                searchResults = emptyList(),
+                selectedCategory = "Trending",
+                selectedGenre = "Trending",
+                selectedOtt = "All",
+                selectedMoodId = null
+            )
+        }
+    }
+
     fun openDeepLinkedTitle(titleId: String) {
         val match = _uiState.value.safeCatalog.firstOrNull { it.id == titleId }
         if (match != null) {
@@ -707,15 +743,14 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
                 headers["Cookie"] = cookie
             }
         }
-        // The catalogue's own media headers win: AniFam and MovieBox CDNs do not
-        // all accept the same referer, and overwriting a working one breaks playback.
+        // Route by id prefix, never by category: a MovieBox anime title is still
+        // a MovieBox stream. AniFam's CDN checks the referer it shipped in
+        // media_headers, while MovieBox's signed CDN authorises by signCookie
+        // alone, so fabricating a referer there only risks a 403.
         fun hasHeader(name: String) = headers.keys.any { it.equals(name, ignoreCase = true) }
-        if (item.id.startsWith("anifam_") || item.category == MediaCategory.ANIME) {
+        if (item.id.startsWith("anifam_")) {
             if (!hasHeader("Referer")) headers["Referer"] = "https://zokoanime.video/"
             if (!hasHeader("Origin")) headers["Origin"] = "https://zokoanime.video"
-        } else {
-            if (!hasHeader("Referer")) headers["Referer"] = "https://sportslive.wine"
-            if (!hasHeader("Origin")) headers["Origin"] = "https://sportslive.wine"
         }
         return headers
     }
@@ -853,6 +888,26 @@ class FlixvoraViewModel(application: Application) : AndroidViewModel(application
 
     fun closePlayer() {
         _uiState.update { it.copy(activePlayerSession = null) }
+    }
+
+    /**
+     * Moves to the next resolved source after ExoPlayer reports an error, so a
+     * dead mirror does not end the session. False once every source is tried.
+     */
+    fun playNextStreamSource(): Boolean {
+        val state = _uiState.value
+        val session = state.activePlayerSession ?: return false
+        val currentIndex = state.streamSources.indexOfFirst { it.id == state.activeSourceId }
+        val next = state.streamSources.getOrNull(currentIndex + 1) ?: return false
+        if (next.url.isBlank()) return false
+        _uiState.update {
+            it.copy(
+                activeSourceId = next.id,
+                activePlayerSession = session.copy(streamUrl = next.url, headers = next.headers),
+                toastMessage = "Trying ${next.name}"
+            )
+        }
+        return true
     }
 
     fun minimizeToBackgroundAudio() {

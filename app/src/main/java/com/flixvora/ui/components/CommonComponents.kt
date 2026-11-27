@@ -206,8 +206,6 @@ fun HeroSpotlightCarousel(
 @Composable
 fun PersonalizedForYouRow(
     recommendations: List<PersonalizedRecommendation>,
-    traktConnected: Boolean,
-    onSyncTrakt: () -> Unit,
     onSelectTitle: (MediaTitle) -> Unit
 ) {
     val accent = LocalAccentTheme.current
@@ -223,15 +221,10 @@ fun PersonalizedForYouRow(
                     Text("Personalized For You", color = Color.White, fontSize = 17.sp, fontWeight = FontWeight.Bold)
                 }
                 Text(
-                    text = if (traktConnected) "Curated from Trakt scrobbles & watch history" else "Curated from watch history & saved list",
+                    text = "Curated from your watch history & saved list",
                     color = TextSecondary,
                     fontSize = 11.sp
                 )
-            }
-            TextButton(onClick = onSyncTrakt) {
-                Icon(Icons.Default.Refresh, contentDescription = null, tint = accent.primary, modifier = Modifier.size(14.dp))
-                Spacer(Modifier.width(4.dp))
-                Text(if (traktConnected) "Trakt Synced" else "Sync Trakt", color = accent.primary, fontSize = 11.sp, fontWeight = FontWeight.Bold)
             }
         }
 

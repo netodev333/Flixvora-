@@ -1,5 +1,8 @@
 package com.flixvora
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -13,9 +16,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -37,6 +43,21 @@ fun FlixvoraApp(
 ) {
     val uiState by viewModel.uiState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+    var lastBackPress by remember { mutableStateOf(0L) }
+
+    // System back pops one layer (player, detail, filters, tab) before exiting.
+    BackHandler {
+        if (!viewModel.handleBack()) {
+            val now = System.currentTimeMillis()
+            if (now - lastBackPress < 2000L) {
+                (context as? Activity)?.finish()
+            } else {
+                lastBackPress = now
+                Toast.makeText(context, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
 
     LaunchedEffect(deepLinkTitleId) {
         if (!deepLinkTitleId.isNullOrBlank()) {
@@ -170,7 +191,6 @@ fun FlixvoraApp(
                                     onSelectGenre = { viewModel.setGenre(it) },
                                     onSelectOtt = { viewModel.setOtt(it) },
                                     onToggleMood = { viewModel.toggleMood(it) },
-                                    onSyncTrakt = { viewModel.syncTrakt() },
                                     onToggleReminder = { rel -> viewModel.toggleComingSoonReminder(rel.id, rel.title) },
                                     onToggleWatchlist = { viewModel.toggleWatchlist(it) },
                                     onPlayTitle = { item -> viewModel.playTitle(item) },
@@ -205,10 +225,7 @@ fun FlixvoraApp(
                                     uiState = uiState,
                                     onSwitchProfile = { viewModel.requestProfileSwitch(it) },
                                     onSelectTheme = { viewModel.setAccentTheme(it) },
-                                    onToggleTvMode = { viewModel.toggleTvMode() },
                                     onToggleBackgroundAudio = { viewModel.toggleBackgroundAudio() },
-                                    onOpenStreamResolver = { viewModel.setStreamResolverOpen(true) },
-                                    onSyncTrakt = { viewModel.syncTrakt() },
                                     onToggleWifiOnly = { viewModel.updateStorageWifiOnly(it) },
                                     onToggleAutoDelete = { viewModel.updateAutoDeleteWatched(it) },
                                     onClearTempCache = { viewModel.clearTempMediaCacheOnly() },
@@ -230,6 +247,7 @@ fun FlixvoraApp(
                 onClose = { viewModel.closePlayer() },
                 onEnterPip = onEnterPictureInPicture,
                 onNotify = { viewModel.showToast(it) },
+                onPlayerError = { viewModel.playNextStreamSource() },
                 onProgress = { position, duration -> viewModel.saveProgress(session, position, duration) }
             )
         }
