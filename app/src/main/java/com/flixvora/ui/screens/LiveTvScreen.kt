@@ -31,13 +31,14 @@ import com.flixvora.ui.theme.*
 
 @Composable
 fun LiveTvScreen(
+    channels: List<LiveChannel> = SampleCatalog.liveChannels,
     backgroundAudioEnabled: Boolean,
     onWatchChannel: (LiveChannel) -> Unit,
     onPlayAudioCommentary: (LiveChannel) -> Unit
 ) {
     val accent = LocalAccentTheme.current
-    val channels = SampleCatalog.liveChannels
-    var selectedChannel by remember { mutableStateOf(channels.first()) }
+    val liveList = channels.ifEmpty { SampleCatalog.liveChannels }
+    var selectedChannel by remember(liveList) { mutableStateOf(liveList.first()) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -63,7 +64,7 @@ fun LiveTvScreen(
                 ) {
                     Box(modifier = Modifier.size(7.dp).clip(CircleShape).background(LiveCrimson))
                     Spacer(Modifier.width(6.dp))
-                    Text("${channels.size} LIVE", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
+                    Text("${liveList.size} LIVE", color = Color.White, fontSize = 11.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
@@ -183,7 +184,7 @@ fun LiveTvScreen(
             Text("All Channels", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 
-        items(channels, key = { it.id }) { ch ->
+        items(liveList, key = { it.id }) { ch ->
             val active = ch.id == selectedChannel.id
             Row(
                 modifier = Modifier

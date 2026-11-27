@@ -371,7 +371,7 @@ fun HomeScreen(
         // Coming Soon with live countdowns
         item {
             ComingSoonRow(
-                releases = SampleCatalog.comingSoonReleases,
+                releases = uiState.displayComingSoon,
                 remindedIds = uiState.remindedReleases,
                 onToggleReminder = onToggleReminder
             )

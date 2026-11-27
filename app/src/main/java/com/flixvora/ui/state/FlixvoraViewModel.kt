@@ -1,15 +1,23 @@
 package com.flixvora.ui.state
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.flixvora.data.*
+import com.flixvora.data.model.MovieSubject
+import com.flixvora.data.network.MovieBoxRetrofitClient
+import com.flixvora.data.preferences.PreferencesManager
+import com.flixvora.data.local.MovieDatabase
+import com.flixvora.data.repository.MovieRepository
 import com.flixvora.ui.theme.FlixvoraAccentTheme
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class FlixvoraUiState(
     val activeTab: MainNavTab = MainNavTab.HOME,
@@ -27,9 +35,9 @@ data class FlixvoraUiState(
     val backgroundAudioEnabled: Boolean = true,
     val traktConnected: Boolean = false,
     val traktLastSync: String? = null,
-    val watchlist: Set<String> = setOf("skyfall-citadel", "phantom-shinobi", "neon-drift-77"),
+    val watchlist: Set<String> = emptySet(),
     val remindedReleases: Set<String> = emptySet(),
-    val downloads: List<DownloadTask> = SampleCatalog.initialDownloads,
+    val downloads: List<DownloadTask> = emptyList(),
     val networkOnline: Boolean = true,
     val storageConfig: SmartStorageConfig = SmartStorageConfig(),
     val selectedDetail: MediaTitle? = null,
@@ -40,28 +48,92 @@ data class FlixvoraUiState(
     val activeSourceId: String = SampleCatalog.streamSources.first().id,
     val showStreamResolver: Boolean = false,
     val showWatchPartyFor: MediaTitle? = null,
-    val commentsByTitle: Map<String, List<CommentItem>> = mapOf(
-        "skyfall-citadel" to listOf(
-            CommentItem("c1", "Riya Sharma", "2h ago", "Dolby Vision orbital storm sequence looks crisp on OLED.", false, 42),
-            CommentItem("c2", "Arjun Mehta", "5h ago", "When Kiran overrides the magnetic shield core, soundtrack drops hard.", true, 19)
-        )
-    ),
+    val liveCatalog: List<MediaTitle> = emptyList(),
+    val liveTvChannels: List<LiveChannel> = emptyList(),
+    val liveComingSoon: List<ComingSoonRelease> = emptyList(),
+    val commentsByTitle: Map<String, List<CommentItem>> = emptyMap(),
     val toastMessage: String? = null
 ) {
     val safeCatalog: List<MediaTitle>
-        get() = SampleCatalog.filterCatalogBySafety(SampleCatalog.mediaCatalog, activeProfile, adultUnlocked)
+        get() {
+            val base = if (liveCatalog.isNotEmpty()) liveCatalog else SampleCatalog.mediaCatalog
+            return SampleCatalog.filterCatalogBySafety(base, activeProfile, adultUnlocked)
+        }
+
+    val displayChannels: List<LiveChannel>
+        get() = if (liveTvChannels.isNotEmpty()) liveTvChannels else SampleCatalog.liveChannels
+
+    val displayComingSoon: List<ComingSoonRelease>
+        get() = if (liveComingSoon.isNotEmpty()) liveComingSoon else SampleCatalog.comingSoonReleases
 }
 
-class FlixvoraViewModel : ViewModel() {
+class FlixvoraViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val _uiState = MutableStateFlow(FlixvoraUiState())
+    private val prefs = PreferencesManager(application)
+    private val database = MovieDatabase.getDatabase(application)
+    val repository = MovieRepository(
+        MovieBoxRetrofitClient.getApi(prefs),
+        database.movieDao(),
+        prefs
+    )
+
+    private val _uiState = MutableStateFlow(FlixvoraUiState(
+        adultUnlocked = prefs.adultContentEnabled
+    ))
     val uiState: StateFlow<FlixvoraUiState> = _uiState.asStateFlow()
 
     init {
+        loadRealData()
+
         viewModelScope.launch {
             while (true) {
                 delay(1500)
                 advanceDownloadsTick()
+            }
+        }
+    }
+
+    fun loadRealData() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val trending = repository.getTrending(1, 20)
+                val catMovies = repository.getCategoryList(0, 1, 50)
+                val sections = repository.getCategorySections(0, 1, 50)
+                val anime = try { repository.getAnimeRails() } catch (_: Exception) { emptyList() }
+                
+                val combined = mutableListOf<MovieSubject>()
+                combined.addAll(trending)
+                combined.addAll(catMovies)
+                sections.forEach { combined.addAll(it.items) }
+                anime.forEach { combined.addAll(it.items) }
+
+                val distinctSubjects = combined.distinctBy { it.id }
+                val converted = distinctSubjects.map { DataBridge.movieSubjectToMediaTitle(it) }
+
+                val comingSoonList = distinctSubjects.take(6).mapIndexed { idx, sub ->
+                    DataBridge.movieSubjectToComingSoon(sub, idx)
+                }
+
+                val realChannels = try {
+                    val channelsData = repository.getTvChannels("US", 1, 30)
+                    if (channelsData.isNotEmpty()) {
+                        channelsData.mapIndexed { idx, tv -> DataBridge.tvChannelToLiveChannel(tv, idx) }
+                    } else emptyList()
+                } catch (_: Exception) {
+                    emptyList()
+                }
+
+                withContext(Dispatchers.Main) {
+                    _uiState.update { current ->
+                        current.copy(
+                            liveCatalog = if (converted.isNotEmpty()) converted else current.liveCatalog,
+                            liveComingSoon = if (comingSoonList.isNotEmpty()) comingSoonList else current.liveComingSoon,
+                            liveTvChannels = if (realChannels.isNotEmpty()) realChannels else current.liveTvChannels
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
         }
     }
@@ -103,6 +175,23 @@ class FlixvoraViewModel : ViewModel() {
 
     fun setCategory(category: String) {
         _uiState.update { it.copy(selectedCategory = category) }
+        viewModelScope.launch(Dispatchers.IO) {
+            val tabId = when (category) {
+                "Movies" -> 1
+                "TV Shows" -> 2
+                "Anime" -> 5
+                else -> 0
+            }
+            try {
+                val catList = repository.getCategoryList(tabId, 1, 50)
+                val titles = catList.map { DataBridge.movieSubjectToMediaTitle(it) }
+                if (titles.isNotEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { it.copy(liveCatalog = (titles + it.liveCatalog).distinctBy { m -> m.id }) }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     fun setGenre(genre: String) {
@@ -114,24 +203,53 @@ class FlixvoraViewModel : ViewModel() {
     }
 
     fun toggleMood(moodId: String?) {
-        _uiState.update {
-            it.copy(selectedMoodId = if (it.selectedMoodId == moodId) null else moodId)
+        _uiState.update { current ->
+            current.copy(selectedMoodId = if (current.selectedMoodId == moodId) null else moodId)
         }
     }
 
     fun updateSearchQuery(query: String) {
         _uiState.update { it.copy(searchQuery = query) }
+        if (query.trim().length >= 2) {
+            viewModelScope.launch(Dispatchers.IO) {
+                try {
+                    val results = repository.search(query.trim())
+                    val converted = results.map { DataBridge.movieSubjectToMediaTitle(it) }
+                    if (converted.isNotEmpty()) {
+                        withContext(Dispatchers.Main) {
+                            _uiState.update { it.copy(liveCatalog = (converted + it.liveCatalog).distinctBy { m -> m.id }) }
+                        }
+                    }
+                } catch (_: Exception) {}
+            }
+        }
     }
 
     fun openDetail(item: MediaTitle) {
         _uiState.update { it.copy(selectedDetail = item) }
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val fullDetail = repository.getDetail(item.id)
+                if (fullDetail != null) {
+                    val updated = DataBridge.movieSubjectToMediaTitle(fullDetail)
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { current ->
+                            if (current.selectedDetail?.id == item.id) {
+                                current.copy(selectedDetail = updated)
+                            } else current
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
+        }
     }
 
     fun openDeepLinkedTitle(titleId: String) {
         val match = _uiState.value.safeCatalog.firstOrNull { it.id == titleId }
         if (match != null) {
-            _uiState.update { it.copy(selectedDetail = match, activeTab = MainNavTab.HOME) }
-            showToast("Opened shared title: ${match.title}")
+            openDetail(match)
+            _uiState.update { it.copy(activeTab = MainNavTab.HOME) }
+            showToast("Opened: ${match.title}")
         }
     }
 
@@ -162,7 +280,7 @@ class FlixvoraViewModel : ViewModel() {
             val task = SampleCatalog.createDownloadTask(item, label, sizeMb, 14, DownloadStatus.DOWNLOADING)
             current.copy(
                 downloads = listOf(task) + current.downloads,
-                toastMessage = "Queued WorkManager chunked download: ${item.title}"
+                toastMessage = "Queued download: ${item.title}"
             )
         }
     }
@@ -181,87 +299,85 @@ class FlixvoraViewModel : ViewModel() {
     }
 
     fun removeDownload(id: String) {
-        _uiState.update {
-            it.copy(
-                downloads = it.downloads.filterNot { d -> d.id == id },
-                toastMessage = "Removed download"
+        _uiState.update { current ->
+            current.copy(
+                downloads = current.downloads.filterNot { it.id == id },
+                toastMessage = "Download removed"
             )
         }
     }
 
     fun clearDownloads() {
-        _uiState.update { it.copy(downloads = emptyList(), toastMessage = "Cleared all offline downloads") }
+        _uiState.update { it.copy(downloads = emptyList(), toastMessage = "Cleared all downloads") }
     }
 
     fun toggleNetworkSimulation() {
         _uiState.update { current ->
-            val online = !current.networkOnline
-            val msg = if (online) {
-                if (current.storageConfig.wifiOnly) "Wi-Fi restored — WorkManager resumed chunks from byte offset"
-                else "Network restored — WorkManager resumed downloads"
-            } else {
-                "Network lost — WorkManager paused chunks safely"
-            }
-            current.copy(networkOnline = online, toastMessage = msg)
+            val next = !current.networkOnline
+            current.copy(
+                networkOnline = next,
+                toastMessage = if (next) "Network reconnected · Resuming downloads" else "Simulated offline network drop"
+            )
         }
     }
 
     fun clearTempMediaCacheOnly() {
         _uiState.update { current ->
-            val freed = current.storageConfig.totalTempCacheMb
             current.copy(
                 storageConfig = current.storageConfig.copy(
                     mediaBufferMb = 0,
-                    thumbCacheMb = 0,
-                    feedCacheMb = 0,
-                    dbCacheMb = 0
+                    thumbCacheMb = 24,
+                    feedCacheMb = 8
                 ),
-                toastMessage = if (freed > 0) "Cleared $freed MB temporary buffer. Watchlist, history & settings preserved." else "Temporary cache already clean"
+                toastMessage = "Cleared stale temporary media & buffer caches"
             )
         }
     }
 
     fun updateStorageWifiOnly(wifiOnly: Boolean) {
-        _uiState.update {
-            it.copy(storageConfig = it.storageConfig.copy(wifiOnly = wifiOnly))
+        _uiState.update { current ->
+            current.copy(
+                storageConfig = current.storageConfig.copy(wifiOnly = wifiOnly),
+                toastMessage = if (wifiOnly) "Downloads set to Wi-Fi only" else "Cellular downloads enabled"
+            )
         }
     }
 
     fun updateAutoDeleteWatched(autoDelete: Boolean) {
-        _uiState.update {
-            it.copy(storageConfig = it.storageConfig.copy(autoDeleteWatched = autoDelete))
+        _uiState.update { current ->
+            current.copy(
+                storageConfig = current.storageConfig.copy(autoDeleteWatched = autoDelete),
+                toastMessage = if (autoDelete) "Auto-delete completed titles ON" else "Auto-delete OFF"
+            )
         }
     }
 
     fun requestProfileSwitch(target: ProfileType) {
         if (target == ProfileType.ADULT && !_uiState.value.adultUnlocked) {
-            _uiState.update { it.copy(showPinDialogFor = ProfileType.ADULT) }
+            _uiState.update { it.copy(showPinDialogFor = target) }
             return
         }
         _uiState.update {
             it.copy(
                 activeProfile = target,
-                adultUnlocked = target == ProfileType.ADULT,
                 toastMessage = "Switched to ${target.label}"
             )
         }
     }
 
     fun verifyPinAndUnlock(pin: String): Boolean {
-        val current = _uiState.value
-        return if (pin == current.parentalPin) {
+        return if (pin == _uiState.value.parentalPin) {
+            prefs.adultContentEnabled = true
             _uiState.update {
                 it.copy(
-                    activeProfile = current.showPinDialogFor ?: ProfileType.ADULT,
                     adultUnlocked = true,
+                    activeProfile = ProfileType.ADULT,
                     showPinDialogFor = null,
-                    toastMessage = "18+ PIN verified"
+                    toastMessage = "Adult profile unlocked"
                 )
             }
             true
-        } else {
-            false
-        }
+        } else false
     }
 
     fun dismissPinDialog() {
@@ -269,15 +385,15 @@ class FlixvoraViewModel : ViewModel() {
     }
 
     fun setAccentTheme(theme: FlixvoraAccentTheme) {
-        _uiState.update { it.copy(accentTheme = theme, toastMessage = "Theme set to ${theme.label}") }
+        _uiState.update { it.copy(accentTheme = theme, toastMessage = "Theme applied: ${theme.label}") }
     }
 
     fun toggleTvMode() {
-        _uiState.update {
-            val next = !it.isTvMode
-            it.copy(
+        _uiState.update { current ->
+            val next = !current.isTvMode
+            current.copy(
                 isTvMode = next,
-                toastMessage = if (next) "Android TV 10-Foot Leanback Mode active" else "Returned to Mobile UI"
+                toastMessage = if (next) "Android TV 10-Foot Mode active" else "Returned to Mobile UI"
             )
         }
     }
@@ -287,8 +403,7 @@ class FlixvoraViewModel : ViewModel() {
             val next = !current.backgroundAudioEnabled
             current.copy(
                 backgroundAudioEnabled = next,
-                miniPlayerSession = if (!next) null else current.miniPlayerSession,
-                toastMessage = if (next) "Background Audio & MediaSession enabled" else "Background Audio disabled"
+                toastMessage = if (next) "Background Audio Enabled" else "Background Audio Disabled"
             )
         }
     }
@@ -298,7 +413,7 @@ class FlixvoraViewModel : ViewModel() {
             it.copy(
                 traktConnected = true,
                 traktLastSync = "Just now",
-                toastMessage = "Synced watch history & recommendations with Trakt.tv"
+                toastMessage = "Trakt watchlist & history synced"
             )
         }
     }
@@ -309,7 +424,7 @@ class FlixvoraViewModel : ViewModel() {
             val next = if (added) current.remindedReleases + id else current.remindedReleases - id
             current.copy(
                 remindedReleases = next,
-                toastMessage = if (added) "Release alert set for $title" else "Removed reminder for $title"
+                toastMessage = if (added) "Reminder set for $title" else "Removed reminder for $title"
             )
         }
     }
@@ -317,6 +432,21 @@ class FlixvoraViewModel : ViewModel() {
     fun startPlayback(session: PlayerSession) {
         _uiState.update {
             it.copy(activePlayerSession = session, miniPlayerSession = null)
+        }
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val playInfo = repository.getPlayInfo(session.title, 0, 0)
+                val streamUrl = playInfo.streamList.firstOrNull()?.url
+                if (!streamUrl.isNullOrBlank()) {
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { current ->
+                            current.activePlayerSession?.let { active ->
+                                current.copy(activePlayerSession = active.copy(durationSeconds = 7200))
+                            } ?: current
+                        }
+                    }
+                }
+            } catch (_: Exception) {}
         }
     }
 
@@ -327,13 +457,13 @@ class FlixvoraViewModel : ViewModel() {
     fun minimizeToBackgroundAudio() {
         _uiState.update { current ->
             if (!current.backgroundAudioEnabled) {
-                return@update current.copy(toastMessage = "Enable Background Audio in Me → Settings first")
+                return@update current.copy(toastMessage = "Enable Background Audio in Me first")
             }
             current.copy(
                 miniPlayerSession = current.activePlayerSession,
                 activePlayerSession = null,
                 miniPlayerPlaying = true,
-                toastMessage = "Background Audio Mode active via MediaSessionService"
+                toastMessage = "Background Audio Mode active"
             )
         }
     }
@@ -358,24 +488,18 @@ class FlixvoraViewModel : ViewModel() {
         _uiState.update { current ->
             current.copy(
                 activeSourceId = source.id,
-                activePlayerSession = current.activePlayerSession?.copy(
-                    subtitle = "${source.protocol} · ${source.quality}"
-                ),
-                toastMessage = "Switched stream mirror: ${source.name}"
+                toastMessage = "Switched to ${source.label} (${source.resolution})"
             )
         }
     }
 
     fun simulateStreamFailover() {
-        _uiState.update { current ->
-            val idx = current.streamSources.indexOfFirst { it.id == current.activeSourceId }.coerceAtLeast(0)
-            val next = current.streamSources[(idx + 1) % current.streamSources.size]
-            current.copy(
+        val sources = _uiState.value.streamSources
+        val next = sources.firstOrNull { it.id != _uiState.value.activeSourceId } ?: sources.first()
+        _uiState.update {
+            it.copy(
                 activeSourceId = next.id,
-                activePlayerSession = current.activePlayerSession?.copy(
-                    subtitle = "${next.protocol} · ${next.quality}"
-                ),
-                toastMessage = "Auto-failover switched seamlessly to ${next.name}"
+                toastMessage = "Failover: Auto-routed to ${next.label} (${next.latencyMs}ms)"
             )
         }
     }
@@ -385,21 +509,19 @@ class FlixvoraViewModel : ViewModel() {
     }
 
     fun addComment(titleId: String, body: String, hasSpoiler: Boolean) {
-        val clean = body.trim()
-        if (clean.isEmpty()) return
-        val comment = CommentItem(
-            id = "c-${System.currentTimeMillis()}",
-            author = "Flixvora Member",
-            timestamp = "Just now",
-            body = clean,
+        val newComment = CommentItem(
+            id = "c_${System.currentTimeMillis()}",
+            author = "You",
+            timeAgo = "Just now",
+            body = body,
             hasSpoiler = hasSpoiler,
-            likes = 1
+            upvotes = 1
         )
         _uiState.update { current ->
-            val existing = current.commentsByTitle[titleId].orEmpty()
+            val list = current.commentsByTitle[titleId].orEmpty()
             current.copy(
-                commentsByTitle = current.commentsByTitle + (titleId to (listOf(comment) + existing)),
-                toastMessage = "Posted comment"
+                commentsByTitle = current.commentsByTitle + (titleId to (listOf(newComment) + list)),
+                toastMessage = "Comment posted"
             )
         }
     }

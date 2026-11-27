@@ -234,6 +234,7 @@ fun FlixvoraApp(
                                 )
 
                                 MainNavTab.LIVE_TV -> LiveTvScreen(
+                                    channels = uiState.displayChannels,
                                     backgroundAudioEnabled = uiState.backgroundAudioEnabled,
                                     onWatchChannel = { ch ->
                                         viewModel.startPlayback(
