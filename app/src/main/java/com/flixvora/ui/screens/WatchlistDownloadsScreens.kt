@@ -36,7 +36,9 @@ fun WatchlistScreen(
     onClearAll: () -> Unit
 ) {
     val accent = LocalAccentTheme.current
-    val saved = uiState.safeCatalog.filter { uiState.watchlist.contains(it.id) }
+    val saved = uiState.watchlistItems.ifEmpty {
+        uiState.safeCatalog.filter { uiState.watchlist.contains(it.id) }
+    }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

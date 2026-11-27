@@ -152,7 +152,9 @@ data class StreamSource(
     val quality: String,
     val pingMs: Int,
     val bitrateMbps: Float,
-    val isPrimary: Boolean = false
+    val isPrimary: Boolean = false,
+    val url: String = "",
+    val headers: Map<String, String> = emptyMap()
 )
 
 data class CommentItem(
@@ -185,5 +187,32 @@ data class PlayerSession(
     val tmdbId: Int,
     val audioTracks: List<AudioTrackMetadata>,
     val isLive: Boolean = false,
-    val introEndSeconds: Int = 85
+    val introEndSeconds: Int = 85,
+    /** Resolved, playable media URL (HLS/DASH/MP4). Empty means unresolved. */
+    val streamUrl: String = "",
+    val subtitleUrl: String? = null,
+    /** Extra HTTP headers required by the CDN (Cookie, Referer, Origin...). */
+    val headers: Map<String, String> = emptyMap(),
+    val subjectId: String = "",
+    val season: Int = 0,
+    val episode: Int = 0
+)
+
+/** One real, titled row of the home feed (e.g. "Trending Movies"). */
+data class CatalogRail(
+    val id: String,
+    val title: String,
+    val items: List<MediaTitle>
+)
+
+/** Real update state sourced from GitHub Releases. */
+data class AppUpdateState(
+    val currentVersion: String = "",
+    val latestVersion: String? = null,
+    val isChecking: Boolean = false,
+    val isUpdateAvailable: Boolean = false,
+    val releaseUrl: String? = null,
+    val apkUrl: String? = null,
+    val notes: String? = null,
+    val message: String? = null
 )

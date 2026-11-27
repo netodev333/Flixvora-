@@ -121,32 +121,9 @@ fun FlixvoraApp(
                     uiState.isTvMode -> {
                         TvLeanbackScreen(
                             catalog = uiState.safeCatalog,
-                            onPlayTitle = { item ->
-                                viewModel.startPlayback(
-                                    PlayerSession(
-                                        title = item.title,
-                                        subtitle = "${item.year} · ${item.quality}",
-                                        backdropUrl = item.backdropUrl,
-                                        durationSeconds = 7200,
-                                        tmdbId = item.tmdbId,
-                                        audioTracks = item.audioTracks,
-                                        introEndSeconds = item.introEndSeconds
-                                    )
-                                )
-                            },
-                            onWatchChannel = { ch ->
-                                viewModel.startPlayback(
-                                    PlayerSession(
-                                        title = ch.name,
-                                        subtitle = "CH ${ch.number} · ${ch.currentProgram}",
-                                        backdropUrl = ch.previewUrl,
-                                        durationSeconds = 3600,
-                                        tmdbId = 900101,
-                                        audioTracks = SampleCatalog.defaultMovieTracks,
-                                        isLive = true
-                                    )
-                                )
-                            },
+                            channels = uiState.displayChannels,
+                            onPlayTitle = { item -> viewModel.playTitle(item) },
+                            onWatchChannel = { ch -> viewModel.playChannel(ch) },
                             onExitTvMode = { viewModel.toggleTvMode() }
                         )
                     }
@@ -159,37 +136,16 @@ fun FlixvoraApp(
                             comments = uiState.commentsByTitle[detail.id].orEmpty(),
                             shareUrl = viewModel.buildDeepLinkUrl(detail.id),
                             onBack = { viewModel.closeDetail() },
-                            onPlay = {
-                                viewModel.startPlayback(
-                                    PlayerSession(
-                                        title = detail.title,
-                                        subtitle = "${detail.year} · ${detail.quality}",
-                                        backdropUrl = detail.backdropUrl,
-                                        durationSeconds = 7200,
-                                        tmdbId = detail.tmdbId,
-                                        audioTracks = detail.audioTracks,
-                                        introEndSeconds = detail.introEndSeconds
-                                    )
-                                )
-                            },
-                            onPlayEpisode = { seasonNum, ep ->
-                                viewModel.startPlayback(
-                                    PlayerSession(
-                                        title = "${detail.title} · S${seasonNum}E${ep.number}",
-                                        subtitle = ep.title,
-                                        backdropUrl = detail.backdropUrl,
-                                        durationSeconds = 1800,
-                                        tmdbId = detail.tmdbId,
-                                        audioTracks = detail.audioTracks,
-                                        introEndSeconds = detail.introEndSeconds
-                                    )
-                                )
-                            },
+                            recommendations = uiState.detailRecommendations,
+                            downloadQualities = uiState.detailQualities,
+                            onOpenRecommendation = { viewModel.openDetail(it) },
+                            onPlay = { viewModel.playTitle(detail) },
+                            onPlayEpisode = { seasonNum, ep -> viewModel.playEpisode(detail, seasonNum, ep) },
                             onDownloadQuality = { qualityLabel, sizeMb ->
                                 viewModel.enqueueDownload(detail, qualityLabel, sizeMb)
                             },
                             onDownloadEpisode = { seasonNum, ep ->
-                                viewModel.enqueueDownload(detail, "S$seasonNum · Ep ${ep.number} · ${ep.title}", ep.sizeMb)
+                                viewModel.enqueueEpisodeDownload(detail, seasonNum, ep)
                             },
                             onToggleWatchlist = { viewModel.toggleWatchlist(detail.id) },
                             onOpenWatchParty = { viewModel.openWatchParty(detail) },
@@ -208,6 +164,7 @@ fun FlixvoraApp(
                             when (tab) {
                                 MainNavTab.HOME -> HomeScreen(
                                     uiState = uiState,
+                                    onRefresh = { viewModel.refresh() },
                                     onSearchChange = { viewModel.updateSearchQuery(it) },
                                     onSelectCategory = { viewModel.setCategory(it) },
                                     onSelectGenre = { viewModel.setGenre(it) },
@@ -216,19 +173,7 @@ fun FlixvoraApp(
                                     onSyncTrakt = { viewModel.syncTrakt() },
                                     onToggleReminder = { rel -> viewModel.toggleComingSoonReminder(rel.id, rel.title) },
                                     onToggleWatchlist = { viewModel.toggleWatchlist(it) },
-                                    onPlayTitle = { item ->
-                                        viewModel.startPlayback(
-                                            PlayerSession(
-                                                title = item.title,
-                                                subtitle = "${item.year} · ${item.quality}",
-                                                backdropUrl = item.backdropUrl,
-                                                durationSeconds = 7200,
-                                                tmdbId = item.tmdbId,
-                                                audioTracks = item.audioTracks,
-                                                introEndSeconds = item.introEndSeconds
-                                            )
-                                        )
-                                    },
+                                    onPlayTitle = { item -> viewModel.playTitle(item) },
                                     onDownloadTitle = { item -> viewModel.enqueueDownload(item) },
                                     onOpenDetail = { viewModel.openDetail(it) }
                                 )
@@ -236,51 +181,14 @@ fun FlixvoraApp(
                                 MainNavTab.LIVE_TV -> LiveTvScreen(
                                     channels = uiState.displayChannels,
                                     backgroundAudioEnabled = uiState.backgroundAudioEnabled,
-                                    onWatchChannel = { ch ->
-                                        viewModel.startPlayback(
-                                            PlayerSession(
-                                                title = ch.name,
-                                                subtitle = "CH ${ch.number} · ${ch.currentProgram}",
-                                                backdropUrl = ch.previewUrl,
-                                                durationSeconds = 3600,
-                                                tmdbId = 900101,
-                                                audioTracks = SampleCatalog.defaultMovieTracks,
-                                                isLive = true
-                                            )
-                                        )
-                                    },
-                                    onPlayAudioCommentary = { ch ->
-                                        viewModel.startPlayback(
-                                            PlayerSession(
-                                                title = "${ch.name} (Audio Commentary)",
-                                                subtitle = "CH ${ch.number} · ${ch.currentProgram}",
-                                                backdropUrl = ch.previewUrl,
-                                                durationSeconds = 3600,
-                                                tmdbId = 900101,
-                                                audioTracks = SampleCatalog.defaultMovieTracks,
-                                                isLive = true
-                                            )
-                                        )
-                                        viewModel.minimizeToBackgroundAudio()
-                                    }
+                                    onWatchChannel = { ch -> viewModel.playChannel(ch) },
+                                    onPlayAudioCommentary = { ch -> viewModel.playChannel(ch) }
                                 )
 
                                 MainNavTab.WATCHLIST -> WatchlistScreen(
                                     uiState = uiState,
                                     onOpenDetail = { viewModel.openDetail(it) },
-                                    onPlayTitle = { item ->
-                                        viewModel.startPlayback(
-                                            PlayerSession(
-                                                title = item.title,
-                                                subtitle = "${item.year} · ${item.quality}",
-                                                backdropUrl = item.backdropUrl,
-                                                durationSeconds = 7200,
-                                                tmdbId = item.tmdbId,
-                                                audioTracks = item.audioTracks,
-                                                introEndSeconds = item.introEndSeconds
-                                            )
-                                        )
-                                    },
+                                    onPlayTitle = { item -> viewModel.playTitle(item) },
                                     onRemoveWatchlist = { viewModel.toggleWatchlist(it) },
                                     onClearAll = { viewModel.clearWatchlist() }
                                 )
@@ -305,7 +213,8 @@ fun FlixvoraApp(
                                     onToggleAutoDelete = { viewModel.updateAutoDeleteWatched(it) },
                                     onClearTempCache = { viewModel.clearTempMediaCacheOnly() },
                                     onClearDownloads = { viewModel.clearDownloads() },
-                                    onCheckUpdates = { viewModel.showToast("Flixvora v4.2.0 is up to date via GitHub Releases") }
+                                    onCheckUpdates = { viewModel.checkForUpdates(isManual = true) },
+                                    onDownloadUpdate = { viewModel.downloadUpdate() }
                                 )
                             }
                         }
@@ -316,21 +225,19 @@ fun FlixvoraApp(
 
         // Fullscreen ExoPlayer Overlay
         uiState.activePlayerSession?.let { session ->
-            VideoPlayerOverlay(
+            RealPlayerOverlay(
                 session = session,
-                backgroundAudioEnabled = uiState.backgroundAudioEnabled,
                 onClose = { viewModel.closePlayer() },
                 onEnterPip = onEnterPictureInPicture,
-                onOpenSourceResolver = { viewModel.setStreamResolverOpen(true) },
-                onMinimizeToBackground = { viewModel.minimizeToBackgroundAudio() },
-                onNotify = { viewModel.showToast(it) }
+                onNotify = { viewModel.showToast(it) },
+                onProgress = { position, duration -> viewModel.saveProgress(session, position, duration) }
             )
         }
 
         // Multi-Source Backup Stream Resolver Modal
         if (uiState.showStreamResolver) {
-            val activeTitle = uiState.activePlayerSession?.title ?: uiState.selectedDetail?.title ?: "Skyfall Citadel"
-            val activeTmdb = uiState.activePlayerSession?.tmdbId ?: uiState.selectedDetail?.tmdbId ?: 948210
+            val activeTitle = uiState.activePlayerSession?.title ?: uiState.selectedDetail?.title ?: "Stream sources"
+            val activeTmdb = uiState.activePlayerSession?.tmdbId ?: uiState.selectedDetail?.tmdbId ?: 0
             StreamResolverSheet(
                 mediaTitle = activeTitle,
                 tmdbId = activeTmdb,
@@ -356,17 +263,7 @@ fun FlixvoraApp(
                 title = title,
                 onStartWatchParty = {
                     viewModel.openWatchParty(null)
-                    viewModel.startPlayback(
-                        PlayerSession(
-                            title = "${title.title} (Watch Party)",
-                            subtitle = "Synced Room FX-8492 · ${title.quality}",
-                            backdropUrl = title.backdropUrl,
-                            durationSeconds = 7200,
-                            tmdbId = title.tmdbId,
-                            audioTracks = title.audioTracks,
-                            introEndSeconds = title.introEndSeconds
-                        )
-                    )
+                    viewModel.playTitle(title)
                 },
                 onDismiss = { viewModel.openWatchParty(null) }
             )

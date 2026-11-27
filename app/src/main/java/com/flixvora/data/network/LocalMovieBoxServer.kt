@@ -1261,18 +1261,7 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                             }
 
                             if (suggestions.isEmpty()) {
-                                suggestions = listOf(
-                                    "Deadpool & Wolverine",
-                                    "Dune: Part Two",
-                                    "Loki",
-                                    "Stranger Things",
-                                    "House of the Dragon",
-                                    "Oppenheimer",
-                                    "The Boys",
-                                    "Avengers: Endgame",
-                                    "Breaking Bad",
-                                    "Spider-Man: Across the Spider-Verse"
-                                )
+                                suggestions = emptyList()
                             }
 
                             val responseBody = mapOf(
@@ -1290,18 +1279,7 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                     } catch (e: Exception) {
                         Log.w("LocalMovieBoxServer", "Search-suggestions fallback triggered: ${e.message}")
 
-                        var fallbackSuggestions = listOf(
-                            "Deadpool & Wolverine",
-                            "Dune: Part Two",
-                            "Loki",
-                            "Stranger Things",
-                            "House of the Dragon",
-                            "Oppenheimer",
-                            "The Boys",
-                            "Avengers: Endgame",
-                            "Breaking Bad",
-                            "Spider-Man: Across the Spider-Verse"
-                        )
+                        var fallbackSuggestions = emptyList<String>()
 
                         try {
                             val trendRaw = makeOfficialRequest("POST", "/wefeed-mobile-bff/subject-api/trending/v2", emptyMap(), "{}")
@@ -1472,40 +1450,8 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
                         Pair(200, toJsonString(responseBody))
 
                     } catch (e: Exception) {
-                        Log.w("LocalMovieBoxServer", "Detail fallback triggered: ${e.message}")
-
-                        val mockTrending = getMockTrending()
-                        val mockMovie = mockTrending.find { it["subjectId"] == subjectId }
-                            ?: mockTrending.firstOrNull()
-                            ?: return Pair(404, "{\"code\": 1, \"msg\": \"Not found\"}")
-
-                        val mutableMapped = mockMovie.toMutableMap()
-
-                        mutableMapped["cast"] = listOf(
-
-                            mapOf("name" to "Keanu Reeves", "role" to "Neo", "avatar" to "https://image.tmdb.org/t/p/w500/b9v69EMT2g7uY78MKg6Y67688v6.jpg"),
-
-                            mapOf("name" to "Carrie-Anne Moss", "role" to "Trinity", "avatar" to "https://image.tmdb.org/t/p/w500/8gRE3687bcu6797hY0A1vGZ6P6V.jpg")
-
-                        )
-
-                        mutableMapped["languages"] = listOf(
-
-                            mapOf("id" to "sub_en", "subjectId" to subjectId, "name" to "English Dub", "type" to "dub"),
-
-                            mapOf("id" to "res_hd", "subjectId" to subjectId, "name" to "Google Resource (1080p)", "type" to "resource")
-
-                        )
-
-                        val responseBody = mapOf(
-
-                            "code" to 0,
-
-                            "data" to mutableMapped
-
-                        )
-
-                        Pair(200, toJsonString(responseBody))
+                        Log.w("LocalMovieBoxServer", "Detail request failed: ${e.message}")
+                        Pair(500, "{\"code\": 1, \"msg\": \"Detail unavailable\"}")
 
                     }
 
@@ -3691,139 +3637,6 @@ class LocalMovieBoxServer(private val context: Context, private val port: Int = 
 
     }
 
-    private fun getMockTrending(): List<Map<String, Any?>> {
-        return listOf(
-
-            mapOf(
-
-                "subjectId" to "11059",
-
-                "id" to "11059",
-
-                "title" to "The Matrix Resurrections",
-
-                "cover" to "https://image.tmdb.org/t/p/w500/8cZ1777vX6Y1RLuSgEpY66i9d6y.jpg",
-
-                "poster" to "https://image.tmdb.org/t/p/w500/8cZ1777vX6Y1RLuSgEpY66i9d6y.jpg",
-
-                "score" to "7.2",
-
-                "releaseTime" to "2021",
-
-                "subjectType" to 1,
-
-                "runtime" to "148 mins",
-
-                "description" to "Return to a world of two realities: one, everyday life; the other, what lies behind it. To find out if his reality is a physical or mental construct, to truly know himself, Mr. Anderson will have to choose to follow the white rabbit once more."
-
-            ),
-
-            mapOf(
-
-                "subjectId" to "10543",
-
-                "id" to "10543",
-
-                "title" to "Spider-Man: No Way Home",
-
-                "cover" to "https://image.tmdb.org/t/p/w500/1g0dhvJI6H9Ygjr6YvA1vGZ6P6V.jpg",
-
-                "poster" to "https://image.tmdb.org/t/p/w500/1g0dhvJI6H9Ygjr6YvA1vGZ6P6V.jpg",
-
-                "score" to "8.7",
-
-                "releaseTime" to "2021",
-
-                "subjectType" to 1,
-
-                "runtime" to "148 mins",
-
-                "description" to "Peter Parker is unmasked and no longer able to separate his normal life from the high-stakes of being a super-hero. When he asks for help from Doctor Strange the stakes become even more dangerous, forcing him to discover what it truly means to be Spider-Man."
-
-            ),
-
-            mapOf(
-
-                "subjectId" to "11382",
-
-                "id" to "11382",
-
-                "title" to "Dune: Part Two",
-
-                "cover" to "https://image.tmdb.org/t/p/w500/cz062Sg88Vv6RAsmY8g8b0GgX6n.jpg",
-
-                "poster" to "https://image.tmdb.org/t/p/w500/cz062Sg88Vv6RAsmY8g8b0GgX6n.jpg",
-
-                "score" to "8.9",
-
-                "releaseTime" to "2024",
-
-                "subjectType" to 1,
-
-                "runtime" to "166 mins",
-
-                "description" to "Follow the mythic journey of Paul Atreides as he unites with Chani and the Fremen while on a path of revenge against the conspirators who destroyed his family."
-
-            ),
-
-            mapOf(
-
-                "subjectId" to "11500",
-
-                "id" to "11500",
-
-                "title" to "Oppenheimer",
-
-                "cover" to "https://image.tmdb.org/t/p/w500/8Gxv2gSjdhY7WbgSg1f07st662B.jpg",
-
-                "poster" to "https://image.tmdb.org/t/p/w500/8Gxv2gSjdhY7WbgSg1f07st662B.jpg",
-
-                "score" to "8.6",
-
-                "releaseTime" to "2023",
-
-                "subjectType" to 1,
-
-                "runtime" to "180 mins",
-
-                "description" to "The story of American scientist J. Robert Oppenheimer and his role in the development of the atomic bomb."
-
-            ),
-
-            mapOf(
-
-                "subjectId" to "11650",
-
-                "id" to "11650",
-
-                "title" to "Interstellar",
-
-                "cover" to "https://image.tmdb.org/t/p/w500/gEU2Qv6Xg77DJ9v3vG6mI80m2fN.jpg",
-
-                "poster" to "https://image.tmdb.org/t/p/w500/gEU2Qv6Xg77DJ9v3vG6mI80m2fN.jpg",
-
-                "score" to "8.7",
-
-                "releaseTime" to "2014",
-
-                "subjectType" to 1,
-
-                "runtime" to "169 mins",
-
-                "description" to "The adventures of a group of explorers who make use of a newly discovered wormhole to surpass the limitations on human space travel and conquer the vast distances involved in an interstellar voyage."
-
-            )
-
-        )
-
-    }
-
-    /**
-     * Only bodies that carry real data are worth caching. Error payloads (a
-     * 406 "find no content", a 400 params error, an expired token) must not be
-     * kept, otherwise a transient upstream failure is replayed to the user for
-     * the whole cache window even after the upstream recovers.
-     */
     private fun isSuccessBody(body: String): Boolean {
         if (body.contains("Internal Server Error")) return false
         if (body.contains("JWT token has expired")) return false

@@ -38,7 +38,8 @@ fun MeProfileScreen(
     onToggleAutoDelete: (Boolean) -> Unit,
     onClearTempCache: () -> Unit,
     onClearDownloads: () -> Unit,
-    onCheckUpdates: () -> Unit
+    onCheckUpdates: () -> Unit,
+    onDownloadUpdate: () -> Unit = {}
 ) {
     val accent = LocalAccentTheme.current
     val watchHours = String.format("%.1f hrs", uiState.storageConfig.watchMinutesTotal / 60f)
@@ -221,7 +222,12 @@ fun MeProfileScreen(
                 }
 
                 Row(
-                    modifier = Modifier.fillMaxWidth().clickable { onCheckUpdates() }.padding(vertical = 4.dp),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable {
+                            if (uiState.update.isUpdateAvailable) onDownloadUpdate() else onCheckUpdates()
+                        }
+                        .padding(vertical = 4.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -230,10 +236,28 @@ fun MeProfileScreen(
                         Spacer(Modifier.width(10.dp))
                         Column {
                             Text("GitHub OTA Update Check", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.SemiBold)
-                            Text("Flixvora Android Compose v4.2.0", color = TextSecondary, fontSize = 11.sp)
+                            val latest = uiState.update.latestVersion
+                            Text(
+                                if (latest.isNullOrBlank()) "Flixvora v${uiState.update.currentVersion}"
+                                else "Flixvora v${uiState.update.currentVersion} · Latest v$latest",
+                                color = TextSecondary,
+                                fontSize = 11.sp
+                            )
+                            uiState.update.message?.let { msg ->
+                                Text(msg, color = accent.primary, fontSize = 10.sp)
+                            }
                         }
                     }
-                    Text("Check", color = accent.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        when {
+                            uiState.update.isChecking -> "Checking…"
+                            uiState.update.isUpdateAvailable -> "Update"
+                            else -> "Check"
+                        },
+                        color = accent.primary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
         }

@@ -37,6 +37,10 @@ class MovieRepository(
         dao.deleteFavoriteById(id)
     }
 
+    suspend fun clearFavorites() = withContext(Dispatchers.IO) {
+        dao.deleteAllFavorites()
+    }
+
     suspend fun syncFavorites(favorites: List<FavoriteEntity>) = withContext(Dispatchers.IO) {
         dao.syncFavorites(favorites)
     }
@@ -848,35 +852,13 @@ class MovieRepository(
                 if ((response.code == 0 || response.code == 200) && response.data.isNotEmpty()) {
                     response.data
                 } else if (query.isNullOrBlank()) {
-                    listOf(
-                        "Deadpool & Wolverine",
-                        "Dune: Part Two",
-                        "Loki",
-                        "Stranger Things",
-                        "House of the Dragon",
-                        "Oppenheimer",
-                        "The Boys",
-                        "Avengers: Endgame",
-                        "Breaking Bad",
-                        "Spider-Man: Across the Spider-Verse"
-                    )
+                    emptyList()
                 } else {
                     emptyList()
                 }
             } catch (e: Exception) {
                 if (query.isNullOrBlank()) {
-                    listOf(
-                        "Deadpool & Wolverine",
-                        "Dune: Part Two",
-                        "Loki",
-                        "Stranger Things",
-                        "House of the Dragon",
-                        "Oppenheimer",
-                        "The Boys",
-                        "Avengers: Endgame",
-                        "Breaking Bad",
-                        "Spider-Man: Across the Spider-Verse"
-                    )
+                    emptyList()
                 } else {
                     emptyList()
                 }
@@ -936,6 +918,29 @@ class MovieRepository(
                     module.subjects + (module.customData?.items ?: emptyList()).mapNotNull { c -> c.subject }
                 }
                 ?.filterAdultMovies()
+        } ?: emptyList()
+
+    /**
+     * Raw, titled modules of a catalogue tab (e.g. "Trending Now", "Top Series").
+     *
+     * The home UI renders real rails, so it needs the module titles the
+     * catalogue sends instead of one flattened list. Promo rows are dropped by
+     * exact title; matching substrings removed real content rails.
+     */
+    suspend fun getTabOperatingModules(tabId: Int, page: Int = 1): List<CategorySection> =
+        safeExt {
+            it.getTabOperating(tabId, page, 30).data?.items
+                ?.mapNotNull { module ->
+                    val items = module.subjects +
+                        (module.customData?.items ?: emptyList()).mapNotNull { c -> c.subject }
+                    val filtered = items.distinctBy { s -> s.id }.filterAdultMovies()
+                    if (filtered.isEmpty()) null
+                    else CategorySection(
+                        title = module.title.ifBlank { "Tab $tabId" },
+                        type = module.type.ifBlank { "SUBJECTS_MOVIE" },
+                        items = filtered
+                    )
+                }
         } ?: emptyList()
 
     suspend fun getShortsFeed(page: Int = 1): List<PostItem> =

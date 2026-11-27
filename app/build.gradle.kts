@@ -31,12 +31,25 @@ android {
   // Fallback: GitHub releases list endpoint
   val updateManifestUrl2 = (project.findProperty("updateManifestUrl2") as String?) ?: "https://api.github.com/repos/netodev333/Flixvora-/releases"
 
+  // Single source of truth for the version. GitHub Actions reads the same
+  // file to tag the release, so the APK, the release tag and the Me tab can
+  // never drift apart again.
+  val versionProps = Properties().apply {
+    val file = rootProject.file("version.properties")
+    if (file.exists()) file.inputStream().use { load(it) }
+  }
+  val appVersionName = (project.findProperty("versionName") as String?)
+    ?: versionProps.getProperty("versionName", "11.5")
+  val appVersionCode = (project.findProperty("versionCode") as String?)?.toIntOrNull()
+    ?: versionProps.getProperty("versionCode", "64").toIntOrNull()
+    ?: 64
+
   defaultConfig {
     applicationId = "com.flixvora.app"
     minSdk = 24
     targetSdk = 36
-    versionCode = 63
-    versionName = "11.4"
+    versionCode = appVersionCode
+    versionName = appVersionName
 
     buildConfigField("String", "TMDB_API_KEY_1", "\"$tmdbApiKey1\"")
     buildConfigField("String", "TMDB_API_KEY_2", "\"$tmdbApiKey2\"")

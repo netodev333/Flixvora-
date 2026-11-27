@@ -36,6 +36,9 @@ fun DetailScreen(
     inWatchlist: Boolean,
     comments: List<CommentItem>,
     shareUrl: String,
+    recommendations: List<MediaTitle> = emptyList(),
+    downloadQualities: List<String> = emptyList(),
+    onOpenRecommendation: (MediaTitle) -> Unit = {},
     onBack: () -> Unit,
     onPlay: () -> Unit,
     onPlayEpisode: (Int, EpisodeItem) -> Unit,
@@ -226,21 +229,22 @@ fun DetailScreen(
                         verticalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
                         Text("Select Download Quality", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold)
-                        listOf("4K Dolby Vision" to 2640, "1080p High Bitrate" to 1480, "720p Data Saver" to 720).forEach { (q, mb) ->
+                        val options = downloadQualities.ifEmpty { listOf("Auto · Best available") }
+                        options.forEach { quality ->
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clip(RoundedCornerShape(10.dp))
                                     .background(accent.canvas)
                                     .clickable {
-                                        onDownloadQuality(q, mb)
+                                        onDownloadQuality(quality, 0)
                                         showQualitySheet = false
                                     }
                                     .padding(10.dp),
                                 horizontalArrangement = Arrangement.SpaceBetween
                             ) {
-                                Text(q, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
-                                Text("$mb MB", color = accent.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                Text(quality, color = Color.White, fontSize = 12.sp, fontWeight = FontWeight.SemiBold)
+                                Text("Auto", color = accent.primary, fontSize = 12.sp, fontWeight = FontWeight.Bold)
                             }
                         }
                     }
@@ -280,6 +284,51 @@ fun DetailScreen(
                         onPlayEpisode = onPlayEpisode,
                         onDownloadEpisode = onDownloadEpisode
                     )
+                }
+            }
+        }
+
+        // Real catalogue recommendations for this title
+        if (recommendations.isNotEmpty()) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(
+                        "More Like This",
+                        color = Color.White,
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = 16.dp)
+                    )
+                    LazyRow(
+                        contentPadding = PaddingValues(horizontal = 16.dp),
+                        horizontalArrangement = Arrangement.spacedBy(10.dp)
+                    ) {
+                        items(recommendations.take(15), key = { it.id }) { rec ->
+                            Column(
+                                modifier = Modifier
+                                    .width(110.dp)
+                                    .clip(RoundedCornerShape(12.dp))
+                                    .background(accent.surface)
+                                    .border(1.dp, BorderHairline, RoundedCornerShape(12.dp))
+                                    .clickable { onOpenRecommendation(rec) }
+                            ) {
+                                AsyncImage(
+                                    model = rec.posterUrl,
+                                    contentDescription = rec.title,
+                                    contentScale = ContentScale.Crop,
+                                    modifier = Modifier.fillMaxWidth().aspectRatio(3f / 4f)
+                                )
+                                Text(
+                                    rec.title,
+                                    color = Color.White,
+                                    fontSize = 11.sp,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2,
+                                    modifier = Modifier.padding(6.dp)
+                                )
+                            }
+                        }
+                    }
                 }
             }
         }
