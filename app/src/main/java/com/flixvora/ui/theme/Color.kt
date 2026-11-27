@@ -7,27 +7,27 @@ import androidx.compose.ui.graphics.Color
 // Cinematic Dark Theme with Purple, Neon Pink & Cyber Accents
 // ─────────────────────────────────────────────────────────────────────────────
 
-// Brand Colors (Figma Design System v2)
-val FlixPurple = Color(0xFF8B5CF6)
-val FlixPurpleDark = Color(0xFF6D28D9)
-val FlixPurpleLight = Color(0xFFA78BFA)
-val FlixNeonPink = Color(0xFFEC4899)
+// Brand Colors (flixvora-ui.zip Design System)
+val FlixPurple = Color(0xFF1DD171)        // Emerald Neon Primary
+val FlixPurpleDark = Color(0xFF15A859)
+val FlixPurpleLight = Color(0xFF38E586)   // Emerald Bright
+val FlixNeonPink = Color(0xFF89FF5B)      // Highlight
 val FlixNeonBlue = Color(0xFF06B6D4)
-val FlixNeonGreen = Color(0xFF10B981)
+val FlixNeonGreen = Color(0xFF1DD171)
 val FlixOrange = Color(0xFFF59E0B)
 val FlixRed = Color(0xFFEF4444)
 
-// Surface & Dark Canvas
-val BgDeep = Color(0xFF050507)          // Pure deep background
-val BgDark = Color(0xFF0A0A0C)          // Slightly lifted dark background
-val BgCard = Color(0xFF111114)          // Card surface
-val BgCardHover = Color(0xFF18181D)     // Card hover/highlight
-val BgElevated = Color(0xFF16161B)      // Elevated surface (modals/sheets)
-val BgOverlay = Color(0xE6050507)       // Overlay scrim (90% deep)
+// Surface & Dark Canvas (flixvora-ui.zip)
+val BgDeep = Color(0xFF07080B)          // --bg-canvas
+val BgDark = Color(0xFF07080B)          // --bg-canvas
+val BgCard = Color(0xFF101218)          // --bg-surface
+val BgCardHover = Color(0xFF171A23)     // --bg-elevated
+val BgElevated = Color(0xFF171A23)      // --bg-elevated
+val BgOverlay = Color(0xE607080B)       // Overlay scrim
 
 // Borders & Glass
-val BorderSubtle = Color(0xFF1F1F23)
-val BorderBrand = Color(0xFF8B5CF6)
+val BorderSubtle = Color(0x14FFFFFF)    // rgba(255,255,255,0.08)
+val BorderBrand = Color(0xFF1DD171)
 val BorderGlass = Color(0x14FFFFFF)     // 8% white glass border
 
 // Core Canvas aliases
@@ -66,12 +66,12 @@ val AccentGold = FlixOrange
 val CrimsonRed = FlixRed
 val AccentAmber = FlixOrange
 
-// Text ramp
-val TextPrimary = Color(0xFFFFFFFF)
-val TextSecondary = Color(0xFF9CA3AF)
-val TextTertiary = Color(0xFF6B7280)
-val TextDisabled = Color(0xFF374151)
-val TextOnAccent = Color(0xFFFFFFFF)
+// Text ramp (flixvora-ui.zip)
+val TextPrimary = Color(0xFFF8FAFC)
+val TextSecondary = Color(0xFF94A3B8)
+val TextTertiary = Color(0xFF64748B)
+val TextDisabled = Color(0xFF334155)
+val TextOnAccent = Color(0xFF051A0D)
 
 // Semantic feedback
 val SuccessGreen = FlixNeonGreen
